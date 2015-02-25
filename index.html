@@ -116,9 +116,9 @@ function init() {
 	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0f90 } );
 	var materialSide = new THREE.MeshBasicMaterial( { color: 0x009988 } );
 	var materialArray = [ materialFront, materialSide ];
-	var textGeom = new THREE.TextGeometry( "Say hello!", 
+	var textGeom = new THREE.TextGeometry( "Say create *whatever*", 
 	{
-		size: 30, height: 4, curveSegments: 3,
+		size: 28, height: 4, curveSegments: 3,
 		font: "helvetiker", weight: "bold", style: "normal",
 		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
 		material: 0, extrudeMaterial: 1
@@ -142,6 +142,9 @@ function init() {
   	var commands = {
   	  'hello': function() { 
   	  	scene.add(create3DText('Hello!'));
+  	  },
+  	  'create *text': function(text) {
+  	  	scene.add(create3DText(text));
   	  }
   	};
 
