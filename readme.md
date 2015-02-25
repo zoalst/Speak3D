@@ -9,7 +9,7 @@ Built off of the Text3D example in Lee Stemkoski's
 
 ## If you want to run on your server 
 
-	- you'll need [nodejs](http://nodejs.org/) installed.
+You'll need [nodejs](http://nodejs.org/) installed
   - Clone to your machine
   - run npm install from your CLI
   - run node server.js command
