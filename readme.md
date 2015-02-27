@@ -9,17 +9,29 @@ Built off of the Text3D example in Lee Stemkoski's
 
 ## List of Commands
 
-* say 'create cube' w/ optional parameters
+	* say 'create cube' w/ optional parameters
 
-* say 'create ball' w/ optional parameters
+	* say 'create ball' w/ optional parameters
 
-* say 'create floor' w/ optional parameters (only has y coordinate right now)
+	* say 'create floor' w/ optional parameters (only has y coordinate right now)
 
-* say 'create text' then say whatever you want
+	* say 'create text' then say whatever you want
 
-* optional parameters are x (number), y (number), z (number), size (number)
+	* optional parameters are x (number), y (number), z (number), size (number)
 
-* example of parameter usage: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 x 150'
+	* example of parameter usage: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 x 150'
+
+##Usage
+
+	* enunciate all your words clearly
+
+	* leave a pause between commands
+
+	* leave a slight pause between words
+
+	* to use negative numbers you can say 'negative' or 'minus' followed a number, do not pause between these words
+
+	* example (.. will represent a slight pause): say 'create cube .. size .. one hundred fifty .. x .. minus twenty five'
 
 ## If you want to run on your server 
 
@@ -31,31 +43,23 @@ You'll need [nodejs](http://nodejs.org/) installed
   - Allow microphone access
   - Speak to your browser
 
-##Usage
-
-* enunciate all your words clearly
-
-* leave a pause between commands
-
-* leave a slight pause between words
-
-* to use negative numbers you can say 'negative' or 'minus' followed a number, do not pause between these words
-
-* example (.. will represent a slight pause): say 'create cube .. size .. one hundred fifty .. x .. minus twenty five'
-
 ## To Do
 
-* a lot
+	* a lot
 
-* more geometries
+	* more geometries
 
-* add parameters for color, dimensions, rotation, transparent, etc.
+	* add parameters for color, dimensions, rotation, transparent, etc.
 
-* problems with people talking fast
+	* problems with people talking fast
 
-* documentation for usage & list of commands
+	* geometries in motion
 
-* display message when browser does not support speech recognition
+	* ability to manipulate & remove geometries after they are created
+
+	* usage & list of commands
+
+	* display message when browser does not support speech recognition
 
 ## Authors
 

@@ -171,7 +171,7 @@ function render() {
 }
 
 //TODO, add params font, size, colors, coordinates, etc.
-function create3DText(text,x,y,z,size) {
+function create3DText(text) {//,x,y,z,size) {
 	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0f90 } );
 	var materialSide = new THREE.MeshBasicMaterial( { color: 0x009988 } );
 	var materialArray = [ materialFront, materialSide ];
@@ -267,11 +267,12 @@ function parseParams(params) {
 	var paramsArray = params.split(" ");
 	var parsedParams = {};
 	for(var i = 0; i < paramsArray.length-1; i+=2) {
-		//annyang sometimes thinks you are saying 'why' instead of 'y'
 		//mainly happens when y is your first or only coordinate input
-		//also maybe when you say 'y' in a questionly manner
-		//TODO, sometimes it thinks you are saying 'by'
-		if(paramsArray[i].toLowerCase() == 'why') {
+		//annyang sometimes thinks you are saying 'why' instead of 'y'
+		//maybe when you say 'y' in a questionly manner?
+		//sometimes it thinks you are saying 'by'
+		//TODO, something better
+		if(paramsArray[i].toLowerCase() == 'why' || paramsArray[i].toLowerCase() == 'by' ) {
 			parsedParams['y'] = paramsArray[i+1];			
 		}
 		else{
