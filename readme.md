@@ -20,6 +20,7 @@ Built off of the Text3D example in Lee Stemkoski's
 
   - enunciate all your words clearly
   - leave a pause between commands
+  - wait a few seconds to see if anything renders before retrying a command
   - leave a slight pause between words
   - to use negative numbers you can say 'negative' or 'minus' followed a number, do not pause between these words
   - example (.. will represent a slight pause): say 'create cube .. size .. one hundred fifty .. x .. minus twenty five'
@@ -37,11 +38,14 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - a lot
+  - use updated version of three.js
   - more geometries
   - add parameters for color, dimensions, rotation, transparent, etc.
+  - ability to set default parameters
   - problems with people talking fast
   - geometries in motion
   - ability to manipulate & remove geometries after they are created
+  - export function so users can save the world they create
   - usage & list of commands
   - display message when browser does not support speech recognition
 
