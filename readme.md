@@ -1,6 +1,6 @@
 ## Speak3D
 
-Web app that creates 3D text when you speak to your browser 
+Web app that creates 3D stuff when you speak to your browser. 
 Created using [three.js](http://threejs.org) and [annyang.](https://www.talater.com/annyang/) 
 Built off of the Text3D example in Lee Stemkoski's
 [Three.js examples](http://stemkoski.github.io/Three.js/index.html)
@@ -20,6 +20,16 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
 * a lot
+
+* more geometries
+
+* add parameters for color, dimensions, rotation, transparent, etc.
+
+* problems with fast speakers
+
+* usage & list of commands
+
+* display message when browser does not support speech recognition
 
 ## Authors
 

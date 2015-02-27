@@ -1,7 +1,7 @@
 {
   "name": "Speak3D",
   "version": "0.0.1",
-  "description": "Generates 3D text when you speak to your browser",
+  "description": "Generates 3D stuff when you speak to your browser",
   "main": "index.html",
   "keywords": [
     "Three.js",
