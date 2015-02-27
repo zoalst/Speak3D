@@ -114,30 +114,57 @@ function init() {
   	  	scene.add(create3DText('Hello!'));
   	  },
   	  'create ball': function() {
+  	  	console.log('create ball');
   	  	scene.add(createSphere(0,50,0,50));
   	  },
   	  'create ball *params': function(params) {
-  	  	console.log('createball params: '+params);
+  	  	console.log('create ball params: '+params);
   	  	var pp = parseParams(params);
-  	  	scene.add(createSphere(pp['x'],pp['y'],pp['z'],pp['size'],pp['color']));
+  	  	scene.add(createSphere(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
   	  },	  
   	  'create cube': function() {
+  	  	console.log('create cube');
   	  	scene.add(createCube(0,50,0,50));
   	  },
   	  'create cube *params': function(params) {
-  	  	console.log('createcube params: '+params);
+  	  	console.log('create cube params: '+params);
   	  	var pp = parseParams(params);
-  	  	scene.add(createCube(pp['x'],pp['y'],pp['z'],pp['size'],pp['color']));
+  	  	scene.add(createCube(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  },	
+  	  'create ring': function() {
+  	  	console.log('create ring');
+  	  	scene.add(createRing(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create ring *params': function(params) {
+  	  	console.log('create ring params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createRing(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  },
+  	  //TorusKnot, annyang usually picks up 'not' instead of 'knot'
+  	  'create not': function() {
+  	  	console.log('create knot');
+  	  	scene.add(createTorusKnot(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create not *params': function(params) {
+  	  	console.log('create knot params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createTorusKnot(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
   	  },	
 			'create floor': function() {
+  	  	console.log('create floor');
   	  	scene.add(createFloor(-0.5));
   	  },
    	  'create floor *params': function(params) {
-  	  	console.log('createfloor params: '+params);
+  	  	console.log('create floor params: '+params);
   	  	var pp = parseParams(params);
   	  	scene.add(createFloor(pp['y']));
   	  },	
   	  'create text *text': function(text) {
+  	  	console.log('create text: '+text);
   	  	scene.add(create3DText(text));
   	  }
   	};
@@ -197,7 +224,7 @@ function create3DText(text) {//,x,y,z,size) {
 	return textMesh;
 }
 
-function createSphere(x,y,z,size,color) {
+function createSphere(x,y,z,size,color,transparent) {
 	if(x == undefined){
 		x = 0;
 	}
@@ -213,10 +240,17 @@ function createSphere(x,y,z,size,color) {
 	if(color == undefined){
 		color = 0xff000f;
 	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
 	var material = new THREE.MeshPhongMaterial( { 
 		color: color, 
 		ambient: color, //TODO, ambient param
-		transparent: false, 
+		transparent: btrans, 
 		blending: THREE.AdditiveBlending 
 	} );
 	var sphereGeom = new THREE.SphereGeometry(size);
@@ -225,7 +259,7 @@ function createSphere(x,y,z,size,color) {
 	return sphereMesh;
 }
 
-function createCube(x,y,z,size,color) {
+function createCube(x,y,z,size,color,transparent) {
 	if(x == undefined){
 		x = 0;
 	}
@@ -241,16 +275,95 @@ function createCube(x,y,z,size,color) {
 	if(color == undefined){
 		color = 0x44ffff;
 	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
 	var material = new THREE.MeshPhongMaterial( { 
 		color: color, 
 		ambient: color,//TODO ambient param 
-		transparent: false, 
+		transparent: btrans, 
 		blending: THREE.AdditiveBlending 
 	} );
 	var cubeGeom = new THREE.CubeGeometry(size,size,size);
 	var cubeMesh = new THREE.Mesh(cubeGeom, material );	
 	cubeMesh.position.set( x, y, z );
 	return cubeMesh;
+}
+
+function createRing(x,y,z,size,color,transparent) {
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0xffb6c1;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	//RingGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength)
+	var ringGeom = new THREE.RingGeometry(size/5,size);
+	var ringMesh = new THREE.Mesh(ringGeom, material );	
+	ringMesh.position.set( x, y, z );
+	return ringMesh;
+}
+
+function createTorusKnot(x,y,z,size,color,transparent) {
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0xffb6c1;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+  //TorusKnotGeometry(radius, tube, radialSegments, tubularSegments, p, q, heightScale)
+	var torusKnotGeom = new THREE.TorusKnotGeometry(size,size*2/5);
+	var torusKnotMesh = new THREE.Mesh(torusKnotGeom, material );	
+	torusKnotMesh.position.set( x, y, z );
+	return torusKnotMesh;
 }
 
 function createFloor(y) {
@@ -289,6 +402,18 @@ function parseParams(params) {
 		}
 	}
 	return parsedParams;
+}
+
+function convertWordToBoolean(word) {
+	if(word == 'true') {
+		return true;
+	}
+	//do not need to check if user says false because default is set to false right now
+	//TODO, when users can set default parameters this won't work
+	//sometimes annyang thinks I'm saying Falls
+	else {
+		return false;
+	}
 }
 
 //original code from

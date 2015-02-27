@@ -1,53 +1,53 @@
 ## List of Color Names
 
-  -aqua
-  -aquamarine
-  -azure
-  -beige
-  -bisque
-  -black
-  -blue
-  -brown
-  -burlywood
-  -chartreuse
-  -chocolate
-  -coral
-  -crimson
-  -cyan
-  -fuchsia
-  -gainsboro
-  -gold
-  -goldenrod
-  -gray
-  -grey
-  -green
-  -honeydew
-  -indigo
-  -ivory
-  -khaki
-  -lavender
-  -lime
-  -linen
-  -magenta
-  -maroon
-  -navy
-  -olive
-  -orange
-  -orchid
-  -pink
-  -plum
-  -purple
-  -red
-  -salmon
-  -sienna
-  -silver
-  -snow
-  -tan
-  -teal
-  -thistle
-  -tomato
-  -turquoise
-  -violet
-  -wheat
-  -white
-  -yellow
+  - aqua
+  - aquamarine
+  - azure
+  - beige
+  - bisque
+  - black
+  - blue
+  - brown
+  - burlywood
+  - chartreuse
+  - chocolate
+  - coral
+  - crimson
+  - cyan
+  - fuchsia
+  - gainsboro
+  - gold
+  - goldenrod
+  - gray
+  - grey
+  - green
+  - honeydew
+  - indigo
+  - ivory
+  - khaki
+  - lavender
+  - lime
+  - linen
+  - magenta
+  - maroon
+  - navy
+  - olive
+  - orange
+  - orchid
+  - pink
+  - plum
+  - purple
+  - red
+  - salmon
+  - sienna
+  - silver
+  - snow
+  - tan
+  - teal
+  - thistle
+  - tomato
+  - turquoise
+  - violet
+  - wheat
+  - white
+  - yellow
