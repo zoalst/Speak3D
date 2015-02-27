@@ -151,7 +151,7 @@ function init() {
 }
 
 function animate() {
-    requestAnimationFrame( animate );
+  requestAnimationFrame( animate );
 	render();		
 	update();
 }
@@ -213,7 +213,6 @@ function createSphere(x,y,z,size,color) {
 	if(color == undefined){
 		color = 0xff000f;
 	}
-	//var material = new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide } );
 	var material = new THREE.MeshPhongMaterial( { 
 		color: color, 
 		ambient: color, //TODO, ambient param
@@ -242,7 +241,6 @@ function createCube(x,y,z,size,color) {
 	if(color == undefined){
 		color = 0x44ffff;
 	}
-	//var material = new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide } );
 	var material = new THREE.MeshPhongMaterial( { 
 		color: color, 
 		ambient: color,//TODO ambient param 
@@ -295,8 +293,7 @@ function parseParams(params) {
 
 //original code from
 //http://stackoverflow.com/questions/1573053/javascript-function-to-convert-color-names-to-hex-codes
-function colourNameToHex(colour)
-{
+function colourNameToHex(colour) {
 		//TODO, colors with more than one word
     var colours = {
     	//"alice blue":"#f0f8ff",
@@ -383,12 +380,13 @@ function colourNameToHex(colour)
     	"yellow":"#ffff00"//,
     	//"yellowgreen":"#9acd32"
   	};
-
     if (typeof colours[colour.toLowerCase()] != 'undefined')
         return colours[colour.toLowerCase()];
 
     return false;
 }
+//end code from 
+//http://stackoverflow.com/questions/1573053/javascript-function-to-convert-color-names-to-hex-codes
 
 </script>
 

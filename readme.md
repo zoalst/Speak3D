@@ -13,7 +13,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'create ball' w/ optional parameters
   - say 'create floor' w/ optional parameters (only has y coordinate right now)
   - say 'create text' then say whatever you want
-  - optional parameters are x (number), y (number), z (number), size (number)
+  - optional parameters are x (number), y (number), z (number), size (number), color (color name)
   - example of parameter usage: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 x 150'
 
 ##Usage
@@ -35,17 +35,73 @@ You'll need [nodejs](http://nodejs.org/) installed
   - Allow microphone access
   - Speak to your browser
 
+## List of Color Names
+
+  -aqua
+  -aquamarine
+  -azure
+  -beige
+  -bisque
+  -black
+  -blue
+  -brown
+  -burlywood
+  -chartreuse
+  -chocolate
+  -coral
+  -crimson
+  -cyan
+  -fuchsia
+  -gainsboro
+  -gold
+  -goldenrod
+  -gray
+  -grey
+  -green
+  -honeydew
+  -indigo
+  -ivory
+  -khaki
+  -lavender
+  -lime
+  -linen
+  -magenta
+  -maroon
+  -navy
+  -olive
+  -orange
+  -orchid
+  -pink
+  -plum
+  -purple
+  -red
+  -salmon
+  -sienna
+  -silver
+  -snow
+  -tan
+  -teal
+  -thistle
+  -tomato
+  -turquoise
+  -violet
+  -wheat
+  -white
+  -yellow
+
 ## To Do
 
   - a lot
   - use updated version of three.js
   - more geometries
-  - add parameters for color, dimensions, rotation, transparent, etc.
+  - add parameters for dimensions, rotation, transparent, etc.
   - ability to set default parameters
   - problems with people talking fast
   - geometries in motion
   - ability to manipulate & remove geometries after they are created
   - export function so users can save the world they create
+  - more colors
+  - built-in models and user uploaded models
   - usage & list of commands
   - display message when browser does not support speech recognition
 
