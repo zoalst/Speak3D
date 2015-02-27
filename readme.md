@@ -7,6 +7,20 @@ Built off of the Text3D example in Lee Stemkoski's
 
 [Try the Demo on Google Drive](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (only works with Chrome)
 
+## List of Commands
+
+* say 'create cube' w/ optional parameters
+
+* say 'create ball' w/ optional parameters
+
+* say 'create floor' w/ optional parameters (only has y coordinate right now)
+
+* say 'create text' then say whatever you want
+
+* optional parameters are x (number), y (number), z (number), size (number)
+
+* example of parameter usage: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 x 150'
+
 ## If you want to run on your server 
 
 You'll need [nodejs](http://nodejs.org/) installed
@@ -17,6 +31,18 @@ You'll need [nodejs](http://nodejs.org/) installed
   - Allow microphone access
   - Speak to your browser
 
+##Usage
+
+* enunciate all your words clearly
+
+* leave a pause between commands
+
+* leave a slight pause between words
+
+* to use negative numbers you can say 'negative' or 'minus' followed a number, do not pause between these words
+
+* example (.. will represent a slight pause): say 'create cube .. size .. one hundred fifty .. x .. minus twenty five'
+
 ## To Do
 
 * a lot
@@ -25,9 +51,9 @@ You'll need [nodejs](http://nodejs.org/) installed
 
 * add parameters for color, dimensions, rotation, transparent, etc.
 
-* problems with fast speakers
+* problems with people talking fast
 
-* usage & list of commands
+* documentation for usage & list of commands
 
 * display message when browser does not support speech recognition
 

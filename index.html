@@ -270,6 +270,7 @@ function parseParams(params) {
 		//annyang sometimes thinks you are saying 'why' instead of 'y'
 		//mainly happens when y is your first or only coordinate input
 		//also maybe when you say 'y' in a questionly manner
+		//TODO, sometimes it thinks you are saying 'by'
 		if(paramsArray[i].toLowerCase() == 'why') {
 			parsedParams['y'] = paramsArray[i+1];			
 		}
