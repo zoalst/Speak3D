@@ -121,54 +121,49 @@ function init() {
   	  //TODO::::over
   	  'create ball': function() {
   	  	console.log('create ball');
-  	  	scene.add(createSphere(0,50,0,50));
+  	  	scene.add(createSphere({x:0,y:50,z:0,size:50}));
   	  },
   	  'create ball *params': function(params) {
   	  	console.log('create ball params: '+params);
-  	  	var pp = parseParams(params);
-  	  	scene.add(createSphere(pp['x'],pp['y'],pp['z'],
-  	  		pp['size'],pp['color'],pp['transparent']));
+  	  	var parsedParams = parseParams(params);
+  	  	scene.add(createSphere(parsedParams));
   	  },	  
   	  'create cube': function() {
   	  	console.log('create cube');
-  	  	scene.add(createCube(0,50,0,50));
+  	  	scene.add(createCube({x:0,y:50,z:0,size:50}));
   	  },
   	  'create cube *params': function(params) {
   	  	console.log('create cube params: '+params);
-  	  	var pp = parseParams(params);
-  	  	scene.add(createCube(pp['x'],pp['y'],pp['z'],
-  	  		pp['size'],pp['color'],pp['transparent']));
+  	  	var parsedParams = parseParams(params);
+  	  	scene.add(createCube(parsedParams));
   	  },	
   	  'create ring': function() {
   	  	console.log('create ring');
-  	  	scene.add(createRing(0,50,0,50,0xffb6c1));
+  	  	scene.add(createRing({x:0,y:50,z:0,size:50,color:0xffb6c1}));
   	  },
   	  'create ring *params': function(params) {
   	  	console.log('create ring params: '+params);
-  	  	var pp = parseParams(params);
-  	  	scene.add(createRing(pp['x'],pp['y'],pp['z'],
-  	  		pp['size'],pp['color'],pp['transparent']));
+  	  	var parsedParams = parseParams(params);
+  	  	scene.add(createRing(parsedParams));
   	  },
   	  //TorusKnot, annyang usually picks up 'not' instead of 'knot'
   	  'create not': function() {
   	  	console.log('create knot');
-  	  	scene.add(createTorusKnot(0,50,0,50,0xffb6c1));
+  	  	scene.add(createTorusKnot({x:0,y:50,z:0,size:50,color:0xffb6c1}));
   	  },
   	  'create not *params': function(params) {
   	  	console.log('create knot params: '+params);
-  	  	var pp = parseParams(params);
-  	  	scene.add(createTorusKnot(pp['x'],pp['y'],pp['z'],
-  	  		pp['size'],pp['color'],pp['transparent']));
+  	  	var parsedParams = parseParams(params);
+  	  	scene.add(createTorusKnot(parsedParams));
   	  },	
   	  'create cylinder': function() {
   	  	console.log('create cylinder');
-  	  	scene.add(createCylinder(0,50,0,50,0xffb6c1));
+  	  	scene.add(createCylinder({x:0,y:50,z:0,size:50,color:0xffb6c1}));
   	  },
   	  'create cylinder *params': function(params) {
   	  	console.log('create cylinder params: '+params);
-  	  	var pp = parseParams(params);
-  	  	scene.add(createCylinder(pp['x'],pp['y'],pp['z'],
-  	  		pp['size'],pp['color'],pp['transparent']));
+  	  	var parsedParams = parseParams(params);
+  	  	scene.add(createCylinder(parsedParams));
   	  },
   	  /*'create octa': function() {
   	  	console.log('create octahedron');
@@ -252,21 +247,21 @@ function init() {
   	  },*/
  			'create floor': function() {
   	  	console.log('create floor');
-  	  	scene.add(createFloor(-0.5));
+  	  	scene.add(createFloor({y:0,size:1000}));
   	  },
    	  'create floor *params': function(params) {
   	  	console.log('create floor params: '+params);
-  	  	var pp = parseParams(params);
-  	  	scene.add(createFloor(pp['y']));
+  	  	var parsedParams = parseParams(params);
+  	  	scene.add(createFloor(parsedParams));
   	  },	
  			'create wall': function() {
   	  	console.log('create wall');
-  	  	scene.add(createWall(-150,500));
+  	  	scene.add(createWall({x:-150,y:500,size:1000}));
   	  },
    	  'create wall *params': function(params) {
   	  	console.log('create wall params: '+params);
-  	  	var pp = parseParams(params);
-  	  	scene.add(createWall(pp['x'],pp['y']));
+  	  	var parsedParams = parseParams(params);
+  	  	scene.add(createWall(parsedParams));
   	  },
    	  'create text *text': function(text) {
   	  	console.log('create text: '+text);
@@ -333,7 +328,13 @@ function create3DText(text) {//,x,y,z,size) {
 	return textMesh;
 }
 
-function createSphere(x,y,z,size,color,transparent) {
+function createSphere(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
 	if(x == undefined){
 		x = 0;
 	}
@@ -368,7 +369,13 @@ function createSphere(x,y,z,size,color,transparent) {
 	return sphereMesh;
 }
 
-function createCube(x,y,z,size,color,transparent) {
+function createCube(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
 	if(x == undefined){
 		x = 0;
 	}
@@ -403,7 +410,13 @@ function createCube(x,y,z,size,color,transparent) {
 	return cubeMesh;
 }
 
-function createRing(x,y,z,size,color,transparent) {
+function createRing(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
 	if(x == undefined){
 		x = 0;
 	}
@@ -439,7 +452,13 @@ function createRing(x,y,z,size,color,transparent) {
 	return ringMesh;
 }
 
-function createTorusKnot(x,y,z,size,color,transparent) {
+function createTorusKnot(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
 	if(x == undefined){
 		x = 0;
 	}
@@ -475,7 +494,13 @@ function createTorusKnot(x,y,z,size,color,transparent) {
 	return torusKnotMesh;
 }
 
-function createCylinder(x,y,z,size,color,transparent) {
+function createCylinder(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
 	if(x == undefined){
 		x = 0;
 	}
@@ -655,12 +680,20 @@ function createIcosahedron(x,y,z,size,color,transparent) {
 	return icosahedronMesh;
 }*/
 
-function createFloor(y) {
+function createFloor(params) {
+	var y = params['y'];
+	var size = params['size'];
+	if(y == undefined){
+		y = 500;
+	}
+	if(size == undefined){
+		size = 1000;
+	}
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 10, 10 );
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	var floorGeometry = new THREE.PlaneGeometry(size, size, 10, 10);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
 	if(y == undefined){
 		y = -0.5;
@@ -670,19 +703,25 @@ function createFloor(y) {
 	return floor;
 }
 
-function createWall(x,y) {
+function createWall(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var size = params['size'];
+	if(x == undefined){
+		x = -150;
+	}
+	if(y == undefined){
+		y = 500;
+	}
+	if(size == undefined){
+		size = 1000;
+	}
 	var wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
 	wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
 	wallTexture.repeat.set( 10, 10 );
 	var wallMaterial = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide } );
-	var wallGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	var wallGeometry = new THREE.PlaneGeometry(size, size, 10, 10);
 	var wall = new THREE.Mesh(wallGeometry, wallMaterial);
-	if(y == undefined){
-		y = 500;
-	}
-	if(x == undefined){
-		x = -150;
-	}
 	wall.position.x = x;
 	wall.position.y = y;
 	//wall.rotation.x = Math.PI / 2;
