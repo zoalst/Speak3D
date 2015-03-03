@@ -104,9 +104,6 @@ function init() {
 	////////////
 	// CUSTOM //
 	////////////
-  	  	  	  	scene.add(createWall(-150,500));
-  	  	scene.add(createWall(150,500));
-  	  	scene.add(createFloor(0));
 
 	//Speech Recognition
 	if (annyang) {
@@ -514,7 +511,7 @@ function createCylinder(x,y,z,size,color,transparent) {
 	return cylinderMesh;
 }
 
-function createOctahedron(x,y,z,size,color,transparent) {
+/*function createOctahedron(x,y,z,size,color,transparent) {
 	if(x == undefined){
 		x = 0;
 	}
@@ -656,7 +653,7 @@ function createIcosahedron(x,y,z,size,color,transparent) {
 	var icosahedronMesh = new THREE.Mesh(icosahedronGeom, material );	
 	icosahedronMesh.position.set( x, y, z );
 	return icosahedronMesh;
-}
+}*/
 
 function createFloor(y) {
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );

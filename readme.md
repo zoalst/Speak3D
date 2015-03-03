@@ -18,7 +18,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'create wall' w/ optional parameters (only has x,y coordinate right now)
   - say 'create text' then say whatever you want
   - optional parameters are x (number), y (number), z (number), size (number), color (color name), transparent (true or false)
-  - parameter usage example: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 x 150'
+  - parameter usage example: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 y 150'
 
 ##Usage
 
