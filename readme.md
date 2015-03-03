@@ -25,6 +25,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - enunciate all your words clearly
   - leave a pause between commands
   - wait a few seconds to see if anything renders before retrying a command
+  - you can look at the console log (ctrl+shift+c) to see if your Speak3D commands and parameters are being picked up properly
   - leave a slight pause between words
   - to use negative numbers you can say 'negative' or 'minus' followed a number, do not pause between these words
   - example (.. represents a slight pause): say 'create cube .. size .. one hundred fifty .. x .. minus twenty five'
@@ -111,6 +112,8 @@ You'll need [nodejs](http://nodejs.org/) installed
   - better debugging
   - usage & list of commands
   - display message when browser does not support speech recognition
+  - cli alternative to send commands
+  - ctrl+z, or something similiar
 
 ## Authors
 

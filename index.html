@@ -54,6 +54,7 @@ var clock = new THREE.Clock();
 // custom global variables
 var cube;
 
+var meshs = {};
 init();
 animate();
 
@@ -266,6 +267,11 @@ function init() {
    	  'create text *text': function(text) {
   	  	console.log('create text: '+text);
   	  	scene.add(create3DText(text));
+  	  },
+  	  'remove *name': function(name) {
+  	  	//TODO, error handling
+  	  	console.log('remove: '+name);
+  	  	scene.remove(meshs[name.toLowerCase()]);
   	  }
   	};
 
@@ -335,6 +341,7 @@ function createSphere(params) {
 	var size = params['size'];
 	var color = params['color'];
 	var transparent = params['transparent'];
+	var name = params['named'];
 	if(x == undefined){
 		x = 0;
 	}
@@ -357,6 +364,9 @@ function createSphere(params) {
 	else{
 		btrans = convertWordToBoolean(transparent);
 	}
+	if(name == undefined){
+		name = 'name'; //TODO unique generic name
+	}
 	var material = new THREE.MeshPhongMaterial( { 
 		color: color, 
 		ambient: color, //TODO, ambient param
@@ -366,6 +376,7 @@ function createSphere(params) {
 	var sphereGeom = new THREE.SphereGeometry(size);
 	var sphereMesh = new THREE.Mesh(sphereGeom, material );	
 	sphereMesh.position.set( x, y, z );
+	meshs[name] = sphereMesh;
 	return sphereMesh;
 }
 
@@ -736,7 +747,6 @@ function createWall(params) {
 //howto do removal/manipulation of geometries
 //--user has to name geometry (otherwise default name, cube1,cube2?), 
 //--user can describe geometry (green transparent cube)
-//gunna need a list of all geometries created
 
   ///////////////////////////////////////
  //METHODS FOR DEALING WITH PARAMETERS//
