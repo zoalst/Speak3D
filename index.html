@@ -106,6 +106,7 @@ function init() {
 	// CUSTOM //
 	////////////
 
+
 	//Speech Recognition
 	if (annyang) {
   	// Let's define our first command. First the text we expect, and then the function it should call
@@ -138,6 +139,14 @@ function init() {
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createCube(parsedParams));
   	  },	
+  	  'create many cubes *params': function(params) {
+  	  	console.log('create many cubes params: '+params);
+  	  	var parsedParams = parseParams(params);
+  	  	var cubes = createManyCubes(parsedParams);
+  	  	for(var i = 0; i < cubes.length; i++) {
+  	  		scene.add(cubes[i]);  	  		
+  	  	}
+  	  },
   	  'create ring': function() {
   	  	console.log('create ring');
   	  	scene.add(createRing({x:0,y:50,z:0,size:50,color:0xffb6c1}));
@@ -739,6 +748,86 @@ function createWall(params) {
 	wall.rotation.y = Math.PI / 2;
 	return wall;
 }
+
+//functions for creating mulitple geometries of the same type with a single command
+function createManyCubes(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
+	var amount = params['amount'];
+	var endx = params['endx'];
+	var endy = params['endy'];
+	var endz = params['endz'];
+	var endsize = params['endsize'];
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0x44ffff;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	if(amount == undefined){
+		amount = 2;
+	}
+	if(endx == undefined){
+		endx = x;
+	}
+	if(endy == undefined){
+		endy = y;
+	}
+	if(endz == undefined){
+		endz = z;
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	var cubeMeshs = [];
+	var divisor = amount - 1;
+	var xIncrement = +(endx-x)/divisor;
+	var yIncrement = +(endy-y)/divisor;
+	var zIncrement = +(endz-z)/divisor;
+	if(endsize == undefined) {
+		var cubeGeom = new THREE.CubeGeometry(size,size,size);
+		for(var i = 0; i < amount; i++) {
+			var cubeMesh = new THREE.Mesh(cubeGeom, material );	
+			cubeMesh.position.set( x+i*xIncrement, y+i*yIncrement, z+i*zIncrement );
+			cubeMeshs[i] = cubeMesh;
+		}
+	}
+	else {
+		var sizeIncrement = (endsize-size)/divisor;
+		var newSize;
+		for(var i = 0; i < amount; i++) {
+			newSize = +size+i*sizeIncrement;
+			var cubeGeom = new THREE.CubeGeometry(newSize,newSize,newSize);
+			var cubeMesh = new THREE.Mesh(cubeGeom, material );	
+			cubeMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			cubeMeshs[i] = cubeMesh;
+		}
+	}
+	return cubeMeshs;
+}
   //////////////////////////////////////////
  //END OF METHODS FOR CREATING GEOMETRIES//
 //////////////////////////////////////////
@@ -756,9 +845,33 @@ function parseParams(params) {
 	//TODO, sometimes negative numbers come in with a space (ex: y - 50)
 	var paramsArray = params.split(" ");
 	var parsedParams = {};
+	var lastParamType = '';
 	for(var i = 0; i < paramsArray.length-1; i+=2) {
 		if(paramsArray[i].toLowerCase() == 'color' || paramsArray[i].toLowerCase() == 'colour') {
 			parsedParams['color'] = colourNameToHex(paramsArray[i+1]);
+			lastParamType = 'color';
+		}
+		else if(paramsArray[i].toLowerCase() == 'x' || paramsArray[i].toLowerCase() == 'y' || paramsArray[i].toLowerCase() == 'z' ) {
+			parsedParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];			
+			lastParamType = paramsArray[i].toLowerCase();
+		}
+		else if(paramsArray[i].toLowerCase() == 'and' || paramsArray[i].toLowerCase() == 'end') {
+			if(lastParamType == 'x'){
+				parsedParams['endx'] = paramsArray[i+1];			
+			}
+			else if(lastParamType == 'y'){
+				parsedParams['endy'] = paramsArray[i+1];			
+			}
+			else if(lastParamType == 'z'){
+				parsedParams['endz'] = paramsArray[i+1];			
+			}
+			else if(lastParamType == 'size'){
+				parsedParams['endsize'] = paramsArray[i+1];
+			}
+			else if(lastParamType == 'color'){
+				parsedParams['endcolor'] = paramsArray[i+1];
+			}
+			lastParamType = '';
 		}
 		//mainly happens when y is your first or only coordinate input
 		//annyang sometimes thinks you are saying 'why' instead of 'y'
@@ -767,9 +880,17 @@ function parseParams(params) {
 		//TODO, something better
 		else if(paramsArray[i].toLowerCase() == 'why' || paramsArray[i].toLowerCase() == 'by' ) {
 			parsedParams['y'] = paramsArray[i+1];			
+			lastParamType = 'y';
+		}
+		//sometimes annyang hears announced instead of amount
+		//TODO, something better
+		else if(paramsArray[i].toLowerCase() == 'announced') {
+		  parsedParams['amount'] = paramsArray[i+1];			
+			lastParamType = 'amount';	
 		}
 		else{
 			parsedParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];			
+			lastParamType = paramsArray[i].toLowerCase();
 		}
 	}
 	return parsedParams;

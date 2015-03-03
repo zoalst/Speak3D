@@ -16,6 +16,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'create cylinder' w/ optional parameters
   - say 'create floor' w/ optional parameters (only has y coordinate right now)
   - say 'create wall' w/ optional parameters (only has x,y coordinate right now)
+  - say 'create many cubes' w/ optional parameters, provide amount param and two params on atleast one axis(x,y, or z) or two size params ex: 'create many cubes amount 5 z 0 and 250' or 'create many cubes amount 5 size 10 and 110 transparent true'
   - say 'create text' then say whatever you want
   - optional parameters are x (number), y (number), z (number), size (number), color (color name), transparent (true or false)
   - parameter usage example: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 y 150'
@@ -97,6 +98,7 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - a lot
+  - undo feature by pressing ctrl+z, or by saying 'undo'
   - use updated version of three.js
   - create multiple geometries with one command
   - more geometries
@@ -113,7 +115,6 @@ You'll need [nodejs](http://nodejs.org/) installed
   - usage & list of commands
   - display message when browser does not support speech recognition
   - cli alternative to send commands
-  - ctrl+z, or something similiar
 
 ## Authors
 
