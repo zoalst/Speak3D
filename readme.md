@@ -13,10 +13,12 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'create ball' w/ optional parameters
   - say 'create ring' w/ optional parameters
   - say 'create knot' w/ optional parameters
+  - say 'create cylinder' w/ optional parameters
   - say 'create floor' w/ optional parameters (only has y coordinate right now)
+  - say 'create wall' w/ optional parameters (only has x,y coordinate right now)
   - say 'create text' then say whatever you want
   - optional parameters are x (number), y (number), z (number), size (number), color (color name), transparent (true or false)
-  - example of parameter usage: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 x 150'
+  - parameter usage example: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 x 150'
 
 ##Usage
 
@@ -25,7 +27,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - wait a few seconds to see if anything renders before retrying a command
   - leave a slight pause between words
   - to use negative numbers you can say 'negative' or 'minus' followed a number, do not pause between these words
-  - example (.. will represent a slight pause): say 'create cube .. size .. one hundred fifty .. x .. minus twenty five'
+  - example (.. represents a slight pause): say 'create cube .. size .. one hundred fifty .. x .. minus twenty five'
 
 ## If you want to run on your server 
 
@@ -95,6 +97,7 @@ You'll need [nodejs](http://nodejs.org/) installed
 
   - a lot
   - use updated version of three.js
+  - create multiple geometries with one command
   - more geometries
   - add parameters for dimensions, rotation, transparent, etc.
   - ability to set default parameters

@@ -104,7 +104,9 @@ function init() {
 	////////////
 	// CUSTOM //
 	////////////
-	
+  	  	  	  	scene.add(createWall(-150,500));
+  	  	scene.add(createWall(150,500));
+  	  	scene.add(createFloor(0));
 
 	//Speech Recognition
 	if (annyang) {
@@ -113,6 +115,13 @@ function init() {
   	  'hello': function() { 
   	  	scene.add(create3DText('Hello!'));
   	  },
+  	  //TODO::::
+  	  //look into just have create ball *params
+  	  //----------------------------------
+  	  //look into just have create *params
+  	  //--will it interpret words way more incorrect? maybe annyang takes "create ball" and really knows it's lloking for ball when otherwise it would choose mall, fall, etc...idk
+  	  //--will it be faster because once annyang has a large list of commands it doesn't really work?
+  	  //TODO::::over
   	  'create ball': function() {
   	  	console.log('create ball');
   	  	scene.add(createSphere(0,50,0,50));
@@ -154,7 +163,97 @@ function init() {
   	  	scene.add(createTorusKnot(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  },	
-			'create floor': function() {
+  	  'create cylinder': function() {
+  	  	console.log('create cylinder');
+  	  	scene.add(createCylinder(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create cylinder *params': function(params) {
+  	  	console.log('create cylinder params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createCylinder(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  },
+  	  /*'create octa': function() {
+  	  	console.log('create octahedron');
+  	  	scene.add(createOctahedron(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create octa *params': function(params) {
+  	  	console.log('create octahedron params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createOctahedron(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  }, 
+  	  'create octahedron': function() {
+  	  	console.log('create octahedron');
+  	  	scene.add(createOctahedron(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create octahedron *params': function(params) {
+  	  	console.log('create octahedron params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createOctahedron(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  }, 
+   	  'create tetra': function() {
+  	  	console.log('create tetrahedron');
+  	  	scene.add(createTetrahedron(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create tetra *params': function(params) {
+  	  	console.log('create tetrahedron params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createTetrahedron(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  },    	  
+  	  'create tetrahedron': function() {
+  	  	console.log('create tetrahedron');
+  	  	scene.add(createTetrahedron(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create tetrahedron *params': function(params) {
+  	  	console.log('create tetrahedron params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createTetrahedron(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  },
+   	  'create dodeca': function() {
+  	  	console.log('create dodecahedron');
+  	  	scene.add(createDodecahedron(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create dodeca *params': function(params) {
+  	  	console.log('create dodecahedron params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createDodecahedron(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  },    	  
+  	  'create dodecahedron': function() {
+  	  	console.log('create dodecahedron');
+  	  	scene.add(createDodecahedron(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create dodecahedron *params': function(params) {
+  	  	console.log('create dodecahedron params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createDodecahedron(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  },
+   	  'create icosa': function() {
+  	  	console.log('create icosahedron');
+  	  	scene.add(createIcosahedron(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create icosa *params': function(params) {
+  	  	console.log('create icosahedron params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createIcosahedron(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  },    	  
+  	  'create icosahedron': function() {
+  	  	console.log('create icosahedron');
+  	  	scene.add(createIcosahedron(0,50,0,50,0xffb6c1));
+  	  },
+  	  'create icosahedron *params': function(params) {
+  	  	console.log('create icosahedron params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createIcosahedron(pp['x'],pp['y'],pp['z'],
+  	  		pp['size'],pp['color'],pp['transparent']));
+  	  },*/
+ 			'create floor': function() {
   	  	console.log('create floor');
   	  	scene.add(createFloor(-0.5));
   	  },
@@ -163,7 +262,16 @@ function init() {
   	  	var pp = parseParams(params);
   	  	scene.add(createFloor(pp['y']));
   	  },	
-  	  'create text *text': function(text) {
+ 			'create wall': function() {
+  	  	console.log('create wall');
+  	  	scene.add(createWall(-150,500));
+  	  },
+   	  'create wall *params': function(params) {
+  	  	console.log('create wall params: '+params);
+  	  	var pp = parseParams(params);
+  	  	scene.add(createWall(pp['x'],pp['y']));
+  	  },
+   	  'create text *text': function(text) {
   	  	console.log('create text: '+text);
   	  	scene.add(create3DText(text));
   	  }
@@ -196,6 +304,10 @@ function update() {
 function render() {
 	renderer.render( scene, camera );
 }
+
+  ///////////////////////////////////
+ //METHODS FOR CREATING GEOMETRIES//
+///////////////////////////////////
 
 //TODO, add params font, size, colors, coordinates, etc.
 function create3DText(text) {//,x,y,z,size) {
@@ -366,6 +478,186 @@ function createTorusKnot(x,y,z,size,color,transparent) {
 	return torusKnotMesh;
 }
 
+function createCylinder(x,y,z,size,color,transparent) {
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0xffb6c1;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	//CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded)
+	var cylinderGeom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
+	var cylinderMesh = new THREE.Mesh(cylinderGeom, material );	
+	cylinderMesh.position.set( x, y, z );
+	return cylinderMesh;
+}
+
+function createOctahedron(x,y,z,size,color,transparent) {
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0xffb6c1;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	//OctahedronGeometry(radius, detail)
+	var octahedronGeom = new THREE.OctahedronGeometry(size);
+	var octahedronMesh = new THREE.Mesh(octahedronGeom, material );	
+	octahedronMesh.position.set( x, y, z );
+	return octahedronMesh;
+}
+
+function createTetrahedron(x,y,z,size,color,transparent) {
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0xffb6c1;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	//TetrahedronGeometry(radius, detail)
+	var tetrahedronGeom = new THREE.TetrahedronGeometry(size);
+	var tetrahedronMesh = new THREE.Mesh(tetrahedronGeom, material );	
+	tetrahedronMesh.position.set( x, y, z );
+	return tetrahedronMesh;
+}
+
+function createDodecahedron(x,y,z,size,color,transparent) {
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0xffb6c1;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	//DodecahedronGeometry(radius, detail)
+	var dodecahedronGeom = new THREE.DodecahedronGeometry(size);
+	var dodecahedronMesh = new THREE.Mesh(dodecahedronGeom, material );	
+	dodecahedronMesh.position.set( x, y, z );
+	return dodecahedronMesh;
+}
+
+function createIcosahedron(x,y,z,size,color,transparent) {
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0xffb6c1;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	//IcosahedronGeometry(radius, detail)
+	var icosahedronGeom = new THREE.IcosahedronGeometry(size);
+	var icosahedronMesh = new THREE.Mesh(icosahedronGeom, material );	
+	icosahedronMesh.position.set( x, y, z );
+	return icosahedronMesh;
+}
+
 function createFloor(y) {
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
@@ -381,8 +673,41 @@ function createFloor(y) {
 	return floor;
 }
 
+function createWall(x,y) {
+	var wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
+	wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
+	wallTexture.repeat.set( 10, 10 );
+	var wallMaterial = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide } );
+	var wallGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	var wall = new THREE.Mesh(wallGeometry, wallMaterial);
+	if(y == undefined){
+		y = 500;
+	}
+	if(x == undefined){
+		x = -150;
+	}
+	wall.position.x = x;
+	wall.position.y = y;
+	//wall.rotation.x = Math.PI / 2;
+	wall.rotation.y = Math.PI / 2;
+	return wall;
+}
+  //////////////////////////////////////////
+ //END OF METHODS FOR CREATING GEOMETRIES//
+//////////////////////////////////////////
+
+//TODO:::::
+//howto do removal/manipulation of geometries
+//--user has to name geometry (otherwise default name, cube1,cube2?), 
+//--user can describe geometry (green transparent cube)
+//gunna need a list of all geometries created
+
+  ///////////////////////////////////////
+ //METHODS FOR DEALING WITH PARAMETERS//
+///////////////////////////////////////
 function parseParams(params) {
 	//TODO, if user speaks too fast comes in with no space (ex: z75)
+	//TODO, sometimes negative numbers come in with a space (ex: y - 50)
 	var paramsArray = params.split(" ");
 	var parsedParams = {};
 	for(var i = 0; i < paramsArray.length-1; i+=2) {
@@ -512,6 +837,11 @@ function colourNameToHex(colour) {
 }
 //end code from 
 //http://stackoverflow.com/questions/1573053/javascript-function-to-convert-color-names-to-hex-codes
+
+
+  //////////////////////////////////////////////
+ //END OF METHODS FOR DEALING WITH PARAMETERS//
+//////////////////////////////////////////////
 
 </script>
 
