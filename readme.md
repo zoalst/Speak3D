@@ -99,24 +99,24 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - a lot
+  - ability to set default parameters for specific geometries 
+  - export function so users can save the world they create
+  - cli alternative to send commands
+  - ability to manipulate & remove existing geometries
   - fix negative number bug(annyang gives a space, ex: y - 100)
   - ctrl+z is buggy
   - use updated version of three.js
-  - more geometries
   - textures
-  - add parameters for dimensions, rotation, transparent, etc.
-  - ability to set default parameters
+  - add parameters for dimensions, rotation, etc.
   - problems with people talking fast
   - geometries in motion
-  - ability to manipulate & remove geometries after they are created
-  - export function so users can save the world they create
+  - more geometries
   - more colors
   - lights, fog, skyBox, etc.
   - built-in models and user uploaded models
   - better debugging
   - usage & list of commands
   - display message when browser does not support speech recognition
-  - cli alternative to send commands
   - refactor
 
 ## Authors

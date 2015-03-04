@@ -39,10 +39,10 @@
 /*
 	Speak3D
 	Author: Zachary Stenger
-	Date: Feb. 2015
+	Date: Feb. & Mar. 2015
+  uses annyang for speech recognition
 	built off of the Text3D example in
 	Three.js "tutorials by example" by Lee Stemkoski
-	using annyang
 */
 
 // MAIN
@@ -52,11 +52,12 @@ var container, scene, camera, renderer, controls, stats;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 // custom global variables
-var cube;
-
+//vars for undoing
 var meshs = [];
 var numberOfMeshs = 0;
 var undoing = false;
+//default parameters
+var defaultGlobalParams = {};
 
 init();
 animate();
@@ -108,6 +109,9 @@ function init() {
 	////////////
 	// CUSTOM //
 	////////////
+
+	initDefaultGlobalParams();
+
 //testEverything();//TODO remove
 
 	//Speech Recognition
@@ -121,12 +125,11 @@ function init() {
   	  //look into just have create sphere *params
   	  //----------------------------------
   	  //look into just have create *params
-  	  //--will it interpret words way more incorrect? maybe annyang takes "create sphere" and really knows it's lloking for sphere when otherwise it would choose another similiar sounding word
+  	  //--will it interpret words way more incorrect? maybe annyang takes "create sphere" and really knows it's l0oking for sphere when otherwise it would choose another similiar sounding word
   	  //--will it be faster because once annyang has a large list of commands it doesn't really work?
-  	  //TODO::::over
   	  'create sphere': function() {
   	  	console.log('create sphere');
-  	  	scene.add(createSphere({x:0,y:50,z:0,size:50}));
+  	  	scene.add(createSphere(defaultGlobalParams));
   	  },
   	  'create sphere *params': function(params) {
   	  	console.log('create sphere params: '+params);
@@ -143,7 +146,7 @@ function init() {
   	  },
    	  'create cube': function() {
   	  	console.log('create cube');
-  	  	scene.add(createCube({x:0,y:50,z:0,size:50}));
+  	  	scene.add(createCube(defaultGlobalParams));
   	  },
   	  'create cube *params': function(params) {
   	  	console.log('create cube params: '+params);
@@ -160,7 +163,7 @@ function init() {
   	  },
   	  'create ring': function() {
   	  	console.log('create ring');
-  	  	scene.add(createRing({x:0,y:50,z:0,size:50,color:0xffb6c1}));
+  	  	scene.add(createRing(defaultGlobalParams));
   	  },
   	  'create ring *params': function(params) {
   	  	console.log('create ring params: '+params);
@@ -178,7 +181,7 @@ function init() {
    	  //TorusKnot, annyang usually picks up 'not' instead of 'knot'
   	  'create not': function() {
   	  	console.log('create knot');
-  	  	scene.add(createTorusKnot({x:0,y:50,z:0,size:50,color:0xffb6c1}));
+  	  	scene.add(createTorusKnot(defaultGlobalParams));
   	  },
   	  'create not *params': function(params) {
   	  	console.log('create knot params: '+params);
@@ -195,7 +198,7 @@ function init() {
   	  },
    	  'create cylinder': function() {
   	  	console.log('create cylinder');
-  	  	scene.add(createCylinder({x:0,y:50,z:0,size:50,color:0xffb6c1}));
+  	  	scene.add(createCylinder(defaultGlobalParams));
   	  },
   	  'create cylinder *params': function(params) {
   	  	console.log('create cylinder params: '+params);
@@ -312,9 +315,17 @@ function init() {
   	  	console.log('create text: '+text);
   	  	scene.add(create3DText(text));
   	  },
+  	  'set default *params': function(params) {
+  	  	console.log('set default: '+params);
+  	  	setDefaultGlobalParams(params);
+  	  },
   	  'undo': function() {
   	  	console.log('undo');
   	  	undo();
+  	  },
+  	  'test everything': function() {
+  	  	console.log('testEverything');
+  	  	testEverything();
   	  }
   	};
 
@@ -495,32 +506,32 @@ function createGeometry(params, geometry) {
 	var size = params['size'];
 	var color = params['color'];
 	var transparent = params['transparent'];
-	if(x == undefined){
-		x = 0;
+	if(x == undefined) {
+		x = defaultGlobalParams['x'];
 	}
-	if(y == undefined){
-		y = 50;
+	if(y == undefined) {
+		y = defaultGlobalParams['y'];
 	}
-	if(z == undefined){
-		z = 0;
+	if(z == undefined) {
+		z = defaultGlobalParams['z'];
 	}
-	if(size == undefined){
-		size = 50;
+	if(size == undefined) {
+		size = defaultGlobalParams['size'];
 	}
-	if(color == undefined){
+	if(color == undefined) {
 		//For some reason I want the default cubes and spheres to be a different color from everything else
-		if(geometry == 'SphereGeometry' || geometry == 'CubeGeometry') {
+		/*if(geometry == 'SphereGeometry' || geometry == 'CubeGeometry') {
 			color = 0x44ffff;
 		}
-		else {
-			color = 0xffb6c1
-		}
+		else {*/
+			color = defaultGlobalParams['color'];
+		//}
 	}
 	var btrans;
-	if(transparent == undefined){
-		btrans = false;
+	if(transparent == undefined) {
+		btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
 	}
-	else{
+	else {
 		btrans = convertWordToBoolean(transparent);
 	}
 	var material = new THREE.MeshPhongMaterial( { 
@@ -529,19 +540,19 @@ function createGeometry(params, geometry) {
 		transparent: btrans, 
 		blending: THREE.AdditiveBlending 
 	} );
-	if(geometry == 'CubeGeometry'){
+	if(geometry == 'CubeGeometry') {
 		var geom = new THREE.CubeGeometry(size,size,size);
 	}
-	else if(geometry == 'SphereGeometry'){
+	else if(geometry == 'SphereGeometry') {
 		var geom = new THREE.SphereGeometry(size);
 	}
-	else if(geometry == 'CylinderGeometry'){
+	else if(geometry == 'CylinderGeometry') {
 		var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
 	}
-	else if(geometry == 'RingGeometry'){
+	else if(geometry == 'RingGeometry') {
 		var geom = new THREE.RingGeometry(size/5,size);
 	}
-	else if(geometry == 'TorusKnotGeometry'){
+	else if(geometry == 'TorusKnotGeometry') {
 		var geom = new THREE.TorusKnotGeometry(size);
 	}
 	var mesh = new THREE.Mesh(geom, material );	
@@ -551,7 +562,7 @@ function createGeometry(params, geometry) {
 }
 
 function createManyGeometries(params, geometry) {
-var x = params['x'];
+	var x = params['x'];
 	var y = params['y'];
 	var z = params['z'];
 	var size = params['size'];
@@ -562,39 +573,54 @@ var x = params['x'];
 	var endy = params['endy'];
 	var endz = params['endz'];
 	var endsize = params['endsize'];
-	if(x == undefined){
-		x = 0;
+	if(x == undefined) {
+    x = defaultGlobalParams['x'];
 	}
-	if(y == undefined){
-		y = 50;
+	if(y == undefined) {
+		y = defaultGlobalParams['y'];
 	}
-	if(z == undefined){
-		z = 0;
+	if(z == undefined) {
+		z = defaultGlobalParams['z'];
 	}
-	if(size == undefined){
-		size = 50;
+	if(size == undefined) {
+		size = defaultGlobalParams['size'];
 	}
-	if(color == undefined){
-		color = 0x44ffff;
+	if(color == undefined) {
+		color = defaultGlobalParams['color'];
 	}
 	var btrans;
-	if(transparent == undefined){
-		btrans = false;
+	if(transparent == undefined) {
+		btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
 	}
-	else{
+	else {
 		btrans = convertWordToBoolean(transparent);
 	}
-	if(amount == undefined){
-		amount = 2;
+	if(amount == undefined) {
+		amount = defaultGlobalParams['amount'];
 	}
-	if(endx == undefined){
-		endx = x;
+	if(endx == undefined) {
+    if(defaultGlobalParams['endx'] == undefined) {
+		  endx = x;
+    }
+    else {
+      endx = defaultGlobalParams['endx'];
+    }
 	}
-	if(endy == undefined){
-		endy = y;
+	if(endy == undefined) {
+    if(defaultGlobalParams['endy'] == undefined) {
+      endy = y;
+    }
+    else {
+      endy = defaultGlobalParams['endy'];
+    }
 	}
-	if(endz == undefined){
-		endz = z;
+	if(endz == undefined) {
+    if(defaultGlobalParams['endz'] == undefined) {
+      endz = z;
+    }
+    else {
+      endz = defaultGlobalParams['endz'];
+    }
 	}
 	var material = new THREE.MeshPhongMaterial( { 
 		color: color, 
@@ -742,10 +768,8 @@ function parseParams(params) {
 			}
 			lastParamType = '';
 		}
-		//mainly happens when y is your first or only coordinate input
-		//annyang sometimes thinks you are saying 'why' instead of 'y'
-		//maybe when you say 'y' in a questionly manner?
-		//sometimes it thinks you are saying 'by'
+		//annyang sometimes thinks you are saying 'why' or 'by' instead of 'y'
+    //mainly happens when y is your first or only coordinate input
 		//TODO, something better
 		else if(paramsArray[i].toLowerCase() == 'why' || paramsArray[i].toLowerCase() == 'by' ) {
 			parsedParams['y'] = paramsArray[i+1];			
@@ -763,6 +787,68 @@ function parseParams(params) {
 		}
 	}
 	return parsedParams;
+}
+
+function setDefaultGlobalParams(params) {
+	var paramsArray = params.split(" ");
+	var lastParamType = '';
+	for(var i = 0; i < paramsArray.length-1; i+=2) {
+		if(paramsArray[i].toLowerCase() == 'color' || paramsArray[i].toLowerCase() == 'colour') {
+			defaultGlobalParams['color'] = colourNameToHex(paramsArray[i+1]);
+			lastParamType = 'color';
+		}
+		else if(paramsArray[i].toLowerCase() == 'x' || paramsArray[i].toLowerCase() == 'y' || paramsArray[i].toLowerCase() == 'z' ) {
+			defaultGlobalParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];			
+			lastParamType = paramsArray[i].toLowerCase();
+		}
+		else if(paramsArray[i].toLowerCase() == 'and' || paramsArray[i].toLowerCase() == 'end') {
+			if(lastParamType == 'x'){
+				defaultGlobalParams['endx'] = paramsArray[i+1];			
+			}
+			else if(lastParamType == 'y'){
+				defaultGlobalParams['endy'] = paramsArray[i+1];			
+			}
+			else if(lastParamType == 'z'){
+				defaultGlobalParams['endz'] = paramsArray[i+1];			
+			}
+			else if(lastParamType == 'size'){
+				defaultGlobalParams['endsize'] = paramsArray[i+1];
+			}
+			else if(lastParamType == 'color'){
+				defaultGlobalParams['endcolor'] = paramsArray[i+1];
+			}
+			lastParamType = '';
+		}
+		//annyang sometimes thinks you are saying 'why' or 'by' instead of 'y'
+		else if(paramsArray[i].toLowerCase() == 'why' || paramsArray[i].toLowerCase() == 'by' ) {
+			defaultGlobalParams['y'] = paramsArray[i+1];			
+			lastParamType = 'y';
+		}
+		//sometimes annyang hears announced instead of amount
+		else if(paramsArray[i].toLowerCase() == 'announced') {
+		  defaultGlobalParams['amount'] = paramsArray[i+1];			
+			lastParamType = 'amount';	
+		}
+		/*else if(paramsArray[i].toLowerCase() == 'transparent') {
+		  defaultGlobalParams['transparent'] = convertWordToBoolean(paramsArray[i+1]);			
+			lastParamType = 'transparent';	
+		}*/
+		else{
+			defaultGlobalParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];			
+			lastParamType = paramsArray[i].toLowerCase();
+		}
+	}
+}
+
+function initDefaultGlobalParams() {
+  defaultGlobalParams = {};
+	defaultGlobalParams['x'] = 0;
+	defaultGlobalParams['y'] = 50;
+	defaultGlobalParams['z'] = 0;
+	defaultGlobalParams['size'] = 50;
+	defaultGlobalParams['color'] = 0xffb6c1;
+  defaultGlobalParams['transparent'] = false;
+  defaultGlobalParams['amount'] = 2;
 }
 
 function convertWordToBoolean(word) {
@@ -881,39 +967,39 @@ function colourNameToHex(colour) {
 
 //test method
 function testEverything() {
-	  	 /* 	var pp =parseParams('transparent true x -150 z 100 size 15');
-  	  	scene.add(createSphere(pp));
-    	  	var pp2 =parseParams('transparent true x 250 z 10 size 15');
-  	  	scene.add(createCylinder(pp2));
-    	  	var pp3 =parseParams('transparent true x -250 z -100 size 15');
-  	  	scene.add(createTorusKnot(pp3));
-    	  	var pp4 =parseParams('transparent true x 150 z 100 size 15');
-  	  	scene.add(createRing(pp4));*/
-  	  	
+/*  	  	scene.add(createSphere(parseParams('transparent true x -150 z 100 size 15')));
+  	  	scene.add(createCylinder(parseParams('transparent true x 250 z 10 size 15')));
+  	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
+  	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
+  */	  	setDefaultGlobalParams('transparent true size 9');
+  	  	scene.add(createTorusKnot(defaultGlobalParams));
+  	  	scene.add(createCube({x: 300}));
   
-
-  var pp2 =parseParams('amount 3 y 0 and 300');
-  var testknots = createManyTorusKnots(pp2);
+        setDefaultGlobalParams('color ivory amount 13 x -200 and 200 y -100 and 300 z 25 and -250');
+  	  	
+  var testknots = createManyRings(
+  	parseParams('size 14'));
   	  	
   	  	for(var i = 0; i < testknots.length; i++) {
   	  		scene.add(testknots[i]);  	  		
   	  	}
 
-  var pp3 =parseParams('color orchid transparent true amount 5 size 5 and 50 x -200 and 200 y 100');
-  var testrings = createManyRings(pp3);
+  var testrings = createManyRings(
+  	parseParams('color orchid transparent true amount 5 size 5 and 50 x -200 and 200 y 100'));
   	  	
   	  	for(var i = 0; i < testrings.length; i++) {
   	  		scene.add(testrings[i]);  	  		
   	  	}
 
-  var pp4 =parseParams('color olive transparent true amount 5 size 55 and 10 x 200 and 220 y 100 and 0 z -170 and 170');
-  var testspheres2 = createManySpheres(pp4);
+  var testspheres2 = createManySpheres(
+  	parseParams('color olive transparent true amount 5 size 55 and 10 x 200 and 220 y 100 and 0 z -170 and 170'));
   	  	
   	  	for(var i = 0; i < testspheres2.length; i++) {
   	  		scene.add(testspheres2[i]);  	  		
   	  	}
-  var pp4 =parseParams('color olive transparent true amount 5 size 55 and 10 x -200 and -220 y 100 and 0 z -170 and 170');
-  var testspheres = createManyCubes(pp4);
+
+  var testspheres = createManyCubes(
+  	parseParams('color olive transparent true amount 5 size 55 and 10 x -200 and -220 y 100 and 0 z -170 and 170'));
   	  	
   	  	for(var i = 0; i < testspheres.length; i++) {
   	  		scene.add(testspheres[i]);  	  		
