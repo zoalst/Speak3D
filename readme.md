@@ -7,7 +7,7 @@ Built off of the Text3D example in Lee Stemkoski's
 
 [Try the Demo on Google Drive](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (only works with Chrome)
 
-## List of Commands
+## List of Commands & Examples
 
   - say 'create cube' w/ optional parameters
   - say 'create sphere' w/ optional parameters
@@ -18,8 +18,9 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'create wall' w/ optional parameters (only has x,y coordinate right now)
   - say 'create many cubes/spheres/rings/knots/cylinders' w/ optional parameters, provide amount param and two params on atleast one axis(x,y, or z) or two size params ex: 'create many spheres amount 5 z 0 and 250' or 'create many cubes amount 5 size 10 and 110 transparent true'
   - say 'create text' then say whatever you want
+  - say 'undo' or press ctrl+z
   - optional parameters are x (number), y (number), z (number), size (number), color (color name), transparent (true or false)
-  - parameter usage example: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 y 150'
+  - examples: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 y 150'
 
 ##Usage
 

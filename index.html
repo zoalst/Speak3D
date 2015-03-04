@@ -54,7 +54,10 @@ var clock = new THREE.Clock();
 // custom global variables
 var cube;
 
-var meshs = {};
+var meshs = [];
+var numberOfMeshs = 0;
+var undoing = false;
+
 init();
 animate();
 
@@ -105,7 +108,7 @@ function init() {
 	////////////
 	// CUSTOM //
 	////////////
-//testEverything();//TODO remove
+testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -309,10 +312,9 @@ function init() {
   	  	console.log('create text: '+text);
   	  	scene.add(create3DText(text));
   	  },
-  	  'remove *name': function(name) {
-  	  	//TODO, error handling
-  	  	console.log('remove: '+name);
-  	  	scene.remove(meshs[name.toLowerCase()]);
+  	  'undo': function() {
+  	  	console.log('undo');
+  	  	undo();
   	  }
   	};
 
@@ -331,11 +333,13 @@ function animate() {
 }
 
 function update() {
-	if ( keyboard.pressed("z") ) 
-	{ 
-		// do something
+	//TODO, it's really bugged due to hold down
+	if ( keyboard.pressed("ctrl+z") && !undoing) { 
+		undoing = true;
+		undo()
+		setInterval(function() {undoing=false;}, 1000);
 	}
-	
+
 	controls.update();
 	stats.update();
 }
@@ -382,7 +386,6 @@ function createSphere(params) {
 	var size = params['size'];
 	var color = params['color'];
 	var transparent = params['transparent'];
-	var name = params['named'];
 	if(x == undefined){
 		x = 0;
 	}
@@ -405,20 +408,17 @@ function createSphere(params) {
 	else{
 		btrans = convertWordToBoolean(transparent);
 	}
-	if(name == undefined){
-		name = 'name'; //TODO unique generic name
-	}
 	var material = new THREE.MeshPhongMaterial( { 
 		color: color, 
 		ambient: color, //TODO, ambient param
 		transparent: btrans, 
 		blending: THREE.AdditiveBlending 
 	} );
-	var sphereGeom = new THREE.SphereGeometry(size);
-	var sphereMesh = new THREE.Mesh(sphereGeom, material );	
-	sphereMesh.position.set( x, y, z );
-	meshs[name] = sphereMesh;
-	return sphereMesh;
+	var geom = new THREE.SphereGeometry(size);
+	var mesh = new THREE.Mesh(geom, material );	
+	mesh.position.set( x, y, z );
+	addToMeshs(mesh);
+	return mesh;
 }
 
 function createCube(params) {
@@ -456,10 +456,11 @@ function createCube(params) {
 		transparent: btrans, 
 		blending: THREE.AdditiveBlending 
 	} );
-	var cubeGeom = new THREE.CubeGeometry(size,size,size);
-	var cubeMesh = new THREE.Mesh(cubeGeom, material );	
-	cubeMesh.position.set( x, y, z );
-	return cubeMesh;
+	var geom = new THREE.CubeGeometry(size,size,size);
+	var mesh = new THREE.Mesh(geom, material );	
+	mesh.position.set( x, y, z );
+	addToMeshs(mesh);
+	return mesh;
 }
 
 function createRing(params) {
@@ -498,10 +499,11 @@ function createRing(params) {
 		blending: THREE.AdditiveBlending 
 	} );
 	//RingGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength)
-	var ringGeom = new THREE.RingGeometry(size/5,size);
-	var ringMesh = new THREE.Mesh(ringGeom, material );	
-	ringMesh.position.set( x, y, z );
-	return ringMesh;
+	var geom = new THREE.RingGeometry(size/5,size);
+	var mesh = new THREE.Mesh(geom, material );	
+	mesh.position.set( x, y, z );
+	addToMeshs(mesh);
+	return mesh;
 }
 
 function createTorusKnot(params) {
@@ -540,10 +542,11 @@ function createTorusKnot(params) {
 		blending: THREE.AdditiveBlending 
 	} );
   //TorusKnotGeometry(radius, tube, radialSegments, tubularSegments, p, q, heightScale)
-	var torusKnotGeom = new THREE.TorusKnotGeometry(size,size*2/5);
-	var torusKnotMesh = new THREE.Mesh(torusKnotGeom, material );	
-	torusKnotMesh.position.set( x, y, z );
-	return torusKnotMesh;
+	var geom = new THREE.TorusKnotGeometry(size,size*2/5);
+	var mesh = new THREE.Mesh(geom, material );	
+	mesh.position.set( x, y, z );
+	addToMeshs(mesh);
+	return mesh;
 }
 
 function createCylinder(params) {
@@ -582,10 +585,11 @@ function createCylinder(params) {
 		blending: THREE.AdditiveBlending 
 	} );
 	//CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded)
-	var cylinderGeom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
-	var cylinderMesh = new THREE.Mesh(cylinderGeom, material );	
-	cylinderMesh.position.set( x, y, z );
-	return cylinderMesh;
+	var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
+	var mesh = new THREE.Mesh(geom, material );	
+	mesh.position.set( x, y, z );
+	addToMeshs(mesh);
+	return mesh;
 }
 
 /*function createOctahedron(x,y,z,size,color,transparent) {
@@ -752,6 +756,7 @@ function createFloor(params) {
 	}
 	floor.position.y = y;
 	floor.rotation.x = Math.PI / 2;
+	addToMeshs(floor);
 	return floor;
 }
 
@@ -778,6 +783,7 @@ function createWall(params) {
 	wall.position.y = y;
 	//wall.rotation.x = Math.PI / 2;
 	wall.rotation.y = Math.PI / 2;
+	addToMeshs(wall);
 	return wall;
 }
 
@@ -842,9 +848,10 @@ function createManySpheres(params) {
 	if(endsize == undefined) {
 		var sphereGeom = new THREE.SphereGeometry(size);
 		for(var i = 0; i < amount; i++) {
-			var sphereMesh = new THREE.Mesh(sphereGeom, material );	
-			sphereMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			sphereMeshs[i] = sphereMesh;
+			var mesh = new THREE.Mesh(sphereGeom, material );	
+			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			sphereMeshs[i] = mesh;
+			addToMeshs(mesh);
 		}
 	}
 	else {
@@ -853,9 +860,10 @@ function createManySpheres(params) {
 		for(var i = 0; i < amount; i++) {
 			newSize = +size+i*sizeIncrement;
 			var sphereGeom = new THREE.SphereGeometry(newSize);
-			var sphereMesh = new THREE.Mesh(sphereGeom, material );	
-			sphereMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			sphereMeshs[i] = sphereMesh;
+			var mesh = new THREE.Mesh(sphereGeom, material );	
+			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			sphereMeshs[i] = mesh;
+			addToMeshs(mesh);
 		}
 	}
 	return sphereMeshs;
@@ -921,9 +929,10 @@ function createManyCubes(params) {
 	if(endsize == undefined) {
 		var cubeGeom = new THREE.CubeGeometry(size,size,size);
 		for(var i = 0; i < amount; i++) {
-			var cubeMesh = new THREE.Mesh(cubeGeom, material );	
-			cubeMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			cubeMeshs[i] = cubeMesh;
+			var mesh = new THREE.Mesh(cubeGeom, material );	
+			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			cubeMeshs[i] = mesh;
+			addToMeshs(mesh);
 		}
 	}
 	else {
@@ -932,9 +941,10 @@ function createManyCubes(params) {
 		for(var i = 0; i < amount; i++) {
 			newSize = +size+i*sizeIncrement;
 			var cubeGeom = new THREE.CubeGeometry(newSize,newSize,newSize);
-			var cubeMesh = new THREE.Mesh(cubeGeom, material );	
-			cubeMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			cubeMeshs[i] = cubeMesh;
+			var mesh = new THREE.Mesh(cubeGeom, material );	
+			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			cubeMeshs[i] = mesh;
+			addToMeshs(mesh);
 		}
 	}
 	return cubeMeshs;
@@ -1000,9 +1010,10 @@ function createManyRings(params) {
 	if(endsize == undefined) {
 		var ringGeom = new THREE.RingGeometry(size/5,size);
 		for(var i = 0; i < amount; i++) {
-			var ringMesh = new THREE.Mesh(ringGeom, material );	
-			ringMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			ringMeshs[i] = ringMesh;
+			var mesh = new THREE.Mesh(ringGeom, material );	
+			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			ringMeshs[i] = mesh;
+			addToMeshs(mesh);
 		}
 	}
 	else {
@@ -1011,9 +1022,10 @@ function createManyRings(params) {
 		for(var i = 0; i < amount; i++) {
 			newSize = +size+i*sizeIncrement;
 			var ringGeom = new THREE.RingGeometry(newSize/5,newSize);
-			var ringMesh = new THREE.Mesh(ringGeom, material );	
-			ringMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			ringMeshs[i] = ringMesh;
+			var mesh = new THREE.Mesh(ringGeom, material );	
+			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			ringMeshs[i] = mesh;
+			addToMeshs(mesh);
 		}
 	}
 	return ringMeshs;
@@ -1079,9 +1091,10 @@ function createManyTorusKnots(params) {
 	if(endsize == undefined) {
 		var knotGeom = new THREE.TorusKnotGeometry(size);
 		for(var i = 0; i < amount; i++) {
-			var knotMesh = new THREE.Mesh(knotGeom, material );	
-			knotMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			knotMeshs[i] = knotMesh;
+			var mesh = new THREE.Mesh(knotGeom, material );	
+			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			knotMeshs[i] = mesh;
+			addToMeshs(mesh);
 		}
 	}
 	else {
@@ -1090,9 +1103,10 @@ function createManyTorusKnots(params) {
 		for(var i = 0; i < amount; i++) {
 			newSize = +size+i*sizeIncrement;
 			var knotGeom = new THREE.TorusKnotGeometry(newSize);
-			var knotMesh = new THREE.Mesh(knotGeom, material );	
-			knotMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			knotMeshs[i] = knotMesh;
+			var mesh = new THREE.Mesh(knotGeom, material );	
+			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			knotMeshs[i] = mesh;
+			addToMeshs(mesh);
 		}
 	}
 	return knotMeshs;
@@ -1158,9 +1172,10 @@ function createManyCylinders(params) {
 	if(endsize == undefined) {
 	var cylinderGeom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
 		for(var i = 0; i < amount; i++) {
-			var cylinderMesh = new THREE.Mesh(cylinderGeom, material );	
-			cylinderMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			cylinderMeshs[i] = cylinderMesh;
+			var mesh = new THREE.Mesh(cylinderGeom, material );	
+			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			cylinderMeshs[i] = mesh;
+			addToMeshs(mesh);
 		}
 	}
 	else {
@@ -1169,13 +1184,15 @@ function createManyCylinders(params) {
 		for(var i = 0; i < amount; i++) {
 			newSize = +size+i*sizeIncrement;
 			var cylinderGeom = new THREE.CylinderGeometry(newSize*2/5,newSize*2/5,newSize);
-			var cylinderMesh = new THREE.Mesh(cylinderGeom, material );	
-			cylinderMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			cylinderMeshs[i] = cylinderMesh;
+			var mesh = new THREE.Mesh(cylinderGeom, material );	
+			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			cylinderMeshs[i] = mesh;
+			addToMeshs(mesh);
 		}
 	}
 	return cylinderMeshs;
 }
+
   //////////////////////////////////////////
  //END OF METHODS FOR CREATING GEOMETRIES//
 //////////////////////////////////////////
@@ -1184,6 +1201,16 @@ function createManyCylinders(params) {
 //howto do removal/manipulation of geometries
 //--user has to name geometry (otherwise default name, cube1,cube2?), 
 //--user can describe geometry (green transparent cube)
+//--user can right click on geometry
+
+function addToMeshs(mesh) {
+	meshs[numberOfMeshs] = mesh;
+	numberOfMeshs++;
+}
+function undo() {
+	numberOfMeshs--;
+  scene.remove(meshs[numberOfMeshs]);
+}
 
   ///////////////////////////////////////
  //METHODS FOR DEALING WITH PARAMETERS//
@@ -1360,12 +1387,10 @@ function colourNameToHex(colour) {
 
 //test method
 function testEverything() {
-	  	  	var pp =parseParams('transparent true amount 5 x -150 and 150 z 100 size 15');
-  	  	var testcubes = createManyCubes(pp);
+	  	  	var pp =parseParams('transparent true x -150 z 100 size 15');
+  	  	scene.add(createSphere(pp));
   	  	
-  	  	for(var i = 0; i < testcubes.length; i++) {
-  	  		scene.add(testcubes[i]);  	  		
-  	  	}
+  
 
   var pp2 =parseParams('amount 3 y 0 and 300');
   var testknots = createManyTorusKnots(pp2);
