@@ -108,7 +108,7 @@ function init() {
 	////////////
 	// CUSTOM //
 	////////////
-testEverything();//TODO remove
+//testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -380,360 +380,39 @@ function create3DText(text) {//,x,y,z,size) {
 }
 
 function createSphere(params) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
-	var color = params['color'];
-	var transparent = params['transparent'];
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xff000f;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color, //TODO, ambient param
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	var geom = new THREE.SphereGeometry(size);
-	var mesh = new THREE.Mesh(geom, material );	
-	mesh.position.set( x, y, z );
-	addToMeshs(mesh);
-	return mesh;
+	return createGeometry(params,'SphereGeometry');
 }
 
 function createCube(params) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
-	var color = params['color'];
-	var transparent = params['transparent'];
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0x44ffff;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	var geom = new THREE.CubeGeometry(size,size,size);
-	var mesh = new THREE.Mesh(geom, material );	
-	mesh.position.set( x, y, z );
-	addToMeshs(mesh);
-	return mesh;
+	return createGeometry(params,'CubeGeometry');
 }
 
 function createRing(params) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
-	var color = params['color'];
-	var transparent = params['transparent'];
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xffb6c1;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	//RingGeometry(innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength)
-	var geom = new THREE.RingGeometry(size/5,size);
-	var mesh = new THREE.Mesh(geom, material );	
-	mesh.position.set( x, y, z );
-	addToMeshs(mesh);
-	return mesh;
+	return createGeometry(params,'RingGeometry');
 }
 
 function createTorusKnot(params) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
-	var color = params['color'];
-	var transparent = params['transparent'];
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xffb6c1;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-  //TorusKnotGeometry(radius, tube, radialSegments, tubularSegments, p, q, heightScale)
-	var geom = new THREE.TorusKnotGeometry(size,size*2/5);
-	var mesh = new THREE.Mesh(geom, material );	
-	mesh.position.set( x, y, z );
-	addToMeshs(mesh);
-	return mesh;
+	return createGeometry(params,'TorusKnotGeometry');
 }
 
 function createCylinder(params) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
-	var color = params['color'];
-	var transparent = params['transparent'];
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xffb6c1;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	//CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded)
-	var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
-	var mesh = new THREE.Mesh(geom, material );	
-	mesh.position.set( x, y, z );
-	addToMeshs(mesh);
-	return mesh;
+	return createGeometry(params,'CylinderGeometry');
 }
 
 /*function createOctahedron(x,y,z,size,color,transparent) {
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xffb6c1;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	//OctahedronGeometry(radius, detail)
-	var octahedronGeom = new THREE.OctahedronGeometry(size);
-	var octahedronMesh = new THREE.Mesh(octahedronGeom, material );	
-	octahedronMesh.position.set( x, y, z );
-	return octahedronMesh;
+
 }
 
 function createTetrahedron(x,y,z,size,color,transparent) {
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xffb6c1;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	//TetrahedronGeometry(radius, detail)
-	var tetrahedronGeom = new THREE.TetrahedronGeometry(size);
-	var tetrahedronMesh = new THREE.Mesh(tetrahedronGeom, material );	
-	tetrahedronMesh.position.set( x, y, z );
-	return tetrahedronMesh;
+
 }
 
 function createDodecahedron(x,y,z,size,color,transparent) {
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xffb6c1;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	//DodecahedronGeometry(radius, detail)
-	var dodecahedronGeom = new THREE.DodecahedronGeometry(size);
-	var dodecahedronMesh = new THREE.Mesh(dodecahedronGeom, material );	
-	dodecahedronMesh.position.set( x, y, z );
-	return dodecahedronMesh;
+
 }
 
 function createIcosahedron(x,y,z,size,color,transparent) {
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xffb6c1;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	//IcosahedronGeometry(radius, detail)
-	var icosahedronGeom = new THREE.IcosahedronGeometry(size);
-	var icosahedronMesh = new THREE.Mesh(icosahedronGeom, material );	
-	icosahedronMesh.position.set( x, y, z );
-	return icosahedronMesh;
+
 }*/
 
 function createFloor(params) {
@@ -789,88 +468,90 @@ function createWall(params) {
 
 //functions for creating mulitple geometries of the same type with a single command
 function createManySpheres(params) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
-	var color = params['color'];
-	var transparent = params['transparent'];
-	var amount = params['amount'];
-	var endx = params['endx'];
-	var endy = params['endy'];
-	var endz = params['endz'];
-	var endsize = params['endsize'];
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0x44ffff;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	if(amount == undefined){
-		amount = 2;
-	}
-	if(endx == undefined){
-		endx = x;
-	}
-	if(endy == undefined){
-		endy = y;
-	}
-	if(endz == undefined){
-		endz = z;
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	var sphereMeshs = [];
-	var divisor = amount - 1;
-	var xIncrement = +(endx-x)/divisor;
-	var yIncrement = +(endy-y)/divisor;
-	var zIncrement = +(endz-z)/divisor;
-	if(endsize == undefined) {
-		var sphereGeom = new THREE.SphereGeometry(size);
-		for(var i = 0; i < amount; i++) {
-			var mesh = new THREE.Mesh(sphereGeom, material );	
-			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			sphereMeshs[i] = mesh;
-			addToMeshs(mesh);
-		}
-	}
-	else {
-		var sizeIncrement = (endsize-size)/divisor;
-		var newSize;
-		for(var i = 0; i < amount; i++) {
-			newSize = +size+i*sizeIncrement;
-			var sphereGeom = new THREE.SphereGeometry(newSize);
-			var mesh = new THREE.Mesh(sphereGeom, material );	
-			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			sphereMeshs[i] = mesh;
-			addToMeshs(mesh);
-		}
-	}
-	return sphereMeshs;
+	return createManyGeometries(params, 'SphereGeometry');
 }
 
 function createManyCubes(params) {
+	return createManyGeometries(params, 'CubeGeometry');
+}
+
+function createManyRings(params) {
+	return createManyGeometries(params, 'RingGeometry');
+}
+
+function createManyTorusKnots(params) {
+	return createManyGeometries(params, 'TorusKnotGeometry');
+}
+
+function createManyCylinders(params) {
+	return createManyGeometries(params, 'CylinderGeometry');
+}
+
+
+function createGeometry(params, geometry) {
 	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		//For some reason I want the default cubes and spheres to be a different color from everything else
+		if(geometry == 'SphereGeometry' || geometry == 'CubeGeometry') {
+			color = 0x44ffff;
+		}
+		else {
+			color = 0xffb6c1
+		}
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	if(geometry == 'CubeGeometry'){
+		var geom = new THREE.CubeGeometry(size,size,size);
+	}
+	else if(geometry == 'SphereGeometry'){
+		var geom = new THREE.SphereGeometry(size);
+	}
+	else if(geometry == 'CylinderGeometry'){
+		var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
+	}
+	else if(geometry == 'RingGeometry'){
+		var geom = new THREE.RingGeometry(size/5,size);
+	}
+	else if(geometry == 'TorusKnotGeometry'){
+		var geom = new THREE.TorusKnotGeometry(size);
+	}
+	var mesh = new THREE.Mesh(geom, material );	
+	mesh.position.set( x, y, z );
+	addToMeshs(mesh);
+	return mesh;
+}
+
+function createManyGeometries(params, geometry) {
+var x = params['x'];
 	var y = params['y'];
 	var z = params['z'];
 	var size = params['size'];
@@ -891,7 +572,7 @@ function createManyCubes(params) {
 		z = 0;
 	}
 	if(size == undefined){
-		size = +50;
+		size = 50;
 	}
 	if(color == undefined){
 		color = 0x44ffff;
@@ -921,276 +602,89 @@ function createManyCubes(params) {
 		transparent: btrans, 
 		blending: THREE.AdditiveBlending 
 	} );
-	var cubeMeshs = [];
+	var meshs = [];
 	var divisor = amount - 1;
 	var xIncrement = +(endx-x)/divisor;
 	var yIncrement = +(endy-y)/divisor;
 	var zIncrement = +(endz-z)/divisor;
 	if(endsize == undefined) {
-		var cubeGeom = new THREE.CubeGeometry(size,size,size);
+		if(geometry == 'CubeGeometry'){
+			var geom = new THREE.CubeGeometry(size,size,size);
+		}
+		else if(geometry == 'SphereGeometry'){
+			var geom = new THREE.SphereGeometry(size);
+		}
+		else if(geometry == 'CylinderGeometry'){
+			var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
+		}
+		else if(geometry == 'RingGeometry'){
+			var geom = new THREE.RingGeometry(size/5,size);
+		}
+		else if(geometry == 'TorusKnotGeometry'){
+			var geom = new THREE.TorusKnotGeometry(size);
+		}
 		for(var i = 0; i < amount; i++) {
-			var mesh = new THREE.Mesh(cubeGeom, material );	
+			var mesh = new THREE.Mesh(geom, material );	
 			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			cubeMeshs[i] = mesh;
+			meshs[i] = mesh;
 			addToMeshs(mesh);
 		}
 	}
 	else {
 		var sizeIncrement = (endsize-size)/divisor;
 		var newSize;
-		for(var i = 0; i < amount; i++) {
-			newSize = +size+i*sizeIncrement;
-			var cubeGeom = new THREE.CubeGeometry(newSize,newSize,newSize);
-			var mesh = new THREE.Mesh(cubeGeom, material );	
-			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			cubeMeshs[i] = mesh;
-			addToMeshs(mesh);
+		if(geometry == 'CubeGeometry'){
+			for(var i = 0; i < amount; i++) {
+				newSize = +size+i*sizeIncrement;
+				var geom = new THREE.CubeGeometry(newSize,newSize,newSize);
+				var mesh = new THREE.Mesh(geom, material );	
+				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+				meshs[i] = mesh;
+				addToMeshs(mesh);
+			}
+		}
+		else if(geometry == 'SphereGeometry'){
+			for(var i = 0; i < amount; i++) {
+				newSize = +size+i*sizeIncrement;
+				var geom = new THREE.SphereGeometry(newSize);
+				var mesh = new THREE.Mesh(geom, material );	
+				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+				meshs[i] = mesh;
+				addToMeshs(mesh);
+			}
+		}
+		else if(geometry == 'CylinderGeometry'){
+			for(var i = 0; i < amount; i++) {
+				newSize = +size+i*sizeIncrement;
+				var geom = new THREE.CylinderGeometry(newSize*2/5,newSize*2/5,newSize);
+				var mesh = new THREE.Mesh(geom, material );	
+				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+				meshs[i] = mesh;
+				addToMeshs(mesh);
+			}
+		}
+		else if(geometry == 'RingGeometry'){
+			for(var i = 0; i < amount; i++) {
+				newSize = +size+i*sizeIncrement;
+				var geom = new THREE.RingGeometry(newSize/5,newSize);
+				var mesh = new THREE.Mesh(geom, material );	
+				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+				meshs[i] = mesh;
+				addToMeshs(mesh);
+			}
+		}
+		else if(geometry == 'TorusKnotGeometry'){
+			for(var i = 0; i < amount; i++) {
+				newSize = +size+i*sizeIncrement;
+				var geom = new THREE.TorusKnotGeometry(newSize);
+				var mesh = new THREE.Mesh(geom, material );	
+				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+				meshs[i] = mesh;
+				addToMeshs(mesh);
+			}
 		}
 	}
-	return cubeMeshs;
-}
-
-function createManyRings(params) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
-	var color = params['color'];
-	var transparent = params['transparent'];
-	var amount = params['amount'];
-	var endx = params['endx'];
-	var endy = params['endy'];
-	var endz = params['endz'];
-	var endsize = params['endsize'];
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xffb6c1;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	if(amount == undefined){
-		amount = 2;
-	}
-	if(endx == undefined){
-		endx = x;
-	}
-	if(endy == undefined){
-		endy = y;
-	}
-	if(endz == undefined){
-		endz = z;
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	var ringMeshs = [];
-	var divisor = amount - 1;
-	var xIncrement = +(endx-x)/divisor;
-	var yIncrement = +(endy-y)/divisor;
-	var zIncrement = +(endz-z)/divisor;
-	if(endsize == undefined) {
-		var ringGeom = new THREE.RingGeometry(size/5,size);
-		for(var i = 0; i < amount; i++) {
-			var mesh = new THREE.Mesh(ringGeom, material );	
-			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			ringMeshs[i] = mesh;
-			addToMeshs(mesh);
-		}
-	}
-	else {
-		var sizeIncrement = (endsize-size)/divisor;
-		var newSize;
-		for(var i = 0; i < amount; i++) {
-			newSize = +size+i*sizeIncrement;
-			var ringGeom = new THREE.RingGeometry(newSize/5,newSize);
-			var mesh = new THREE.Mesh(ringGeom, material );	
-			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			ringMeshs[i] = mesh;
-			addToMeshs(mesh);
-		}
-	}
-	return ringMeshs;
-}
-
-function createManyTorusKnots(params) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
-	var color = params['color'];
-	var transparent = params['transparent'];
-	var amount = params['amount'];
-	var endx = params['endx'];
-	var endy = params['endy'];
-	var endz = params['endz'];
-	var endsize = params['endsize'];
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xffb6c1;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	if(amount == undefined){
-		amount = 2;
-	}
-	if(endx == undefined){
-		endx = x;
-	}
-	if(endy == undefined){
-		endy = y;
-	}
-	if(endz == undefined){
-		endz = z;
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	var knotMeshs = [];
-	var divisor = amount - 1;
-	var xIncrement = +(endx-x)/divisor;
-	var yIncrement = +(endy-y)/divisor;
-	var zIncrement = +(endz-z)/divisor;
-	if(endsize == undefined) {
-		var knotGeom = new THREE.TorusKnotGeometry(size);
-		for(var i = 0; i < amount; i++) {
-			var mesh = new THREE.Mesh(knotGeom, material );	
-			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			knotMeshs[i] = mesh;
-			addToMeshs(mesh);
-		}
-	}
-	else {
-		var sizeIncrement = (endsize-size)/divisor;
-		var newSize;
-		for(var i = 0; i < amount; i++) {
-			newSize = +size+i*sizeIncrement;
-			var knotGeom = new THREE.TorusKnotGeometry(newSize);
-			var mesh = new THREE.Mesh(knotGeom, material );	
-			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			knotMeshs[i] = mesh;
-			addToMeshs(mesh);
-		}
-	}
-	return knotMeshs;
-}
-
-function createManyCylinders(params) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
-	var color = params['color'];
-	var transparent = params['transparent'];
-	var amount = params['amount'];
-	var endx = params['endx'];
-	var endy = params['endy'];
-	var endz = params['endz'];
-	var endsize = params['endsize'];
-	if(x == undefined){
-		x = 0;
-	}
-	if(y == undefined){
-		y = 50;
-	}
-	if(z == undefined){
-		z = 0;
-	}
-	if(size == undefined){
-		size = 50;
-	}
-	if(color == undefined){
-		color = 0xffb6c1;
-	}
-	var btrans;
-	if(transparent == undefined){
-		btrans = false;
-	}
-	else{
-		btrans = convertWordToBoolean(transparent);
-	}
-	if(amount == undefined){
-		amount = 2;
-	}
-	if(endx == undefined){
-		endx = x;
-	}
-	if(endy == undefined){
-		endy = y;
-	}
-	if(endz == undefined){
-		endz = z;
-	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
-	var cylinderMeshs = [];
-	var divisor = amount - 1;
-	var xIncrement = +(endx-x)/divisor;
-	var yIncrement = +(endy-y)/divisor;
-	var zIncrement = +(endz-z)/divisor;
-	if(endsize == undefined) {
-	var cylinderGeom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
-		for(var i = 0; i < amount; i++) {
-			var mesh = new THREE.Mesh(cylinderGeom, material );	
-			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			cylinderMeshs[i] = mesh;
-			addToMeshs(mesh);
-		}
-	}
-	else {
-		var sizeIncrement = (endsize-size)/divisor;
-		var newSize;
-		for(var i = 0; i < amount; i++) {
-			newSize = +size+i*sizeIncrement;
-			var cylinderGeom = new THREE.CylinderGeometry(newSize*2/5,newSize*2/5,newSize);
-			var mesh = new THREE.Mesh(cylinderGeom, material );	
-			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			cylinderMeshs[i] = mesh;
-			addToMeshs(mesh);
-		}
-	}
-	return cylinderMeshs;
+	return meshs;	
 }
 
   //////////////////////////////////////////
@@ -1387,8 +881,14 @@ function colourNameToHex(colour) {
 
 //test method
 function testEverything() {
-	  	  	var pp =parseParams('transparent true x -150 z 100 size 15');
+	  	 /* 	var pp =parseParams('transparent true x -150 z 100 size 15');
   	  	scene.add(createSphere(pp));
+    	  	var pp2 =parseParams('transparent true x 250 z 10 size 15');
+  	  	scene.add(createCylinder(pp2));
+    	  	var pp3 =parseParams('transparent true x -250 z -100 size 15');
+  	  	scene.add(createTorusKnot(pp3));
+    	  	var pp4 =parseParams('transparent true x 150 z 100 size 15');
+  	  	scene.add(createRing(pp4));*/
   	  	
   
 
@@ -1406,8 +906,14 @@ function testEverything() {
   	  		scene.add(testrings[i]);  	  		
   	  	}
 
+  var pp4 =parseParams('color olive transparent true amount 5 size 55 and 10 x 200 and 220 y 100 and 0 z -170 and 170');
+  var testspheres2 = createManySpheres(pp4);
+  	  	
+  	  	for(var i = 0; i < testspheres2.length; i++) {
+  	  		scene.add(testspheres2[i]);  	  		
+  	  	}
   var pp4 =parseParams('color olive transparent true amount 5 size 55 and 10 x -200 and -220 y 100 and 0 z -170 and 170');
-  var testspheres = createManySpheres(pp4);
+  var testspheres = createManyCubes(pp4);
   	  	
   	  	for(var i = 0; i < testspheres.length; i++) {
   	  		scene.add(testspheres[i]);  	  		

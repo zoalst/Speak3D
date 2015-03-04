@@ -103,6 +103,7 @@ You'll need [nodejs](http://nodejs.org/) installed
   - ctrl+z is buggy
   - use updated version of three.js
   - more geometries
+  - textures
   - add parameters for dimensions, rotation, transparent, etc.
   - ability to set default parameters
   - problems with people talking fast
