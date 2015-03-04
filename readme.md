@@ -100,9 +100,8 @@ You'll need [nodejs](http://nodejs.org/) installed
 
   - a lot
   - fix negative number bug(annyang gives a space, ex: y - 100)
-  - undo feature by pressing ctrl+z, or by saying 'undo'
+  - ctrl+z is buggy
   - use updated version of three.js
-  - create multiple geometries with one command
   - more geometries
   - add parameters for dimensions, rotation, transparent, etc.
   - ability to set default parameters
