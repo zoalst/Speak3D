@@ -105,7 +105,7 @@ function init() {
 	////////////
 	// CUSTOM //
 	////////////
-
+//testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -115,22 +115,30 @@ function init() {
   	  	scene.add(create3DText('Hello!'));
   	  },
   	  //TODO::::
-  	  //look into just have create ball *params
+  	  //look into just have create sphere *params
   	  //----------------------------------
   	  //look into just have create *params
-  	  //--will it interpret words way more incorrect? maybe annyang takes "create ball" and really knows it's lloking for ball when otherwise it would choose mall, fall, etc...idk
+  	  //--will it interpret words way more incorrect? maybe annyang takes "create sphere" and really knows it's lloking for sphere when otherwise it would choose another similiar sounding word
   	  //--will it be faster because once annyang has a large list of commands it doesn't really work?
   	  //TODO::::over
-  	  'create ball': function() {
-  	  	console.log('create ball');
+  	  'create sphere': function() {
+  	  	console.log('create sphere');
   	  	scene.add(createSphere({x:0,y:50,z:0,size:50}));
   	  },
-  	  'create ball *params': function(params) {
-  	  	console.log('create ball params: '+params);
+  	  'create sphere *params': function(params) {
+  	  	console.log('create sphere params: '+params);
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createSphere(parsedParams));
   	  },	  
-  	  'create cube': function() {
+  	  'create many spheres *params': function(params) {
+  	  	console.log('create many spheres params: '+params);
+  	  	var parsedParams = parseParams(params);
+  	  	var spheres = createManySpheres(parsedParams);
+  	  	for(var i = 0; i < spheres.length; i++) {
+  	  		scene.add(spheres[i]);  	  		
+  	  	}
+  	  },
+   	  'create cube': function() {
   	  	console.log('create cube');
   	  	scene.add(createCube({x:0,y:50,z:0,size:50}));
   	  },
@@ -156,7 +164,15 @@ function init() {
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createRing(parsedParams));
   	  },
-  	  //TorusKnot, annyang usually picks up 'not' instead of 'knot'
+  	  'create many rings *params': function(params) {
+  	  	console.log('create many rings params: '+params);
+  	  	var parsedParams = parseParams(params);
+  	  	var rings = createManyRings(parsedParams);
+  	  	for(var i = 0; i < rings.length; i++) {
+  	  		scene.add(rings[i]);  	  		
+  	  	}
+  	  },
+   	  //TorusKnot, annyang usually picks up 'not' instead of 'knot'
   	  'create not': function() {
   	  	console.log('create knot');
   	  	scene.add(createTorusKnot({x:0,y:50,z:0,size:50,color:0xffb6c1}));
@@ -166,7 +182,15 @@ function init() {
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createTorusKnot(parsedParams));
   	  },	
-  	  'create cylinder': function() {
+  	  'create many knots *params': function(params) {
+  	  	console.log('create many knots params: '+params);
+  	  	var parsedParams = parseParams(params);
+  	  	var knots = createManyTorusKnots(parsedParams);
+  	  	for(var i = 0; i < knots.length; i++) {
+  	  		scene.add(knots[i]);  	  		
+  	  	}
+  	  },
+   	  'create cylinder': function() {
   	  	console.log('create cylinder');
   	  	scene.add(createCylinder({x:0,y:50,z:0,size:50,color:0xffb6c1}));
   	  },
@@ -174,6 +198,14 @@ function init() {
   	  	console.log('create cylinder params: '+params);
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createCylinder(parsedParams));
+  	  },
+  	  'create many cylinders *params': function(params) {
+  	  	console.log('create many cylinders params: '+params);
+  	  	var parsedParams = parseParams(params);
+  	  	var cylinders = createManyCylinders(parsedParams);
+  	  	for(var i = 0; i < cylinders.length; i++) {
+  	  		scene.add(cylinders[i]);  	  		
+  	  	}
   	  },
   	  /*'create octa': function() {
   	  	console.log('create octahedron');
@@ -750,7 +782,7 @@ function createWall(params) {
 }
 
 //functions for creating mulitple geometries of the same type with a single command
-function createManyCubes(params) {
+function createManySpheres(params) {
 	var x = params['x'];
 	var y = params['y'];
 	var z = params['z'];
@@ -802,6 +834,85 @@ function createManyCubes(params) {
 		transparent: btrans, 
 		blending: THREE.AdditiveBlending 
 	} );
+	var sphereMeshs = [];
+	var divisor = amount - 1;
+	var xIncrement = +(endx-x)/divisor;
+	var yIncrement = +(endy-y)/divisor;
+	var zIncrement = +(endz-z)/divisor;
+	if(endsize == undefined) {
+		var sphereGeom = new THREE.SphereGeometry(size);
+		for(var i = 0; i < amount; i++) {
+			var sphereMesh = new THREE.Mesh(sphereGeom, material );	
+			sphereMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			sphereMeshs[i] = sphereMesh;
+		}
+	}
+	else {
+		var sizeIncrement = (endsize-size)/divisor;
+		var newSize;
+		for(var i = 0; i < amount; i++) {
+			newSize = +size+i*sizeIncrement;
+			var sphereGeom = new THREE.SphereGeometry(newSize);
+			var sphereMesh = new THREE.Mesh(sphereGeom, material );	
+			sphereMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			sphereMeshs[i] = sphereMesh;
+		}
+	}
+	return sphereMeshs;
+}
+
+function createManyCubes(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
+	var amount = params['amount'];
+	var endx = params['endx'];
+	var endy = params['endy'];
+	var endz = params['endz'];
+	var endsize = params['endsize'];
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = +50;
+	}
+	if(color == undefined){
+		color = 0x44ffff;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	if(amount == undefined){
+		amount = 2;
+	}
+	if(endx == undefined){
+		endx = x;
+	}
+	if(endy == undefined){
+		endy = y;
+	}
+	if(endz == undefined){
+		endz = z;
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
 	var cubeMeshs = [];
 	var divisor = amount - 1;
 	var xIncrement = +(endx-x)/divisor;
@@ -811,7 +922,7 @@ function createManyCubes(params) {
 		var cubeGeom = new THREE.CubeGeometry(size,size,size);
 		for(var i = 0; i < amount; i++) {
 			var cubeMesh = new THREE.Mesh(cubeGeom, material );	
-			cubeMesh.position.set( x+i*xIncrement, y+i*yIncrement, z+i*zIncrement );
+			cubeMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
 			cubeMeshs[i] = cubeMesh;
 		}
 	}
@@ -827,6 +938,243 @@ function createManyCubes(params) {
 		}
 	}
 	return cubeMeshs;
+}
+
+function createManyRings(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
+	var amount = params['amount'];
+	var endx = params['endx'];
+	var endy = params['endy'];
+	var endz = params['endz'];
+	var endsize = params['endsize'];
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0xffb6c1;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	if(amount == undefined){
+		amount = 2;
+	}
+	if(endx == undefined){
+		endx = x;
+	}
+	if(endy == undefined){
+		endy = y;
+	}
+	if(endz == undefined){
+		endz = z;
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	var ringMeshs = [];
+	var divisor = amount - 1;
+	var xIncrement = +(endx-x)/divisor;
+	var yIncrement = +(endy-y)/divisor;
+	var zIncrement = +(endz-z)/divisor;
+	if(endsize == undefined) {
+		var ringGeom = new THREE.RingGeometry(size/5,size);
+		for(var i = 0; i < amount; i++) {
+			var ringMesh = new THREE.Mesh(ringGeom, material );	
+			ringMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			ringMeshs[i] = ringMesh;
+		}
+	}
+	else {
+		var sizeIncrement = (endsize-size)/divisor;
+		var newSize;
+		for(var i = 0; i < amount; i++) {
+			newSize = +size+i*sizeIncrement;
+			var ringGeom = new THREE.RingGeometry(newSize/5,newSize);
+			var ringMesh = new THREE.Mesh(ringGeom, material );	
+			ringMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			ringMeshs[i] = ringMesh;
+		}
+	}
+	return ringMeshs;
+}
+
+function createManyTorusKnots(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
+	var amount = params['amount'];
+	var endx = params['endx'];
+	var endy = params['endy'];
+	var endz = params['endz'];
+	var endsize = params['endsize'];
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0xffb6c1;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	if(amount == undefined){
+		amount = 2;
+	}
+	if(endx == undefined){
+		endx = x;
+	}
+	if(endy == undefined){
+		endy = y;
+	}
+	if(endz == undefined){
+		endz = z;
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	var knotMeshs = [];
+	var divisor = amount - 1;
+	var xIncrement = +(endx-x)/divisor;
+	var yIncrement = +(endy-y)/divisor;
+	var zIncrement = +(endz-z)/divisor;
+	if(endsize == undefined) {
+		var knotGeom = new THREE.TorusKnotGeometry(size);
+		for(var i = 0; i < amount; i++) {
+			var knotMesh = new THREE.Mesh(knotGeom, material );	
+			knotMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			knotMeshs[i] = knotMesh;
+		}
+	}
+	else {
+		var sizeIncrement = (endsize-size)/divisor;
+		var newSize;
+		for(var i = 0; i < amount; i++) {
+			newSize = +size+i*sizeIncrement;
+			var knotGeom = new THREE.TorusKnotGeometry(newSize);
+			var knotMesh = new THREE.Mesh(knotGeom, material );	
+			knotMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			knotMeshs[i] = knotMesh;
+		}
+	}
+	return knotMeshs;
+}
+
+function createManyCylinders(params) {
+	var x = params['x'];
+	var y = params['y'];
+	var z = params['z'];
+	var size = params['size'];
+	var color = params['color'];
+	var transparent = params['transparent'];
+	var amount = params['amount'];
+	var endx = params['endx'];
+	var endy = params['endy'];
+	var endz = params['endz'];
+	var endsize = params['endsize'];
+	if(x == undefined){
+		x = 0;
+	}
+	if(y == undefined){
+		y = 50;
+	}
+	if(z == undefined){
+		z = 0;
+	}
+	if(size == undefined){
+		size = 50;
+	}
+	if(color == undefined){
+		color = 0xffb6c1;
+	}
+	var btrans;
+	if(transparent == undefined){
+		btrans = false;
+	}
+	else{
+		btrans = convertWordToBoolean(transparent);
+	}
+	if(amount == undefined){
+		amount = 2;
+	}
+	if(endx == undefined){
+		endx = x;
+	}
+	if(endy == undefined){
+		endy = y;
+	}
+	if(endz == undefined){
+		endz = z;
+	}
+	var material = new THREE.MeshPhongMaterial( { 
+		color: color, 
+		ambient: color,//TODO ambient param 
+		transparent: btrans, 
+		blending: THREE.AdditiveBlending 
+	} );
+	var cylinderMeshs = [];
+	var divisor = amount - 1;
+	var xIncrement = +(endx-x)/divisor;
+	var yIncrement = +(endy-y)/divisor;
+	var zIncrement = +(endz-z)/divisor;
+	if(endsize == undefined) {
+	var cylinderGeom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
+		for(var i = 0; i < amount; i++) {
+			var cylinderMesh = new THREE.Mesh(cylinderGeom, material );	
+			cylinderMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			cylinderMeshs[i] = cylinderMesh;
+		}
+	}
+	else {
+		var sizeIncrement = (endsize-size)/divisor;
+		var newSize;
+		for(var i = 0; i < amount; i++) {
+			newSize = +size+i*sizeIncrement;
+			var cylinderGeom = new THREE.CylinderGeometry(newSize*2/5,newSize*2/5,newSize);
+			var cylinderMesh = new THREE.Mesh(cylinderGeom, material );	
+			cylinderMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+			cylinderMeshs[i] = cylinderMesh;
+		}
+	}
+	return cylinderMeshs;
 }
   //////////////////////////////////////////
  //END OF METHODS FOR CREATING GEOMETRIES//
@@ -1009,6 +1357,37 @@ function colourNameToHex(colour) {
   //////////////////////////////////////////////
  //END OF METHODS FOR DEALING WITH PARAMETERS//
 //////////////////////////////////////////////
+
+//test method
+function testEverything() {
+	  	  	var pp =parseParams('transparent true amount 5 x -150 and 150 z 100 size 15');
+  	  	var testcubes = createManyCubes(pp);
+  	  	
+  	  	for(var i = 0; i < testcubes.length; i++) {
+  	  		scene.add(testcubes[i]);  	  		
+  	  	}
+
+  var pp2 =parseParams('amount 3 y 0 and 300');
+  var testknots = createManyTorusKnots(pp2);
+  	  	
+  	  	for(var i = 0; i < testknots.length; i++) {
+  	  		scene.add(testknots[i]);  	  		
+  	  	}
+
+  var pp3 =parseParams('color orchid transparent true amount 5 size 5 and 50 x -200 and 200 y 100');
+  var testrings = createManyRings(pp3);
+  	  	
+  	  	for(var i = 0; i < testrings.length; i++) {
+  	  		scene.add(testrings[i]);  	  		
+  	  	}
+
+  var pp4 =parseParams('color olive transparent true amount 5 size 55 and 10 x -200 and -220 y 100 and 0 z -170 and 170');
+  var testspheres = createManySpheres(pp4);
+  	  	
+  	  	for(var i = 0; i < testspheres.length; i++) {
+  	  		scene.add(testspheres[i]);  	  		
+  	  	}
+}
 
 </script>
 
