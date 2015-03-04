@@ -136,6 +136,13 @@ function init() {
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createSphere(parsedParams));
   	  },	  
+      'create many spheres': function() {
+        console.log('create many spheres');
+        var spheres = createManySpheres(defaultGlobalParams);
+        for(var i = 0; i < spheres.length; i++) {
+          scene.add(spheres[i]);          
+        }
+      },
   	  'create many spheres *params': function(params) {
   	  	console.log('create many spheres params: '+params);
   	  	var parsedParams = parseParams(params);
@@ -153,6 +160,13 @@ function init() {
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createCube(parsedParams));
   	  },	
+      'create many cubes': function() {
+        console.log('create many cubes');
+        var cubes = createManyCubes(defaultGlobalParams);
+        for(var i = 0; i < cubes.length; i++) {
+          scene.add(cubes[i]);          
+        }
+      },
   	  'create many cubes *params': function(params) {
   	  	console.log('create many cubes params: '+params);
   	  	var parsedParams = parseParams(params);
@@ -170,6 +184,13 @@ function init() {
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createRing(parsedParams));
   	  },
+      'create many rings': function() {
+        console.log('create many rings');
+        var rings = createManyRings(defaultGlobalParams);
+        for(var i = 0; i < rings.length; i++) {
+          scene.add(rings[i]);          
+        }
+      },
   	  'create many rings *params': function(params) {
   	  	console.log('create many rings params: '+params);
   	  	var parsedParams = parseParams(params);
@@ -188,6 +209,13 @@ function init() {
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createTorusKnot(parsedParams));
   	  },	
+      'create many knots': function() {
+        console.log('create many knots');
+        var knots = createManyTorusKnots(defaultGlobalParams);
+        for(var i = 0; i < knots.length; i++) {
+          scene.add(knots[i]);          
+        }
+      },
   	  'create many knots *params': function(params) {
   	  	console.log('create many knots params: '+params);
   	  	var parsedParams = parseParams(params);
@@ -205,6 +233,13 @@ function init() {
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createCylinder(parsedParams));
   	  },
+      'create many cylinders': function() {
+        console.log('create many cylinders');
+        var cylinders = createManyCylinders(defaultGlobalParams);
+        for(var i = 0; i < cylinders.length; i++) {
+          scene.add(cylinders[i]);          
+        }
+      },
   	  'create many cylinders *params': function(params) {
   	  	console.log('create many cylinders params: '+params);
   	  	var parsedParams = parseParams(params);
@@ -801,7 +836,7 @@ function setDefaultGlobalParams(params) {
 			defaultGlobalParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];			
 			lastParamType = paramsArray[i].toLowerCase();
 		}
-		else if(paramsArray[i].toLowerCase() == 'and' || paramsArray[i].toLowerCase() == 'end') {
+		else if(paramsArray[i].toLowerCase() == 'and' || paramsArray[i].toLowerCase() == 'end' || paramsArray[i] == '&') {
 			if(lastParamType == 'x'){
 				defaultGlobalParams['endx'] = paramsArray[i+1];			
 			}

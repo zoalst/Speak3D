@@ -99,6 +99,8 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - a lot
+  - create many geometry bug when give no params
+  - default params bug when given size 10 and 50
   - ability to set default parameters for specific geometries 
   - export function so users can save the world they create
   - cli alternative to send commands
