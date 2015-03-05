@@ -71,7 +71,7 @@ function init() {
 	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
-	camera.position.set(0,150,400);
+	camera.position.set(0,200,500);
 	camera.lookAt(scene.position);	
 	// RENDERER
 	if ( Detector.webgl )
@@ -112,7 +112,7 @@ function init() {
 
 	initDefaultGlobalParams();
 
-//testEverything();//TODO remove
+testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -122,10 +122,8 @@ function init() {
   	  	scene.add(create3DText('Hello!'));
   	  },
   	  //TODO::::
-  	  //look into just have create sphere *params
-  	  //----------------------------------
   	  //look into just have create *params
-  	  //--will it interpret words way more incorrect? maybe annyang takes "create sphere" and really knows it's l0oking for sphere when otherwise it would choose another similiar sounding word
+  	  //--will it interpret words way more incorrect? maybe annyang takes "create sphere" and really knows it's looking for sphere when otherwise it would choose another similiar sounding word
   	  //--will it be faster because once annyang has a large list of commands it doesn't really work?
   	  'create sphere': function() {
   	  	console.log('create sphere');
@@ -398,7 +396,6 @@ function render() {
  //METHODS FOR CREATING GEOMETRIES//
 ///////////////////////////////////
 
-//TODO, add params font, size, colors, coordinates, etc.
 function create3DText(text) {//,x,y,z,size) {
 	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0f90 } );
 	var materialSide = new THREE.MeshBasicMaterial( { color: 0x009988 } );
@@ -657,6 +654,11 @@ function createManyGeometries(params, geometry) {
       endz = defaultGlobalParams['endz'];
     }
 	}
+  if(endsize == undefined) {
+    if(defaultGlobalParams['endsize'] != undefined) {
+      endsize = defaultGlobalParams['endsize'];
+    }
+  }
 	var material = new THREE.MeshPhongMaterial( { 
 		color: color, 
 		ambient: color,//TODO ambient param 
@@ -772,7 +774,6 @@ function undo() {
 ///////////////////////////////////////
 function parseParams(params) {
 	//TODO, if user speaks too fast comes in with no space (ex: z75)
-	//TODO, sometimes negative numbers come in with a space (ex: y - 50)
 	var paramsArray = params.split(" ");
 	var parsedParams = {};
 	var lastParamType = '';
@@ -782,41 +783,53 @@ function parseParams(params) {
 			lastParamType = 'color';
 		}
 		else if(paramsArray[i].toLowerCase() == 'x' || paramsArray[i].toLowerCase() == 'y' || paramsArray[i].toLowerCase() == 'z' ) {
-			parsedParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];			
-			lastParamType = paramsArray[i].toLowerCase();
+      //negative numbers sometimes come in with a space, ex: - 100
+      if(paramsArray[i+1] == '-') {
+        parsedParams[paramsArray[i].toLowerCase()] = paramsArray[i+1] + paramsArray[i+2];
+        lastParamType = paramsArray[i].toLowerCase();
+        i++;  
+      }
+      else {
+			  parsedParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];
+        lastParamType = paramsArray[i].toLowerCase();
+      }			
 		}
+    //annyang sometimes thinks you are saying 'why' or 'by' instead of 'y'
+    //mainly happens when y is your first or only coordinate input
+    else if(paramsArray[i].toLowerCase() == 'why' || paramsArray[i].toLowerCase() == 'by' ) {
+      if(paramsArray[i+1] == '-') {
+        parsedParams['y'] = paramsArray[i+1] + paramsArray[i+2];
+        i++;  
+      }
+      else {
+        parsedParams['y'] = paramsArray[i+1];
+      }     
+      lastParamType = 'y';
+    }
 		else if(paramsArray[i].toLowerCase() == 'and' || paramsArray[i].toLowerCase() == 'end') {
-			if(lastParamType == 'x'){
-				parsedParams['endx'] = paramsArray[i+1];			
+			if(lastParamType == 'x' || lastParamType == 'y' || lastParamType == 'z') {
+        if(paramsArray[i+1] == '-') {
+          parsedParams['end'+lastParamType] = paramsArray[i+1] + paramsArray[i+2]; 
+          i++;    
+        }
+        else {
+				  parsedParams['end'+lastParamType] = paramsArray[i+1];			
+        }
 			}
-			else if(lastParamType == 'y'){
-				parsedParams['endy'] = paramsArray[i+1];			
-			}
-			else if(lastParamType == 'z'){
-				parsedParams['endz'] = paramsArray[i+1];			
-			}
-			else if(lastParamType == 'size'){
+			else if(lastParamType == 'size') {
 				parsedParams['endsize'] = paramsArray[i+1];
 			}
-			else if(lastParamType == 'color'){
+			else if(lastParamType == 'color') {
 				parsedParams['endcolor'] = paramsArray[i+1];
 			}
 			lastParamType = '';
 		}
-		//annyang sometimes thinks you are saying 'why' or 'by' instead of 'y'
-    //mainly happens when y is your first or only coordinate input
-		//TODO, something better
-		else if(paramsArray[i].toLowerCase() == 'why' || paramsArray[i].toLowerCase() == 'by' ) {
-			parsedParams['y'] = paramsArray[i+1];			
-			lastParamType = 'y';
-		}
 		//sometimes annyang hears announced instead of amount
-		//TODO, something better
 		else if(paramsArray[i].toLowerCase() == 'announced') {
 		  parsedParams['amount'] = paramsArray[i+1];			
 			lastParamType = 'amount';	
 		}
-		else{
+		else {
 			parsedParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];			
 			lastParamType = paramsArray[i].toLowerCase();
 		}
@@ -833,42 +846,52 @@ function setDefaultGlobalParams(params) {
 			lastParamType = 'color';
 		}
 		else if(paramsArray[i].toLowerCase() == 'x' || paramsArray[i].toLowerCase() == 'y' || paramsArray[i].toLowerCase() == 'z' ) {
-			defaultGlobalParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];			
-			lastParamType = paramsArray[i].toLowerCase();
+      //negative numbers sometimes come in with a space, ex: - 100
+      if(paramsArray[i+1] == '-') {
+        defaultGlobalParams[paramsArray[i].toLowerCase()] = paramsArray[i+1] + paramsArray[i+2];
+        lastParamType = paramsArray[i].toLowerCase();
+        i++;  
+      }
+      else {
+			  defaultGlobalParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];
+        lastParamType = paramsArray[i].toLowerCase();
+      }			
 		}
+    //annyang sometimes thinks you are saying 'why' or 'by' instead of 'y'
+    else if(paramsArray[i].toLowerCase() == 'why' || paramsArray[i].toLowerCase() == 'by' ) {
+      if(paramsArray[i+1] == '-') {
+        defaultGlobalParams['y'] = paramsArray[i+1] + paramsArray[i+2];
+        i++;  
+      }
+      else {
+        defaultGlobalParams['y'] = paramsArray[i+1];  
+      }   
+      lastParamType = 'y';
+    }
 		else if(paramsArray[i].toLowerCase() == 'and' || paramsArray[i].toLowerCase() == 'end' || paramsArray[i] == '&') {
-			if(lastParamType == 'x'){
-				defaultGlobalParams['endx'] = paramsArray[i+1];			
-			}
-			else if(lastParamType == 'y'){
-				defaultGlobalParams['endy'] = paramsArray[i+1];			
-			}
-			else if(lastParamType == 'z'){
-				defaultGlobalParams['endz'] = paramsArray[i+1];			
-			}
-			else if(lastParamType == 'size'){
+      if(lastParamType == 'x' || lastParamType == 'y' || lastParamType == 'z') {
+        if(paramsArray[i+1] == '-') {
+          defaultGlobalParams['end'+lastParamType] = paramsArray[i+1] + paramsArray[i+2]; 
+          i++;    
+        }
+        else {
+          defaultGlobalParams['end'+lastParamType] = paramsArray[i+1];     
+        }
+      }
+			else if(lastParamType == 'size') {
 				defaultGlobalParams['endsize'] = paramsArray[i+1];
 			}
-			else if(lastParamType == 'color'){
+			else if(lastParamType == 'color') {
 				defaultGlobalParams['endcolor'] = paramsArray[i+1];
 			}
 			lastParamType = '';
-		}
-		//annyang sometimes thinks you are saying 'why' or 'by' instead of 'y'
-		else if(paramsArray[i].toLowerCase() == 'why' || paramsArray[i].toLowerCase() == 'by' ) {
-			defaultGlobalParams['y'] = paramsArray[i+1];			
-			lastParamType = 'y';
 		}
 		//sometimes annyang hears announced instead of amount
 		else if(paramsArray[i].toLowerCase() == 'announced') {
 		  defaultGlobalParams['amount'] = paramsArray[i+1];			
 			lastParamType = 'amount';	
 		}
-		/*else if(paramsArray[i].toLowerCase() == 'transparent') {
-		  defaultGlobalParams['transparent'] = convertWordToBoolean(paramsArray[i+1]);			
-			lastParamType = 'transparent';	
-		}*/
-		else{
+		else {
 			defaultGlobalParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];			
 			lastParamType = paramsArray[i].toLowerCase();
 		}
@@ -890,9 +913,6 @@ function convertWordToBoolean(word) {
 	if(word == 'true') {
 		return true;
 	}
-	//do not need to check if user says false because default is set to false right now
-	//TODO, when users can set default parameters this won't work
-	//sometimes annyang thinks I'm saying Falls
 	else {
 		return false;
 	}
@@ -1006,39 +1026,49 @@ function testEverything() {
   	  	scene.add(createCylinder(parseParams('transparent true x 250 z 10 size 15')));
   	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
-  */	  	setDefaultGlobalParams('transparent true size 9');
-  	  	scene.add(createTorusKnot(defaultGlobalParams));
+  	  	*/
+        scene.add(createTorusKnot(parseParams('z - 600 size 150')));
+        setDefaultGlobalParams('transparent true size 25');
   	  	scene.add(createCube({x: 300}));
   
-        setDefaultGlobalParams('color ivory amount 13 x -200 and 200 y -100 and 300 z 25 and -250');
+        setDefaultGlobalParams('transparent false x - 150 and - 10 color chartreuse amount 6');
   	  	
-  var testknots = createManyRings(
-  	parseParams('size 14'));
+  var testknots = createManyCubes(
+  	parseParams(''));
   	  	
   	  	for(var i = 0; i < testknots.length; i++) {
   	  		scene.add(testknots[i]);  	  		
   	  	}
+                setDefaultGlobalParams('color orchid');
 
-  var testrings = createManyRings(
-  	parseParams('color orchid transparent true amount 5 size 5 and 50 x -200 and 200 y 100'));
+  var testrings = createManyCubes(
+  	parseParams('y 300'));
   	  	
   	  	for(var i = 0; i < testrings.length; i++) {
   	  		scene.add(testrings[i]);  	  		
   	  	}
+        
+
+        scene.add(createFloor({y: 0}));
+    setDefaultGlobalParams('size 55 and 10 ');
 
   var testspheres2 = createManySpheres(
-  	parseParams('color olive transparent true amount 5 size 55 and 10 x 200 and 220 y 100 and 0 z -170 and 170'));
+  	parseParams('color olive transparent true amount 5 x 220 and 200 y 100 and 0 z -170 and 170'));
   	  	
   	  	for(var i = 0; i < testspheres2.length; i++) {
   	  		scene.add(testspheres2[i]);  	  		
   	  	}
 
   var testspheres = createManyCubes(
-  	parseParams('color olive transparent true amount 5 size 55 and 10 x -200 and -220 y 100 and 0 z -170 and 170'));
+  	parseParams('color olive transparent true amount 5 x - 220 and - 200 y 100 and 0 z -170 and 170'));
   	  	
   	  	for(var i = 0; i < testspheres.length; i++) {
   	  		scene.add(testspheres[i]);  	  		
   	  	}
+        
+
+
+
 }
 
 </script>

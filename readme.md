@@ -99,13 +99,10 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - a lot
-  - create many geometry bug when give no params
-  - default params bug when given size 10 and 50
-  - ability to set default parameters for specific geometries 
-  - export function so users can save the world they create
+  - more controls to navigate in 3D space
+  - export function so users can save whatever they create
   - cli alternative to send commands
   - ability to manipulate & remove existing geometries
-  - fix negative number bug(annyang gives a space, ex: y - 100)
   - ctrl+z is buggy
   - use updated version of three.js
   - textures
@@ -114,6 +111,8 @@ You'll need [nodejs](http://nodejs.org/) installed
   - geometries in motion
   - more geometries
   - more colors
+  - ability to set default parameters for specific geometries 
+  - spin(command would be spin x, spin y, spin z)
   - lights, fog, skyBox, etc.
   - built-in models and user uploaded models
   - better debugging
