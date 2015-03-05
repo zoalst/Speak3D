@@ -59,6 +59,9 @@ var undoing = false;
 //default parameters
 var defaultGlobalParams = {};
 
+var user;
+//var useOtherControls = true;
+
 init();
 animate();
 
@@ -85,7 +88,7 @@ function init() {
 	THREEx.WindowResize(renderer, camera);
 	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 	// CONTROLS
-	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	//controls = new THREE.OrbitControls( camera, renderer.domElement );//TODO
 	// STATS
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -106,13 +109,40 @@ function init() {
 	// scene.add(skyBox);
 	scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
 
+  // USER, renamed person from http://stemkoski.github.io/7DFPS/3JSFPS.html
+  user = new THREE.Object3D();
+  user.add(camera);
+  camera.position.set(0,115,10); // first-person view
+  user.position.set(0,100,500);
+  //user.rotation.y = -Math.PI / 2.0;
+
+  boundingG = new THREE.CubeGeometry(40,40,40);
+  // radiusAtTop, radiusAtBottom, height, segmentsAroundRadius, segmentsAlongHeight,
+  // boundingG = new THREE.CylinderGeometry(20,20,80,8,2);
+  // better collision but FPS drops too much
+  
+  boundingG.computeBoundingSphere();
+  boundingM = new THREE.MeshBasicMaterial( {color:0xff66f3, transparent:true, wireframe:false} );
+  bounding  = new THREE.Mesh( boundingG, boundingM );
+  bounding.visible = true;
+  user.add(bounding);
+
+  user.velocity = new THREE.Vector3(0,0,0);
+  
+  scene.add(user);
+
+  var coordinator = function(z,x,y)
+  {
+    return new THREE.Vector3(50*x, 50*y, 50*z);
+  }
+
 	////////////
 	// CUSTOM //
 	////////////
 
 	initDefaultGlobalParams();
 
-testEverything();//TODO remove
+//testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -368,7 +398,64 @@ testEverything();//TODO remove
   	// Start listening. You can call this here, or attach this call to an event, button, etc.
   	annyang.start();
 	}
+
+  //controls from http://stemkoski.github.io/7DFPS/3JSFPS.html
+  // Mouse Look (Free Look) controls 
+  this.mouseLook = { x:0, y:0 };
+  document.addEventListener( 'click', function ( event ) 
+  {
+    var havePointerLock = 'pointerLockElement' in document ||
+               'mozPointerLockElement' in document ||
+            'webkitPointerLockElement' in document;
+    if ( !havePointerLock ) return;
+    
+    var element = document.body;
+    // Ask the browser to lock the pointer
+    element.requestPointerLock = element.requestPointerLock ||
+                  element.mozRequestPointerLock ||
+                 element.webkitRequestPointerLock;
+    // Ask the browser to lock the pointer
+    element.requestPointerLock();
+    
+    // Hook pointer lock state change events
+    document.addEventListener(      'pointerlockchange', pointerLockChange, false);
+    document.addEventListener(   'mozpointerlockchange', pointerLockChange, false);
+    document.addEventListener('webkitpointerlockchange', pointerLockChange, false);
+    
+    // Hook mouse move events
+    // document.addEventListener("mousemove", this.moveCallback, false);
+    
+  }, false );
 }
+
+function moveCallback(e)
+{
+  var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+  var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
+  // store movement amounts; will be processed by update function.
+  mouseLook.x += movementX;
+  mouseLook.y += movementY;
+}
+
+function pointerLockChange(event)
+{
+  var element = document.body;
+  if (document.pointerLockElement       === element ||
+      document.mozPointerLockElement    === element ||
+        document.webkitPointerLockElement === element) 
+  {
+    // Pointer was just locked, enable the mousemove listener
+    document.addEventListener("mousemove", moveCallback, false);
+  } 
+  else 
+  {
+    // Pointer was just unlocked, disable the mousemove listener
+    document.removeEventListener("mousemove", moveCallback, false);
+  }
+}
+
+function projectXZ(v)
+{ return new THREE.Vector3(v.x, 0, v.z); }
 
 function animate() {
   requestAnimationFrame( animate );
@@ -384,7 +471,78 @@ function update() {
 		setInterval(function() {undoing=false;}, 1000);
 	}
 
-	controls.update();
+	//controls.update();//TODO, have both????
+  //controls from http://stemkoski.github.io/7DFPS/3JSFPS.html
+  var delta = clock.getDelta(); // seconds since last update
+  
+  var moveDistance = 200 * delta; // 200 pixels per second  // should be velocity?
+  var rotateAngle = Math.PI / 4 * delta;   // pi/4 radians (45 degrees) per second
+  var cursorSpeed = 200 * delta;
+  // movement controls  
+  var move = { xDist: 0, yAngle: 0, zDist: 0 };
+  // keyboard fallback
+  
+  // forwards/backwards
+  if (keyboard.pressed("W"))
+    move.zDist -= moveDistance;
+  if (keyboard.pressed("S"))
+    move.zDist += moveDistance;
+  // turn left/right
+  if (keyboard.pressed("Q"))
+    move.yAngle += rotateAngle;
+  if (keyboard.pressed("E"))
+    move.yAngle -= rotateAngle;
+  // left/right (strafe)
+  if ( keyboard.pressed("A") )
+    move.xDist -= moveDistance;
+  if ( keyboard.pressed("D") )
+    move.xDist += moveDistance;
+    
+  // process data from mouse look
+  //  (if inactive, there will be no change)
+  move.yAngle -= rotateAngle * mouseLook.x * 0.1;
+  mouseLook.x = 0;
+  
+  // up/down (debugging fly)
+  if ( keyboard.pressed("R") )
+  {
+    user.velocity = new THREE.Vector3(0,0,0);
+    user.translateY( moveDistance );
+  }
+  if ( keyboard.pressed("F") )
+  {
+    user.velocity = new THREE.Vector3(0,0,0);
+    user.translateY( -moveDistance );
+  }
+
+  user.translateZ( move.zDist );
+  user.rotateY( move.yAngle );
+  user.translateX( move.xDist );
+  user.updateMatrix();
+
+  // look up/down
+  if ( keyboard.pressed("3") ) // third-person view
+    camera.position.set(0,50,250);
+  if ( keyboard.pressed("1") ) // first-person view
+    camera.position.set(0,35,10);
+  if ( keyboard.pressed("T") )
+    camera.rotateX(  rotateAngle );
+  if ( keyboard.pressed("G") )
+    camera.rotateX( -rotateAngle );
+    
+  // process data from mouse look
+  //  (if inactive, there will be no change)
+  camera.rotateX( -rotateAngle * mouseLook.y * 0.05 );
+  mouseLook.y = 0;
+    
+  // limit camera to +/- 45 degrees (0.7071 radians) or +/- 60 degrees (1.04 radians)
+  camera.rotation.x = THREE.Math.clamp( camera.rotation.x, -1.04, 1.04 );
+  // pressing both buttons moves look angle to horizon
+  if ( keyboard.pressed("R") && keyboard.pressed("F") )
+    camera.rotateX( -6 * camera.rotation.x * rotateAngle );
+  
+  user.translateY( user.velocity.y );
+
 	stats.update();
 }
 
@@ -1027,7 +1185,7 @@ function testEverything() {
   	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
   	  	*/
-        scene.add(createTorusKnot(parseParams('z - 600 size 150')));
+        scene.add(createTorusKnot(parseParams('y 250 z - 600 size 150')));
         setDefaultGlobalParams('transparent true size 25');
   	  	scene.add(createCube({x: 300}));
   

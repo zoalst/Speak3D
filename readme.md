@@ -19,6 +19,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'create many cubes/spheres/rings/knots/cylinders' w/ optional parameters, provide amount param and two params on atleast one axis(x,y, or z) or two size params ex: 'create many spheres amount 5 z 0 and 250' or 'create many cubes amount 5 size 10 and 110 transparent true'
   - say 'create text' then say whatever you want
   - say 'undo' or press ctrl+z
+  - say 'test everything' to see a bunch of stuff at once
   - optional parameters are x (number), y (number), z (number), size (number), color (color name), transparent (true or false)
   - examples: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 y 150'
 
@@ -103,8 +104,10 @@ You'll need [nodejs](http://nodejs.org/) installed
   - export function so users can save whatever they create
   - cli alternative to send commands
   - ability to manipulate & remove existing geometries
+  - have start/pause screen that has usage & commands & examples
   - ctrl+z is buggy
   - use updated version of three.js
+  - create self, for third person view
   - textures
   - add parameters for dimensions, rotation, etc.
   - problems with people talking fast
