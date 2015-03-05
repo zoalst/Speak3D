@@ -45,6 +45,7 @@ You'll need [nodejs](http://nodejs.org/) installed
 
 ## List of Color Names
 
+  -antique
   -aqua
   -aquamarine
   -azure
@@ -59,8 +60,11 @@ You'll need [nodejs](http://nodejs.org/) installed
   -coral
   -crimson
   -cyan
+  -fire
+  -forest
   -fuchsia
   -gainsboro
+  -ghost
   -gold
   -goldenrod
   -gray
@@ -71,10 +75,14 @@ You'll need [nodejs](http://nodejs.org/) installed
   -ivory
   -khaki
   -lavender
+  -lawn
+  -lemon
   -lime
   -linen
   -magenta
   -maroon
+  -midnight
+  -mint
   -navy
   -olive
   -orange
@@ -84,8 +92,10 @@ You'll need [nodejs](http://nodejs.org/) installed
   -purple
   -red
   -salmon
+  -seashell
   -sienna
   -silver
+  -sky
   -snow
   -tan
   -teal
@@ -100,14 +110,14 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - a lot
-  - more controls to navigate in 3D space
   - export function so users can save whatever they create
   - cli alternative to send commands
   - ability to manipulate & remove existing geometries
   - have start/pause screen that has usage & commands & examples
   - ctrl+z is buggy
   - use updated version of three.js
-  - create self, for third person view
+  - create self command, for third person view
+  - better controls to navigate in 3D space
   - textures
   - add parameters for dimensions, rotation, etc.
   - problems with people talking fast

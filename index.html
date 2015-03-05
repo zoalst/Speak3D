@@ -142,7 +142,7 @@ function init() {
 
 	initDefaultGlobalParams();
 
-//testEverything();//TODO remove
+testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -1082,7 +1082,7 @@ function colourNameToHex(colour) {
 		//TODO, colors with more than one word
     var colours = {
     	//"alice blue":"#f0f8ff",
-    	//"antique white":"#faebd7",
+    	"antique":"#faebd7",
     	"aqua":"#00ffff",
     	"aquamarine":"#7fffd4",
     	"azure":"#f0ffff",
@@ -1105,10 +1105,12 @@ function colourNameToHex(colour) {
     	//"darkblue":"#00008b","darkcyan":"#008b8b","darkgoldenrod":"#b8860b","darkgray":"#a9a9a9","darkgreen":"#006400","darkkhaki":"#bdb76b","darkmagenta":"#8b008b","darkolivegreen":"#556b2f",
     	//"darkorange":"#ff8c00","darkorchid":"#9932cc","darkred":"#8b0000","darksalmon":"#e9967a","darkseagreen":"#8fbc8f","darkslateblue":"#483d8b","darkslategray":"#2f4f4f","darkturquoise":"#00ced1",
     	//"darkviolet":"#9400d3","deeppink":"#ff1493","deepskyblue":"#00bfff","dimgray":"#696969","dodgerblue":"#1e90ff",
-    	//"firebrick":"#b22222","floralwhite":"#fffaf0","forestgreen":"#228b22",
+    	"fire":"#b22222",
+      //"floralwhite":"#fffaf0",
+      "forest":"#228b22",
     	"fuchsia":"#ff00ff",
     	"gainsboro":"#dcdcdc",
-    	//"ghostwhite":"#f8f8ff",
+    	"ghost":"#f8f8ff",
     	"gold":"#ffd700",
     	"goldenrod":"#daa520",
     	"gray":"#808080",
@@ -1121,7 +1123,10 @@ function colourNameToHex(colour) {
     	"ivory":"#fffff0",
     	"khaki":"#f0e68c",
     	"lavender":"#e6e6fa",
-    	//"lavenderblush":"#fff0f5","lawngreen":"#7cfc00","lemonchiffon":"#fffacd","lightblue":"#add8e6","lightcoral":"#f08080","lightcyan":"#e0ffff","lightgoldenrodyellow":"#fafad2",
+    	//"lavenderblush":"#fff0f5",
+      "lawn":"#7cfc00",
+      "lemon":"#fffacd",
+      //"lightblue":"#add8e6","lightcoral":"#f08080","lightcyan":"#e0ffff","lightgoldenrodyellow":"#fafad2",
     	//"lightgrey":"#d3d3d3","lightgreen":"#90ee90","lightpink":"#ffb6c1","lightsalmon":"#ffa07a","lightseagreen":"#20b2aa","lightskyblue":"#87cefa","lightslategray":"#778899","lightsteelblue":"#b0c4de",
     	//"lightyellow":"#ffffe0",
     	"lime":"#00ff00",
@@ -1130,7 +1135,10 @@ function colourNameToHex(colour) {
     	"magenta":"#ff00ff",
     	"maroon":"#800000",
     	//"mediumaquamarine":"#66cdaa","mediumblue":"#0000cd","mediumorchid":"#ba55d3","mediumpurple":"#9370d8","mediumseagreen":"#3cb371","mediumslateblue":"#7b68ee",
-    	//"mediumspringgreen":"#00fa9a","mediumturquoise":"#48d1cc","mediumvioletred":"#c71585","midnightblue":"#191970","mintcream":"#f5fffa","mistyrose":"#ffe4e1",
+    	//"mediumspringgreen":"#00fa9a","mediumturquoise":"#48d1cc","mediumvioletred":"#c71585",
+      "midnight":"#191970",
+      "mint":"#f5fffa",
+      //"mistyrose":"#ffe4e1",
       "navy":"#000080",
     	//"oldlace":"#fdf5e6",
     	"olive":"#808000",
@@ -1138,7 +1146,9 @@ function colourNameToHex(colour) {
     	"orange":"#ffa500",
     	//"orangered":"#ff4500",
     	"orchid":"#da70d6",
-    	//"palegoldenrod":"#eee8aa","palegreen":"#98fb98","paleturquoise":"#afeeee","palevioletred":"#d87093","papayawhip":"#ffefd5","peachpuff":"#ffdab9",
+    	//"palegoldenrod":"#eee8aa","palegreen":"#98fb98","paleturquoise":"#afeeee","palevioletred":"#d87093",
+      "papaya":"#ffefd5",
+      "peach":"#ffdab9",
     	"pink":"#ffc0cb",
     	"plum":"#dda0dd",
     	//"powderblue":"#b0e0e6",
@@ -1147,10 +1157,12 @@ function colourNameToHex(colour) {
     	//"rosybrown":"#bc8f8f","royalblue":"#4169e1",
     	//"saddlebrown":"#8b4513",
     	"salmon":"#fa8072",
-    	//"sandybrown":"#f4a460","seagreen":"#2e8b57","seashell":"#fff5ee",
+    	//"sandybrown":"#f4a460","seagreen":"#2e8b57",
+      "seashell":"#fff5ee",
     	"sienna":"#a0522d",
     	"silver":"#c0c0c0",
-    	//"skyblue":"#87ceeb","slateblue":"#6a5acd","slategray":"#708090",
+    	"sky":"#87ceeb",
+      //"slateblue":"#6a5acd","slategray":"#708090",
     	"snow":"#fffafa",
     	//"springgreen":"#00ff7f","steelblue":"#4682b4",
     	"tan":"#d2b48c",
@@ -1185,11 +1197,11 @@ function testEverything() {
   	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
   	  	*/
-        scene.add(createTorusKnot(parseParams('y 250 z - 600 size 150')));
+        scene.add(createTorusKnot(parseParams('color sky y 250 z - 600 size 150')));
         setDefaultGlobalParams('transparent true size 25');
   	  	scene.add(createCube({x: 300}));
   
-        setDefaultGlobalParams('transparent false x - 150 and - 10 color chartreuse amount 6');
+        setDefaultGlobalParams('transparent false x - 150 and - 10 color midnight amount 6');
   	  	
   var testknots = createManyCubes(
   	parseParams(''));
@@ -1197,7 +1209,7 @@ function testEverything() {
   	  	for(var i = 0; i < testknots.length; i++) {
   	  		scene.add(testknots[i]);  	  		
   	  	}
-                setDefaultGlobalParams('color orchid');
+                setDefaultGlobalParams('color forest');
 
   var testrings = createManyCubes(
   	parseParams('y 300'));
@@ -1211,14 +1223,14 @@ function testEverything() {
     setDefaultGlobalParams('size 55 and 10 ');
 
   var testspheres2 = createManySpheres(
-  	parseParams('color olive transparent true amount 5 x 220 and 200 y 100 and 0 z -170 and 170'));
+  	parseParams('color lawn transparent true amount 5 x 220 and 200 y 100 and 0 z -170 and 170'));
   	  	
   	  	for(var i = 0; i < testspheres2.length; i++) {
   	  		scene.add(testspheres2[i]);  	  		
   	  	}
 
   var testspheres = createManyCubes(
-  	parseParams('color olive transparent true amount 5 x - 220 and - 200 y 100 and 0 z -170 and 170'));
+  	parseParams('color lemon transparent true amount 5 x - 220 and - 200 y 100 and 0 z -170 and 170'));
   	  	
   	  	for(var i = 0; i < testspheres.length; i++) {
   	  		scene.add(testspheres[i]);  	  		

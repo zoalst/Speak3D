@@ -1,5 +1,6 @@
 ## List of Color Names
 
+  - antique
   - aqua
   - aquamarine
   - azure
@@ -14,8 +15,11 @@
   - coral
   - crimson
   - cyan
+  - fire
+  - forest
   - fuchsia
   - gainsboro
+  - ghost
   - gold
   - goldenrod
   - gray
@@ -26,6 +30,8 @@
   - ivory
   - khaki
   - lavender
+  - lawn
+  - lemon
   - lime
   - linen
   - magenta
@@ -34,13 +40,17 @@
   - olive
   - orange
   - orchid
+  - papaya
+  - peach
   - pink
   - plum
   - purple
   - red
   - salmon
+  - seashell
   - sienna
   - silver
+  - sky
   - snow
   - tan
   - teal
