@@ -115,7 +115,10 @@ You'll need [nodejs](http://nodejs.org/) installed
   -checkers
   -chrome
   -cloud
+  -crate
   -electric
+  -glow
+  -rock
 
 ## To Do
 

@@ -154,7 +154,7 @@ function init() {
 
 	initDefaultGlobalParams();
 
-//testEverything();//TODO remove
+testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -665,54 +665,61 @@ function createIcosahedron(x,y,z,size,color,transparent) {
 }*/
 
 function createFloor(params) {
-	var y = params['y'];
-	var size = params['size'];
-	if(y == undefined){
-		y = 500;
-	}
-	if(size == undefined){
-		size = 1000;
-	}
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
-	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
-	floorTexture.repeat.set( 10, 10 );
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(size, size, 10, 10);
-	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	if(y == undefined){
-		y = -0.5;
-	}
-	floor.position.y = y;
-	floor.rotation.x = Math.PI / 2;
-	addToMeshs(floor);
-	return floor;
+  return createFloorOrWall(params, 'Floor');
 }
 
 function createWall(params) {
-	var x = params['x'];
-	var y = params['y'];
-	var size = params['size'];
-	if(x == undefined){
-		x = -150;
-	}
-	if(y == undefined){
-		y = 500;
-	}
-	if(size == undefined){
-		size = 1000;
-	}
-	var wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
-	wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
-	wallTexture.repeat.set( 10, 10 );
-	var wallMaterial = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide } );
-	var wallGeometry = new THREE.PlaneGeometry(size, size, 10, 10);
-	var wall = new THREE.Mesh(wallGeometry, wallMaterial);
-	wall.position.x = x;
-	wall.position.y = y;
-	//wall.rotation.x = Math.PI / 2;
-	wall.rotation.y = Math.PI / 2;
-	addToMeshs(wall);
-	return wall;
+	return createFloorOrWall(params, 'Wall');
+}
+
+function createFloorOrWall(params, floorOrWall) {
+  var x = params['x'];
+  var y = params['y'];
+  var size = params['size'];
+  var texture = params['texture'];
+  if(x == undefined){
+    x = -150;
+  }
+  if(y == undefined){
+    y = 500;
+  }
+  if(size == undefined){
+    size = 1000;
+  }
+  if(texture == undefined) {
+    texture = defaultGlobalParams['texture'];
+  }
+  if(texture == undefined) {
+    var planeTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
+  }
+  else if(texture == 'random') {
+      var rand = getRandomInt(0,texturesLength-1);
+      var i = 0;
+      for(var t in textures) {
+        if(rand == i) {
+          var planeTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[t] );
+        }
+        i++;
+      }    
+  }
+  else {
+    var planeTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[texture] );    
+  }
+  planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping; 
+  planeTexture.repeat.set( 10, 10 );
+  var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide } );
+  var geometry = new THREE.PlaneGeometry(size, size, 10, 10);
+  var mesh = new THREE.Mesh(geometry, material);
+  mesh.position.x = x;
+  mesh.position.y = y;
+  if(floorOrWall == 'Floor') {
+    mesh.rotation.x = Math.PI / 2;
+  }
+  else if(floorOrWall == 'Wall') {
+    mesh.rotation.y = Math.PI / 2;
+  }
+  addToMeshs(mesh);
+  return mesh;
 }
 
 //functions for creating mulitple geometries of the same type with a single command
@@ -738,50 +745,17 @@ function createManyCylinders(params) {
 
 
 function createGeometry(params, geometry) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
   var color = params['color'];
   var ambient = params['ambient'];
   var texture = params['texture'];
-	var transparent = params['transparent'];
-	if(x == undefined) {
-		x = defaultGlobalParams['x'];
-	}
-	if(y == undefined) {
-		y = defaultGlobalParams['y'];
-	}
-	if(z == undefined) {
-		z = defaultGlobalParams['z'];
-	}
-	if(size == undefined) {
-		size = defaultGlobalParams['size'];
-	}
-	/*if(color == undefined) {
-		//For some reason I want the default cubes and spheres to be a different color from everything else
-		/*if(geometry == 'SphereGeometry' || geometry == 'CubeGeometry') {
-			color = 0x44ffff;
-		}
-		else {
-			color = defaultGlobalParams['color'];
-		//}
-	}
-  if(ambient == undefined) {
-    if(defaultGlobalParams['ambient'] == undefined) {
-      ambient = color;
-    }
-    else {
-      ambient = defaultGlobalParams['ambient'];
-    }
-  }*/
-	var btrans;
-	if(transparent == undefined) {
-		btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
-	}
-	else {
-		btrans = convertWordToBoolean(transparent);
-	}
+  //color/ambient/texture not yet resolved
+  var resolvedParams = resolveParams(params);
+  var x = resolvedParams['x'];
+  var y = resolvedParams['y'];
+  var z = resolvedParams['z'];
+  var size = resolvedParams['size'];
+  var btrans = resolvedParams['btrans'];
+
   //first check if there is a default texture
   if(texture == undefined) {
     texture = defaultGlobalParams['texture'];
@@ -850,70 +824,22 @@ function createGeometry(params, geometry) {
 }
 
 function createManyGeometries(params, geometry) {
-	var x = params['x'];
-	var y = params['y'];
-	var z = params['z'];
-	var size = params['size'];
   var color = params['color'];
   var ambient = params['ambient'];
   var texture = params['texture'];
-	var transparent = params['transparent'];
-	var amount = params['amount'];
-	var endx = params['endx'];
-	var endy = params['endy'];
-	var endz = params['endz'];
-	var endsize = params['endsize'];
-	if(x == undefined) {
-    x = defaultGlobalParams['x'];
-	}
-	if(y == undefined) {
-		y = defaultGlobalParams['y'];
-	}
-	if(z == undefined) {
-		z = defaultGlobalParams['z'];
-	}
-	if(size == undefined) {
-		size = defaultGlobalParams['size'];
-	}
-	var btrans;
-	if(transparent == undefined) {
-		btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
-	}
-	else {
-		btrans = convertWordToBoolean(transparent);
-	}
-	if(amount == undefined) {
-		amount = defaultGlobalParams['amount'];
-	}
-	if(endx == undefined) {
-    if(defaultGlobalParams['endx'] == undefined) {
-		  endx = x;
-    }
-    else {
-      endx = defaultGlobalParams['endx'];
-    }
-	}
-	if(endy == undefined) {
-    if(defaultGlobalParams['endy'] == undefined) {
-      endy = y;
-    }
-    else {
-      endy = defaultGlobalParams['endy'];
-    }
-	}
-	if(endz == undefined) {
-    if(defaultGlobalParams['endz'] == undefined) {
-      endz = z;
-    }
-    else {
-      endz = defaultGlobalParams['endz'];
-    }
-	}
-  if(endsize == undefined) {
-    if(defaultGlobalParams['endsize'] != undefined) {
-      endsize = defaultGlobalParams['endsize'];
-    }
-  }
+  //color/ambient/texture not yet resolved
+  var resolvedParams = resolveParams(params);
+	var x = resolvedParams['x'];
+	var y = resolvedParams['y'];
+	var z = resolvedParams['z'];
+  var size = resolvedParams['size'];
+  var btrans = resolvedParams['btrans'];
+	var amount = resolvedParams['amount'];
+	var endx = resolvedParams['endx'];
+	var endy = resolvedParams['endy'];
+	var endz = resolvedParams['endz'];
+	var endsize = resolvedParams['endsize'];
+
   //first check if there is a default texture
   if(texture == undefined) {
     texture = defaultGlobalParams['texture'];
@@ -1047,6 +973,7 @@ function createManyGeometries(params, geometry) {
 }
 
 function createManyFloorsOrWalls(params,floorOrWall) {
+  var texture = params['texture'];
   var x = params['x'];
   var y = params['y'];
   var z = params['z'];
@@ -1111,10 +1038,28 @@ function createManyFloorsOrWalls(params,floorOrWall) {
       endsize = defaultGlobalParams['endsize'];
     }
   }
-  var wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
-  wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
-  wallTexture.repeat.set( 10, 10 );
-  var material = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide } );
+  if(texture == undefined) {
+    texture = defaultGlobalParams['texture'];
+  }
+  if(texture == undefined) {
+    var planeTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
+  }
+  else if(texture == 'random') {
+      var rand = getRandomInt(0,texturesLength-1);
+      var i = 0;
+      for(var t in textures) {
+        if(rand == i) {
+          var planeTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[t] );
+        }
+        i++;
+      }    
+  }
+  else {
+    var planeTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[texture] );    
+  }
+  planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping; 
+  planeTexture.repeat.set( 10, 10 );
+  var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide } );
   var meshs = [];
   var divisor = amount - 1;
   var xIncrement = +(endx-x)/divisor;
@@ -1311,7 +1256,7 @@ function initDefaultGlobalParams() {
 	defaultGlobalParams['size'] = 50;
 	defaultGlobalParams['color'] = 0xffb6c1;
   defaultGlobalParams['transparent'] = false;
-  defaultGlobalParams['amount'] = 2;
+  defaultGlobalParams['amount'] = 3;
 }
 
 function convertWordToBoolean(word) {
@@ -1440,19 +1385,103 @@ function colourNameToHex(colour) {
 
 //to convert given texture name to texture file
 function getTextures() {
-  texturesLength = 6;
+  texturesLength = 9;
   return {
       "checkers":"checkerboard.jpg",
       "cloud":"cloud.png",
       "chrome":"Chrome.png",
+      "crate":"x-crate.png",
       "electric":"electric-blue-light.jpg",//maybe change name to water?
       "alloy":"alien-alloy.png",
-      "carving":"alien-carving.png"
+      "carving":"alien-carving.png",
+      "rock":"rocky-ground.jpg",
+      "glow":"blue-glowy.jpg"
   };
 }
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+//resolves params except color/ambient/texture
+function resolveParams(params) {
+  var resolvedParams = {};
+  var x = params['x'];
+  var y = params['y'];
+  var z = params['z'];
+  var size = params['size'];
+  /*var color = params['color'];
+  var ambient = params['ambient'];
+  var texture = params['texture'];*/
+  var transparent = params['transparent'];
+  var amount = params['amount'];
+  var endx = params['endx'];
+  var endy = params['endy'];
+  var endz = params['endz'];
+  var endsize = params['endsize'];
+  if(x == undefined) {
+    x = defaultGlobalParams['x'];
+  }
+  if(y == undefined) {
+    y = defaultGlobalParams['y'];
+  }
+  if(z == undefined) {
+    z = defaultGlobalParams['z'];
+  }
+  if(size == undefined) {
+    size = defaultGlobalParams['size'];
+  }
+  var btrans;
+  if(transparent == undefined) {
+    btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
+  }
+  else {
+    btrans = convertWordToBoolean(transparent);
+  }
+  if(amount == undefined) {
+    amount = defaultGlobalParams['amount'];
+  }
+  if(endx == undefined) {
+    if(defaultGlobalParams['endx'] == undefined) {
+      endx = x;
+    }
+    else {
+      endx = defaultGlobalParams['endx'];
+    }
+  }
+  if(endy == undefined) {
+    if(defaultGlobalParams['endy'] == undefined) {
+      endy = y;
+    }
+    else {
+      endy = defaultGlobalParams['endy'];
+    }
+  }
+  if(endz == undefined) {
+    if(defaultGlobalParams['endz'] == undefined) {
+      endz = z;
+    }
+    else {
+      endz = defaultGlobalParams['endz'];
+    }
+  }
+  if(endsize == undefined) {
+    if(defaultGlobalParams['endsize'] != undefined) {
+      endsize = defaultGlobalParams['endsize'];
+    }
+  }
+  resolvedParams["x"] = x;
+  resolvedParams["y"] = y;
+  resolvedParams["z"] = z;
+  resolvedParams["btrans"] = btrans;
+  resolvedParams["amount"] = amount;
+  resolvedParams["size"] = size;
+  resolvedParams["endx"] = endx;
+  resolvedParams["endy"] = endy;
+  resolvedParams["endz"] = endz;
+  resolvedParams["endsize"] = endsize;
+
+  return resolvedParams;
 }
   //////////////////////////////////////////////
  //END OF METHODS FOR DEALING WITH PARAMETERS//
