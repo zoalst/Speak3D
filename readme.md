@@ -21,7 +21,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'set default' w/ parameters ex: 'set default transparent true color blue' or 'set default amount 10 size 20 x 0 and 200'
   - say 'undo' or press ctrl+z
   - say 'test everything' to see a bunch of stuff at once
-  - optional parameters are x (number), y (number), z (number), size (number), color (color name), transparent (true or false)
+  - optional parameters are x (number), y (number), z (number), size (number), color (color name), ambient (ambient color name), texture (texture name), transparent (true or false)
   - examples: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 y 150'
 
 ##Usage
@@ -108,9 +108,19 @@ You'll need [nodejs](http://nodejs.org/) installed
   -white
   -yellow
 
+## List of Texture Names
+  
+  -alloy
+  -carving
+  -checkers
+  -chrome
+  -cloud
+  -electric
+
 ## To Do
 
   - a lot
+  - add random as an option, ex: color random or texture random, size & coordinates also
   - export function so users can save whatever they create
   - cli alternative to send commands
   - ability to manipulate & remove existing geometries

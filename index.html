@@ -65,6 +65,8 @@ var numberOfMeshs = 0;
 var undoing = false;
 //default parameters
 var defaultGlobalParams = {};
+var texturesLength;
+var textures = getTextures();
 
 var user;
 //var useOtherControls = true;
@@ -152,7 +154,7 @@ function init() {
 
 	initDefaultGlobalParams();
 
-testEverything();//TODO remove
+//testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -740,7 +742,9 @@ function createGeometry(params, geometry) {
 	var y = params['y'];
 	var z = params['z'];
 	var size = params['size'];
-	var color = params['color'];
+  var color = params['color'];
+  var ambient = params['ambient'];
+  var texture = params['texture'];
 	var transparent = params['transparent'];
 	if(x == undefined) {
 		x = defaultGlobalParams['x'];
@@ -754,15 +758,23 @@ function createGeometry(params, geometry) {
 	if(size == undefined) {
 		size = defaultGlobalParams['size'];
 	}
-	if(color == undefined) {
+	/*if(color == undefined) {
 		//For some reason I want the default cubes and spheres to be a different color from everything else
 		/*if(geometry == 'SphereGeometry' || geometry == 'CubeGeometry') {
 			color = 0x44ffff;
 		}
-		else {*/
+		else {
 			color = defaultGlobalParams['color'];
 		//}
 	}
+  if(ambient == undefined) {
+    if(defaultGlobalParams['ambient'] == undefined) {
+      ambient = color;
+    }
+    else {
+      ambient = defaultGlobalParams['ambient'];
+    }
+  }*/
 	var btrans;
 	if(transparent == undefined) {
 		btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
@@ -770,12 +782,52 @@ function createGeometry(params, geometry) {
 	else {
 		btrans = convertWordToBoolean(transparent);
 	}
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
+  //first check if there is a default texture
+  if(texture == undefined) {
+    texture = defaultGlobalParams['texture'];
+  }
+  if(texture == undefined) {
+    if(color == undefined) {
+      color = defaultGlobalParams['color'];
+    }
+    if(ambient == undefined) {
+      if(defaultGlobalParams['ambient'] == undefined) {
+        ambient = color;
+      }
+      else {
+        ambient = defaultGlobalParams['ambient'];
+      }
+    }
+    var material = new THREE.MeshPhongMaterial( { 
+      color: color, 
+      ambient: ambient,//TODO ambient param 
+      transparent: btrans, 
+      blending: THREE.AdditiveBlending 
+    } );
+  }
+  //TODO other texture? checkerboard is pretty great tho...
+  else {
+    var wallTexture;
+    if(texture != 'random') {
+      wallTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[texture] );
+    }
+    else {
+      var rand = getRandomInt(0,texturesLength-1);
+      var i = 0;
+      for(var t in textures) {
+        if(rand == i) {
+          wallTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[t] );
+        }
+        i++;
+      }
+    }
+    if(wallTexture == undefined) {
+          wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );      
+    }
+    wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
+    wallTexture.repeat.set( 10, 10 );//TODO adjust acc to sze?
+    var material = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide, transparent: btrans } );
+  }
 	if(geometry == 'CubeGeometry') {
 		var geom = new THREE.CubeGeometry(size,size,size);
 	}
@@ -802,7 +854,9 @@ function createManyGeometries(params, geometry) {
 	var y = params['y'];
 	var z = params['z'];
 	var size = params['size'];
-	var color = params['color'];
+  var color = params['color'];
+  var ambient = params['ambient'];
+  var texture = params['texture'];
 	var transparent = params['transparent'];
 	var amount = params['amount'];
 	var endx = params['endx'];
@@ -820,9 +874,6 @@ function createManyGeometries(params, geometry) {
 	}
 	if(size == undefined) {
 		size = defaultGlobalParams['size'];
-	}
-	if(color == undefined) {
-		color = defaultGlobalParams['color'];
 	}
 	var btrans;
 	if(transparent == undefined) {
@@ -863,12 +914,53 @@ function createManyGeometries(params, geometry) {
       endsize = defaultGlobalParams['endsize'];
     }
   }
-	var material = new THREE.MeshPhongMaterial( { 
-		color: color, 
-		ambient: color,//TODO ambient param 
-		transparent: btrans, 
-		blending: THREE.AdditiveBlending 
-	} );
+  //first check if there is a default texture
+  if(texture == undefined) {
+    texture = defaultGlobalParams['texture'];
+  }
+  if(texture == undefined) {
+    if(color == undefined) {
+      color = defaultGlobalParams['color'];
+    }
+    if(ambient == undefined) {
+      if(defaultGlobalParams['ambient'] == undefined) {
+        ambient = color;
+      }
+      else {
+        ambient = defaultGlobalParams['ambient'];
+      }
+    }
+    var material = new THREE.MeshPhongMaterial( { 
+      color: color, 
+      ambient: ambient,//TODO ambient param 
+      transparent: btrans, 
+      blending: THREE.AdditiveBlending 
+    } );
+  }
+  //TODO other texture? checkerboard is pretty great tho...
+  else {
+    var wallTexture;
+    if(texture != 'random') {
+      wallTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[texture] );
+    }
+    else {
+      var rand = getRandomInt(0,texturesLength-1);
+      var i = 0;
+      for(var t in textures) {
+        if(rand == i) {
+          wallTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[t] );
+        }
+        i++;
+      }
+    }
+    if(wallTexture == undefined) {
+          wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );      
+    }
+    wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
+    wallTexture.repeat.set( 10, 10 );//TODO adjust acc to sze?
+    var material = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide, transparent: btrans } );
+  }
+
 	var meshs = [];
 	var divisor = amount - 1;
 	var xIncrement = +(endx-x)/divisor;
@@ -1028,7 +1120,7 @@ function createManyFloorsOrWalls(params,floorOrWall) {
   var xIncrement = +(endx-x)/divisor;
   var yIncrement = +(endy-y)/divisor;
   var zIncrement = +(endz-z)/divisor;
-  //if(endsize == undefined) {
+  if(endsize == undefined) {
     var geom = new THREE.PlaneGeometry(size, size, 10, 10);
     for(var i = 0; i < amount; i++) {
       var mesh = new THREE.Mesh(geom, material ); 
@@ -1042,8 +1134,25 @@ function createManyFloorsOrWalls(params,floorOrWall) {
       meshs[i] = mesh;
       addToMeshs(mesh);
     }
-  //}
-
+  }
+  else {
+    var sizeIncrement = (endsize-size)/divisor;
+    var newSize;
+    for(var i = 0; i < amount; i++) {
+      newSize = +size+i*sizeIncrement;
+      var geom = new THREE.PlaneGeometry(newSize,newSize,10,10);
+      var mesh = new THREE.Mesh(geom, material ); 
+      mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+      if(floorOrWall == 'Wall') {
+        mesh.rotation.y = Math.PI / 2;
+      }
+      else if (floorOrWall == 'Floor') {
+        mesh.rotation.x = Math.PI / 2;
+      }
+      meshs[i] = mesh;
+      addToMeshs(mesh);
+    }
+  }
   return meshs;
 }
   //////////////////////////////////////////
@@ -1329,7 +1438,22 @@ function colourNameToHex(colour) {
 //end code from 
 //http://stackoverflow.com/questions/1573053/javascript-function-to-convert-color-names-to-hex-codes
 
+//to convert given texture name to texture file
+function getTextures() {
+  texturesLength = 6;
+  return {
+      "checkers":"checkerboard.jpg",
+      "cloud":"cloud.png",
+      "chrome":"Chrome.png",
+      "electric":"electric-blue-light.jpg",//maybe change name to water?
+      "alloy":"alien-alloy.png",
+      "carving":"alien-carving.png"
+  };
+}
 
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
   //////////////////////////////////////////////
  //END OF METHODS FOR DEALING WITH PARAMETERS//
 //////////////////////////////////////////////
@@ -1347,26 +1471,26 @@ function testEverything() {
   	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
   	  	*/
-        scene.add(createTorusKnot(parseParams('color sky y 250 z - 600 size 150')));
-        setDefaultGlobalParams('transparent true size 25');
+        scene.add(createTorusKnot(parseParams('color sky ambient pink y 250 z - 600 size 150')));
+        setDefaultGlobalParams('texture random transparent true size 55');
   	  	scene.add(createCube({x: 300}));
   
-        setDefaultGlobalParams('transparent false x -350 and 300 color midnight amount 6');
+        setDefaultGlobalParams('transparent false x -350 and 300 color chartreuse ambient red amount 6');
   	  	
   var testknots = createManyCubes(
-  	parseParams(''));
+  	parseParams('texture checkers'));
   	  	
   	  	for(var i = 0; i < testknots.length; i++) {
   	  		scene.add(testknots[i]);  	  		
   	  	}
                 setDefaultGlobalParams('color forest');
 
-  /*var testrings = createManyFloorsOrWalls(
+  var testrings = createManyFloorsOrWalls(
   	parseParams(''),'Wall');
   	  	
   	  	for(var i = 0; i < testrings.length; i++) {
   	  		scene.add(testrings[i]);  	  		
-  	  	}*/
+  	  	}
         
 
         scene.add(createFloor({y: 0}));
