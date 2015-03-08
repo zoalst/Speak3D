@@ -152,7 +152,7 @@ function init() {
 
 	initDefaultGlobalParams();
 
-//testEverything();//TODO remove
+testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -375,6 +375,21 @@ function init() {
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createFloor(parsedParams));
   	  },	
+      'create many floors': function() {
+        console.log('create many floors');
+        var floors = createManyFloorsOrWalls(defaultGlobalParams,'Floor');
+        for(var i = 0; i < floors.length; i++) {
+          scene.add(floors[i]);          
+        }
+      },      
+      'create many floors *params': function(params) {
+        console.log('create many floors params: '+params);
+        var parsedParams = parseParams(params);
+        var floors = createManyFloorsOrWalls(parsedParams,'Floor');
+        for(var i = 0; i < floors.length; i++) {
+          scene.add(floors[i]);          
+        }
+      },
  			'create wall': function() {
   	  	console.log('create wall');
   	  	scene.add(createWall({x:-150,y:500,size:1000}));
@@ -384,6 +399,23 @@ function init() {
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createWall(parsedParams));
   	  },
+      'create many walls': function() {
+        console.log('create many walls');
+        var testrings = createManyFloorsOrWalls(
+    parseParams(''),'Wall');
+        
+        for(var i = 0; i < testrings.length; i++) {
+          scene.add(testrings[i]);          
+        }
+      },
+      'create many walls *params': function(params) {
+        console.log('create many walls params: '+params);
+        var parsedParams = parseParams(params);
+        var walls = createManyFloorsOrWalls(parsedParams,'Wall');
+        for(var i = 0; i < walls.length; i++) {
+          scene.add(walls[i]);          
+        }
+      },
    	  'create text *text': function(text) {
   	  	console.log('create text: '+text);
   	  	scene.add(create3DText(text));
@@ -922,6 +954,98 @@ function createManyGeometries(params, geometry) {
 	return meshs;	
 }
 
+function createManyFloorsOrWalls(params,floorOrWall) {
+  var x = params['x'];
+  var y = params['y'];
+  var z = params['z'];
+  var size = params['size'];
+  //var transparent = params['transparent'];
+  var amount = params['amount'];
+  var endx = params['endx'];
+  var endy = params['endy'];
+  var endz = params['endz'];
+  var endsize = params['endsize'];
+  if(x == undefined){
+    x = defaultGlobalParams['x'];
+    //x = -150;
+  }
+  if(y == undefined){
+    y = defaultGlobalParams['y'];
+    //y = 500;
+  }
+  if(z == undefined){
+    z = defaultGlobalParams['z'];
+    //z = 0;
+  }
+  if(size == undefined){
+    size = 1000;
+  }
+  var btrans;
+  /*if(transparent == undefined) {
+    btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
+  }
+  else {
+    btrans = convertWordToBoolean(transparent);
+  }*/
+  if(amount == undefined) {
+    amount = defaultGlobalParams['amount'];
+  }
+  if(endx == undefined) {
+    if(defaultGlobalParams['endx'] == undefined) {
+      endx = x;
+    }
+    else {
+      endx = defaultGlobalParams['endx'];
+    }
+  }
+  if(endy == undefined) {
+    if(defaultGlobalParams['endy'] == undefined) {
+      endy = y;
+    }
+    else {
+      endy = defaultGlobalParams['endy'];
+    }
+  }
+  if(endz == undefined) {
+    if(defaultGlobalParams['endz'] == undefined) {
+      endz = z;
+    }
+    else {
+      endz = defaultGlobalParams['endz'];
+    }
+  }
+  if(endsize == undefined) {
+    if(defaultGlobalParams['endsize'] != undefined) {
+      endsize = defaultGlobalParams['endsize'];
+    }
+  }
+  var wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
+  wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
+  wallTexture.repeat.set( 10, 10 );
+  var material = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide } );
+  var meshs = [];
+  var divisor = amount - 1;
+  var xIncrement = +(endx-x)/divisor;
+  var yIncrement = +(endy-y)/divisor;
+  var zIncrement = +(endz-z)/divisor;
+  //if(endsize == undefined) {
+    var geom = new THREE.PlaneGeometry(size, size, 10, 10);
+    for(var i = 0; i < amount; i++) {
+      var mesh = new THREE.Mesh(geom, material ); 
+      mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+      if(floorOrWall == 'Wall') {
+        mesh.rotation.y = Math.PI / 2;
+      }
+      else if (floorOrWall == 'Floor') {
+        mesh.rotation.x = Math.PI / 2;
+      }
+      meshs[i] = mesh;
+      addToMeshs(mesh);
+    }
+  //}
+
+  return meshs;
+}
   //////////////////////////////////////////
  //END OF METHODS FOR CREATING GEOMETRIES//
 //////////////////////////////////////////
@@ -1227,7 +1351,7 @@ function testEverything() {
         setDefaultGlobalParams('transparent true size 25');
   	  	scene.add(createCube({x: 300}));
   
-        setDefaultGlobalParams('transparent false x - 150 and - 10 color midnight amount 6');
+        setDefaultGlobalParams('transparent false x -350 and 300 color midnight amount 6');
   	  	
   var testknots = createManyCubes(
   	parseParams(''));
@@ -1237,12 +1361,12 @@ function testEverything() {
   	  	}
                 setDefaultGlobalParams('color forest');
 
-  var testrings = createManyCubes(
-  	parseParams('y 300'));
+  /*var testrings = createManyFloorsOrWalls(
+  	parseParams(''),'Wall');
   	  	
   	  	for(var i = 0; i < testrings.length; i++) {
   	  		scene.add(testrings[i]);  	  		
-  	  	}
+  	  	}*/
         
 
         scene.add(createFloor({y: 0}));
