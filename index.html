@@ -31,17 +31,12 @@
 <!-- Speech Recognition using annyang -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/1.5.0/annyang.min.js"></script>
 
-<!-- cli -->
-<!-- TODO:
- <form style="position: absolute; right:5px; bottom:5px">
-enter a command:<br>
-<input type="text" name="command">
-<button id="submitButton" type="submit">enter</button>
-</form> -->
 
 <!-- ------------------------------------------------------------ -->
 
 <div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+<!-- cli -->
+<input id="consoleBox" type="text" command="command" size="66" style="position: absolute; right:10px; bottom:10px; visibility:hidden"/>
 <script>
 /*
 	Speak3D
@@ -70,9 +65,8 @@ var textures = getTextures();
 
 var user;
 //var useOtherControls = true;
+var consoleOpen = false;
 
-//var sumbitButton = document.getElementById("submitButton")//TODO
-//  .addEventListener("click", function(){console.log('yo')});
 
 init();
 animate();
@@ -151,10 +145,10 @@ function init() {
 	////////////
 	// CUSTOM //
 	////////////
-
+  initConsole();
 	initDefaultGlobalParams();
 
-testEverything();//TODO remove
+//testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -434,8 +428,16 @@ testEverything();//TODO remove
         console.log('save');
         save();
       },
+      'open console': function() {
+        console.log('open console');
+        openConsole();
+      },
+      'close console': function() {
+        console.log('close console');
+        closeConsole();
+      },
   	  'test everything': function() {
-  	  	console.log('testEverything');
+  	  	console.log('test everything');
   	  	testEverything();
   	  }
   	};
@@ -519,6 +521,8 @@ function update() {
 		setInterval(function() {undoing=false;}, 1000);
 	}
 
+  //don't want controls to work when user is typing in a command
+  if(!consoleOpen) {
 	//controls.update();//TODO, have both????
   //controls from http://stemkoski.github.io/7DFPS/3JSFPS.html
   var delta = clock.getDelta(); // seconds since last update
@@ -590,6 +594,7 @@ function update() {
     camera.rotateX( -6 * camera.rotation.x * rotateAngle );
   
   user.translateY( user.velocity.y );
+}
 
 	stats.update();
 }
@@ -1557,6 +1562,258 @@ function resolveParams(params) {
 function save() {
   //TODO
   //how will this work?
+}
+
+function initConsole() {
+  var cli = document.getElementById("consoleBox");
+  cli.addEventListener("keydown", function (e) {
+    if (e.keyCode === 13) {  
+        console.log(cli.value);
+        submitCommand(cli.value);
+        cli.value='';
+    }
+  });
+}
+function openConsole() {
+  document.getElementById('consoleBox').style.visibility = 'visible';
+  document.getElementById('consoleBox').focus();
+  consoleOpen = true;
+}
+function closeConsole() {
+  document.getElementById('consoleBox').style.visibility = 'hidden';
+  consoleOpen = false;
+}
+
+function submitCommand(command) {
+  if(command.indexOf('create sphere') === 0) {
+    var len = 'create sphere'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create sphere params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createSphere(parsedParams));    
+    }
+    else {
+      scene.add(createSphere(defaultGlobalParams));
+    }
+  }
+  else if(command.indexOf('create many spheres') === 0) {
+    var len = 'create many spheres'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create many spheres params: '+params);
+      var parsedParams = parseParams(params);
+      var spheres = createManySpheres(parsedParams);
+      for(var i = 0; i < spheres.length; i++) {
+        scene.add(spheres[i]);          
+      }
+    }
+    else {
+      var spheres = createManySpheres(defaultGlobalParams);
+      for(var i = 0; i < spheres.length; i++) {
+        scene.add(spheres[i]);          
+      }    
+    }
+  }
+  else if(command.indexOf('create cube') === 0) {
+    var len = 'create cube'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create cube params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createCube(parsedParams));    
+    }
+    else {
+      scene.add(createCube(defaultGlobalParams));
+    }
+  }
+  else if(command.indexOf('create many cubes') === 0) {
+    var len = 'create many cubes'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create many cubes params: '+params);
+      var parsedParams = parseParams(params);
+      var geoms = createManyCubes(parsedParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }
+    }
+    else {
+      var geoms = createManyCubes(defaultGlobalParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }    
+    }
+  }
+  else if(command.indexOf('create ring') === 0) {
+    var len = 'create ring'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create ring params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createRing(parsedParams));    
+    }
+    else {
+      scene.add(createRing(defaultGlobalParams));
+    }
+  }
+  else if(command.indexOf('create many rings') === 0) {
+    var len = 'create many rings'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create many rings params: '+params);
+      var parsedParams = parseParams(params);
+      var geoms = createManyRings(parsedParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }
+    }
+    else {
+      var geoms = createManyRings(defaultGlobalParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }    
+    }
+  }
+  else if(command.indexOf('create knot') === 0) {
+    var len = 'create knot'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create knot params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createTorusKnot(parsedParams));    
+    }
+    else {
+      scene.add(createTorusKnot(defaultGlobalParams));
+    }
+  }
+  else if(command.indexOf('create many knots') === 0) {
+    var len = 'create many knots'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create many knots params: '+params);
+      var parsedParams = parseParams(params);
+      var geoms = createManyTorusKnots(parsedParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }
+    }
+    else {
+      var geoms = createManyTorusKnots(defaultGlobalParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }    
+    }
+  }
+  else if(command.indexOf('create cylinder') === 0) {
+    var len = 'create cylinder'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create cylinder params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createCylinder(parsedParams));    
+    }
+    else {
+      scene.add(createCylinder(defaultGlobalParams));
+    }
+  }
+  else if(command.indexOf('create many cylinders') === 0) {
+    var len = 'create many cylinders'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create many cylinders params: '+params);
+      var parsedParams = parseParams(params);
+      var geoms = createManyCylinders(parsedParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }
+    }
+    else {
+      var geoms = createManyCylinders(defaultGlobalParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }    
+    }
+  }
+  else if(command.indexOf('create floor') === 0) {
+    var len = 'create floor'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create floor params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createFloor(parsedParams));    
+    }
+    else {
+      scene.add(createFloor({y:0,size:1000}));
+    }
+  }
+  else if(command.indexOf('create many floors') === 0) {
+    var len = 'create many floors'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create many floors params: '+params);
+      var parsedParams = parseParams(params);
+      var geoms = createManyFloorsOrWalls(parsedParams,'Floor');
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }
+    }
+    else {
+      var geoms = createManyFloorsOrWalls(defaultGlobalParams,'Floor');
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }    
+    }
+  }
+  else if(command.indexOf('create wall') === 0) {
+    var len = 'create wall'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create wall params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createWall(parsedParams));    
+    }
+    else {
+      scene.add(createWall({x:-150,y:500,size:1000}));
+    }
+  }
+  else if(command.indexOf('create many walls') === 0) {
+    var len = 'create many walls'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create many walls params: '+params);
+      var parsedParams = parseParams(params);
+      var geoms = createManyFloorsOrWalls(parsedParams,'Wall');
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }
+    }
+    else {
+      var geoms = createManyFloorsOrWalls(defaultGlobalParams,'Wall');
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }    
+    }
+  }
+  else if(command.indexOf('create text') === 0) {
+    var len = 'create text'.length;
+    if(command.length > len) {
+      var text = command.substring(len+1);
+      console.log('create text: '+text);
+      scene.add(create3DText(text));    
+    }
+  }
+  else if(command.indexOf('set default') === 0) {
+    var len = 'set default'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('set default: '+params);
+      setDefaultGlobalParams(params);
+    }
+  }
+  else if(command.indexOf('test everything') === 0) {
+    testEverything();
+  }
 }
 //test method
 function testEverything() {

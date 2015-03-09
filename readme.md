@@ -20,6 +20,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'create text' then say whatever you want
   - say 'set default' w/ parameters ex: 'set default transparent true color blue' or 'set default amount 10 size 20 x 0 and 200'
   - say 'undo' or press ctrl+z
+  - say 'open console' to submit typed out commands(submit with enter); say 'close console' to close it
   - say 'test everything' to see a bunch of stuff at once
   - optional parameters are x (number), y (number), z (number), size (number), width (number), color (color name), ambient (ambient color name), texture (texture name), transparent (true or false)
   - examples: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 y 150'
