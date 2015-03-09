@@ -755,6 +755,7 @@ function createGeometry(params, geometry) {
   var z = resolvedParams['z'];
   var size = resolvedParams['size'];
   var btrans = resolvedParams['btrans'];
+  var width = resolvedParams['width'];
 
   //first check if there is a default texture
   if(texture == undefined) {
@@ -779,7 +780,6 @@ function createGeometry(params, geometry) {
       blending: THREE.AdditiveBlending 
     } );
   }
-  //TODO other texture? checkerboard is pretty great tho...
   else {
     var wallTexture;
     if(texture != 'random') {
@@ -809,13 +809,28 @@ function createGeometry(params, geometry) {
 		var geom = new THREE.SphereGeometry(size);
 	}
 	else if(geometry == 'CylinderGeometry') {
-		var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
+    if(width == undefined) {
+      var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
+    }
+    else {
+      var geom = new THREE.CylinderGeometry(width,width,size);          
+    }
 	}
 	else if(geometry == 'RingGeometry') {
-		var geom = new THREE.RingGeometry(size/5,size);
+    if(width == undefined) {
+      var geom = new THREE.RingGeometry(size/5,size);
+    }
+    else {
+      var geom = new THREE.RingGeometry((size-width),size);          
+    }
 	}
 	else if(geometry == 'TorusKnotGeometry') {
-		var geom = new THREE.TorusKnotGeometry(size);
+    if(width == undefined) {
+		  var geom = new THREE.TorusKnotGeometry(size);
+    }
+    else {
+      var geom = new THREE.TorusKnotGeometry(size, width);      
+    }
 	}
 	var mesh = new THREE.Mesh(geom, material );	
 	mesh.position.set( x, y, z );
@@ -839,6 +854,7 @@ function createManyGeometries(params, geometry) {
 	var endy = resolvedParams['endy'];
 	var endz = resolvedParams['endz'];
 	var endsize = resolvedParams['endsize'];
+  var width = resolvedParams['width'];
 
   //first check if there is a default texture
   if(texture == undefined) {
@@ -863,7 +879,6 @@ function createManyGeometries(params, geometry) {
       blending: THREE.AdditiveBlending 
     } );
   }
-  //TODO other texture? checkerboard is pretty great tho...
   else {
     var wallTexture;
     if(texture != 'random') {
@@ -900,13 +915,28 @@ function createManyGeometries(params, geometry) {
 			var geom = new THREE.SphereGeometry(size);
 		}
 		else if(geometry == 'CylinderGeometry'){
-			var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
+      if(width == undefined) {
+        var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
+      }
+      else {
+        var geom = new THREE.CylinderGeometry(width,width,size);          
+      }
 		}
 		else if(geometry == 'RingGeometry'){
-			var geom = new THREE.RingGeometry(size/5,size);
+      if(width == undefined) {
+        var geom = new THREE.RingGeometry(size/5,size);
+      }
+      else {
+        var geom = new THREE.RingGeometry((size-width),size);          
+      }
 		}
 		else if(geometry == 'TorusKnotGeometry'){
-			var geom = new THREE.TorusKnotGeometry(size);
+      if(width == undefined) {
+        var geom = new THREE.TorusKnotGeometry(size);
+      }
+      else {
+        var geom = new THREE.TorusKnotGeometry(size, width);          
+      }
 		}
 		for(var i = 0; i < amount; i++) {
 			var mesh = new THREE.Mesh(geom, material );	
@@ -941,7 +971,12 @@ function createManyGeometries(params, geometry) {
 		else if(geometry == 'CylinderGeometry'){
 			for(var i = 0; i < amount; i++) {
 				newSize = +size+i*sizeIncrement;
-				var geom = new THREE.CylinderGeometry(newSize*2/5,newSize*2/5,newSize);
+        if(width == undefined) {
+  				var geom = new THREE.CylinderGeometry(newSize*2/5,newSize*2/5,newSize);
+        }
+        else {
+          var geom = new THREE.CylinderGeometry(width,width,newSize);          
+        }
 				var mesh = new THREE.Mesh(geom, material );	
 				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
 				meshs[i] = mesh;
@@ -951,7 +986,12 @@ function createManyGeometries(params, geometry) {
 		else if(geometry == 'RingGeometry'){
 			for(var i = 0; i < amount; i++) {
 				newSize = +size+i*sizeIncrement;
-				var geom = new THREE.RingGeometry(newSize/5,newSize);
+        if(width == undefined) {
+				  var geom = new THREE.RingGeometry(newSize/5,newSize);
+        }
+        else {
+          var geom = new THREE.RingGeometry((newSize-width),newSize);          
+        }
 				var mesh = new THREE.Mesh(geom, material );	
 				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
 				meshs[i] = mesh;
@@ -961,7 +1001,12 @@ function createManyGeometries(params, geometry) {
 		else if(geometry == 'TorusKnotGeometry'){
 			for(var i = 0; i < amount; i++) {
 				newSize = +size+i*sizeIncrement;
-				var geom = new THREE.TorusKnotGeometry(newSize);
+        if(width == undefined) {
+				  var geom = new THREE.TorusKnotGeometry(newSize);
+        }
+        else {
+          var geom = new THREE.TorusKnotGeometry(newSize, width,64,8,2,13);      
+        }
 				var mesh = new THREE.Mesh(geom, material );	
 				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
 				meshs[i] = mesh;
@@ -984,6 +1029,7 @@ function createManyFloorsOrWalls(params,floorOrWall) {
   var endy = params['endy'];
   var endz = params['endz'];
   var endsize = params['endsize'];
+  var width = params['width'];
   if(x == undefined){
     x = defaultGlobalParams['x'];
     //x = -150;
@@ -1179,6 +1225,11 @@ function parseParams(params) {
 		  parsedParams['amount'] = paramsArray[i+1];			
 			lastParamType = 'amount';	
 		}
+    //annyang hears with instead of width
+    else if(paramsArray[i].toLowerCase() == 'with') {
+      parsedParams['width'] = paramsArray[i+1];      
+      lastParamType = 'width'; 
+    }
 		else {
 			parsedParams[paramsArray[i].toLowerCase()] = paramsArray[i+1];			
 			lastParamType = paramsArray[i].toLowerCase();
@@ -1385,7 +1436,7 @@ function colourNameToHex(colour) {
 
 //to convert given texture name to texture file
 function getTextures() {
-  texturesLength = 9;
+  texturesLength = 16;
   return {
       "checkers":"checkerboard.jpg",
       "cloud":"cloud.png",
@@ -1394,8 +1445,15 @@ function getTextures() {
       "electric":"electric-blue-light.jpg",//maybe change name to water?
       "alloy":"alien-alloy.png",
       "carving":"alien-carving.png",
-      "rock":"rocky-ground.jpg",
-      "glow":"blue-glowy.jpg"
+      "rocky":"rocky-ground.jpg",
+      "glow":"blue-glowy.jpg",
+      "dirt":"dirt-512.jpg",
+      "rock":"rock-512.jpg",
+      "moon":"moon.jpg",
+      "snow":"snow-512.jpg",
+      "sand":"sand-512.jpg",
+      "grass":"grass-512.jpg",
+      "water":"water512.jpg"
   };
 }
 
@@ -1419,6 +1477,8 @@ function resolveParams(params) {
   var endy = params['endy'];
   var endz = params['endz'];
   var endsize = params['endsize'];
+  var width = params['width'];
+  var height = params['height'];
   if(x == undefined) {
     x = defaultGlobalParams['x'];
   }
@@ -1442,33 +1502,36 @@ function resolveParams(params) {
     amount = defaultGlobalParams['amount'];
   }
   if(endx == undefined) {
-    if(defaultGlobalParams['endx'] == undefined) {
+    endx = defaultGlobalParams['endx'];
+    if(endx == undefined) {
       endx = x;
-    }
-    else {
-      endx = defaultGlobalParams['endx'];
     }
   }
   if(endy == undefined) {
-    if(defaultGlobalParams['endy'] == undefined) {
+    endy = defaultGlobalParams['endy'];
+    if(endy == undefined) {
       endy = y;
-    }
-    else {
-      endy = defaultGlobalParams['endy'];
     }
   }
   if(endz == undefined) {
-    if(defaultGlobalParams['endz'] == undefined) {
+    endz = defaultGlobalParams['endz'];
+    if(endz == undefined) {
       endz = z;
-    }
-    else {
-      endz = defaultGlobalParams['endz'];
     }
   }
   if(endsize == undefined) {
     if(defaultGlobalParams['endsize'] != undefined) {
       endsize = defaultGlobalParams['endsize'];
     }
+  }
+  if(width == undefined) {
+    width = defaultGlobalParams['width'];
+    /*if(width == undefined) {
+      width = size;
+    }*/
+  }
+  if(height == undefined) {
+    height = defaultGlobalParams['height'];
   }
   resolvedParams["x"] = x;
   resolvedParams["y"] = y;
@@ -1480,6 +1543,8 @@ function resolveParams(params) {
   resolvedParams["endy"] = endy;
   resolvedParams["endz"] = endz;
   resolvedParams["endsize"] = endsize;
+  resolvedParams["width"] = width;
+  resolvedParams["height"] = height;
 
   return resolvedParams;
 }
@@ -1500,26 +1565,34 @@ function testEverything() {
   	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
   	  	*/
-        scene.add(createTorusKnot(parseParams('color sky ambient pink y 250 z - 600 size 150')));
+        scene.add(createTorusKnot(parseParams('color forest ambient pink y 250 z - 600 size 150 width 27')));
         setDefaultGlobalParams('texture random transparent true size 55');
   	  	scene.add(createCube({x: 300}));
   
-        setDefaultGlobalParams('transparent false x -350 and 300 color chartreuse ambient red amount 6');
+        setDefaultGlobalParams('transparent false z - 600 x -1350 and 1300 color chartreuse ambient red amount 6 size 150 and 15 width 11');
+  	       
+  var testknots = createManyTorusKnots(
+    parseParams('texture cloud'));
+        
+        for(var i = 0; i < testknots.length; i++) {
+          scene.add(testknots[i]);          
+        }
+                setDefaultGlobalParams('color forest');
+
+  var testknotsc = createManyCylinders(
+  	parseParams('z -77'));
   	  	
-  var testknots = createManyCubes(
-  	parseParams('texture checkers'));
-  	  	
-  	  	for(var i = 0; i < testknots.length; i++) {
-  	  		scene.add(testknots[i]);  	  		
+  	  	for(var i = 0; i < testknotsc.length; i++) {
+  	  		scene.add(testknotsc[i]);  	  		
   	  	}
                 setDefaultGlobalParams('color forest');
 
-  var testrings = createManyFloorsOrWalls(
+  /*var testrings = createManyFloorsOrWalls(
   	parseParams(''),'Wall');
   	  	
   	  	for(var i = 0; i < testrings.length; i++) {
   	  		scene.add(testrings[i]);  	  		
-  	  	}
+  	  	}*/
         
 
         scene.add(createFloor({y: 0}));
