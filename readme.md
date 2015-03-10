@@ -30,6 +30,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - 'color' or 'ambient' followed by a color name
   - 'texture' followed by a texture name
   - 'transparent' followed by a 'true' or 'false'
+  - 'spin' followed by 'x', 'y', or 'z'
   - you can set a parameter range by using the keyword end(or and), ex: create many cubes x 0 end 100
 
 ## Examples
@@ -164,7 +165,7 @@ You'll need [nodejs](http://nodejs.org/) installed
   - more geometries
   - more colors and textures
   - ability to set default parameters for specific geometries 
-  - spin(command would be spin x, spin y, spin z)
+  - enhance spin with different speeds
   - lights, fog, skyBox, etc.
   - built-in models and user uploaded models
   - better debugging

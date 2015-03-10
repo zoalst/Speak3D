@@ -163,6 +163,9 @@ var textures = getTextures();
 var bubbleMaterial;
 var bubbles = false;
 
+var spinningMeshs = [];
+var spinningParams = [];
+
 var user;
 //var useOtherControls = true;
 var consoleOpen = false;
@@ -252,9 +255,10 @@ function init() {
   initConsole();
 	initDefaultGlobalParams();
   initBubble();
-  showPauseScreen();
+  hidePauseScreen();
+  //showPauseScreen();
 
-//testEverything();//TODO remove
+testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -808,6 +812,15 @@ function render() {
     bubbleMesh.visible = true;
   }
 
+  //spin
+  var spinParams;
+  for (var i = 0; i < spinningMeshs.length; i++) {
+    spinParams = spinningParams[i];
+    spinningMeshs[i].rotation.x +=spinParams['x'];
+    spinningMeshs[i].rotation.y +=spinParams['y'];
+    spinningMeshs[i].rotation.z +=spinParams['z'];;
+  }
+
 	renderer.render( scene, camera );
 }
 
@@ -1017,6 +1030,10 @@ function createGeometry(params, geometry) {
   var size = resolvedParams['size'];
   var btrans = resolvedParams['btrans'];
   var width = resolvedParams['width'];
+  var spin = resolvedParams['spin'];
+  var spinx = resolvedParams['spinx'];
+  var spiny = resolvedParams['spiny'];
+  var spinz = resolvedParams['spinz'];
 
   //first check if there is a default texture
   if(texture == undefined) {
@@ -1129,7 +1146,11 @@ function createGeometry(params, geometry) {
   }
 	var mesh = new THREE.Mesh(geom, material );	
 	mesh.position.set( x, y, z );
-	addToMeshs(mesh);
+  if(spin == true) {
+    spinningMeshs.push(mesh);
+    spinningParams.push({'x':spinx, 'y':spiny, 'z':spinz});
+  }
+  addToMeshs(mesh);//increases numberOfMeshs by 1
 	return mesh;
 }
 
@@ -1150,6 +1171,10 @@ function createManyGeometries(params, geometry) {
 	var endz = resolvedParams['endz'];
 	var endsize = resolvedParams['endsize'];
   var width = resolvedParams['width'];
+  var spin = resolvedParams['spin'];
+  var spinx = resolvedParams['spinx'];
+  var spiny = resolvedParams['spiny'];
+  var spinz = resolvedParams['spinz'];
 
   //first check if there is a default texture
   if(texture == undefined) {
@@ -1245,6 +1270,9 @@ function createManyGeometries(params, geometry) {
 			var mesh = new THREE.Mesh(geom, material );	
 			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
 			meshs[i] = mesh;
+      if(spin == true) {
+        initSpinMesh(mesh,spinx,spiny,spinz);
+      }
 			addToMeshs(mesh);
 		}
 	}
@@ -1258,6 +1286,9 @@ function createManyGeometries(params, geometry) {
 				var mesh = new THREE.Mesh(geom, material );	
 				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
 				meshs[i] = mesh;
+        if(spin == true) {
+          initSpinMesh(mesh,spinx,spiny,spinz);
+        }
 				addToMeshs(mesh);
 			}
 		}
@@ -1268,6 +1299,9 @@ function createManyGeometries(params, geometry) {
 				var mesh = new THREE.Mesh(geom, material );	
 				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
 				meshs[i] = mesh;
+        if(spin == true) {
+          initSpinMesh(mesh,spinx,spiny,spinz);
+        }
 				addToMeshs(mesh);
 			}
 		}
@@ -1283,6 +1317,9 @@ function createManyGeometries(params, geometry) {
 				var mesh = new THREE.Mesh(geom, material );	
 				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
 				meshs[i] = mesh;
+        if(spin == true) {
+          initSpinMesh(mesh,spinx,spiny,spinz);
+        }
 				addToMeshs(mesh);
 			}
 		}
@@ -1298,6 +1335,9 @@ function createManyGeometries(params, geometry) {
 				var mesh = new THREE.Mesh(geom, material );	
 				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
 				meshs[i] = mesh;
+        if(spin == true) {
+          initSpinMesh(mesh,spinx,spiny,spinz);
+        }
 				addToMeshs(mesh);
 			}
 		}
@@ -1313,6 +1353,9 @@ function createManyGeometries(params, geometry) {
 				var mesh = new THREE.Mesh(geom, material );	
 				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
 				meshs[i] = mesh;
+        if(spin == true) {
+          initSpinMesh(mesh,spinx,spiny,spinz);
+        }
 				addToMeshs(mesh);
 			}
 		}
@@ -1328,6 +1371,9 @@ function createManyGeometries(params, geometry) {
         var mesh = new THREE.Mesh(geom, material ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
         meshs[i] = mesh;
+        if(spin == true) {
+          initSpinMesh(mesh,spinx,spiny,spinz);
+        }
         addToMeshs(mesh);
       }
     }
@@ -1493,6 +1539,11 @@ function initBubble() {
     fragmentShader: fShader.fragmentShader
   }   );
 }
+
+function initSpinMesh(mesh,spinx,spiny,spinz) {
+    spinningMeshs.push(mesh);
+    spinningParams.push({'x':spinx, 'y':spiny, 'z':spinz});
+}
   //////////////////////////////////////////
  //END OF METHODS FOR CREATING GEOMETRIES//
 //////////////////////////////////////////
@@ -1508,19 +1559,14 @@ function addToMeshs(mesh) {
 	numberOfMeshs++;
 }
 function undo() {
+  //if spinning remove associated data from those arrays as well
+  if(spinningMeshs.lastIndexOf(meshs[numberOfMeshs]) >= 0) {
+    spinningMeshs.pop();
+    spinningParams.pop();
+  }
 	numberOfMeshs--;
   scene.remove(meshs[numberOfMeshs]);
-}
-function pauseScreen() {
-  document.getElementById('submitButton').style.visibility = 'visible';
-  document.getElementById('consoleBox').style.visibility = 'visible';
-  document.getElementById('consoleBox').focus();
-  consoleOpen = true;
-}
-function closeConsole() {
-  document.getElementById('submitButton').style.visibility = 'hidden';
-  document.getElementById('consoleBox').style.visibility = 'hidden';
-  consoleOpen = false;
+  meshs.pop();
 }
   ///////////////////////////////////////
  //METHODS FOR DEALING WITH PARAMETERS//
@@ -1577,6 +1623,21 @@ function parseParams(params) {
 			}
 			lastParamType = '';
 		}
+    //spin
+    else if(paramsArray[i].toLowerCase() == 'spin') {
+      parsedParams['spin'] = true;
+      var dir = paramsArray[i+1];
+      //TODO, variable spin value
+      if(dir == 'x') {
+        parsedParams['spinx'] = 0.001;
+      }
+      else if(dir == 'y') {
+        parsedParams['spiny'] = 0.001;
+      }
+      else if(dir == 'z') {
+        parsedParams['spinz'] = 0.001;        
+      }
+    }
 		//sometimes annyang hears announced instead of amount
 		else if(paramsArray[i].toLowerCase() == 'announced') {
 		  parsedParams['amount'] = paramsArray[i+1];			
@@ -1644,6 +1705,20 @@ function setDefaultGlobalParams(params) {
 			}
 			lastParamType = '';
 		}
+    //spin
+    else if(paramsArray[i].toLowerCase() == 'spin') {
+      defaultGlobalParams['spin'] = true;
+      var dir = paramsArray[i+1];
+      if(dir == 'x') {
+        defaultGlobalParams['spinx'] = 0.001;
+      }
+      else if(dir == 'y') {
+        defaultGlobalParams['spiny'] = 0.001;
+      }
+      else if(dir == 'z') {
+        defaultGlobalParams['spinz'] = 0.001;        
+      }
+    }
 		//sometimes annyang hears announced instead of amount
 		else if(paramsArray[i].toLowerCase() == 'announced') {
 		  defaultGlobalParams['amount'] = paramsArray[i+1];			
@@ -1834,6 +1909,10 @@ function resolveParams(params) {
   var endy = params['endy'];
   var endz = params['endz'];
   var endsize = params['endsize'];
+  var spin = params['spin'];
+  var spinx = params['spinx'];
+  var spiny = params['spiny'];
+  var spinz = params['spinz'];
   var width = params['width'];
   var height = params['height'];
   if(x == undefined) {
@@ -1881,6 +1960,30 @@ function resolveParams(params) {
       endsize = defaultGlobalParams['endsize'];
     }
   }
+  if(spin == undefined) {
+    spin = defaultGlobalParams['spin'];
+    if(spin == undefined) {
+      spin = false;
+    }
+  }
+  if(spinx == undefined) {
+    spinx = defaultGlobalParams['spinx'];
+    if(spinx == undefined) {
+      spinx = 0;
+    }
+  }
+  if(spiny == undefined) {
+    spiny = defaultGlobalParams['spiny'];
+    if(spiny == undefined) {
+      spiny = 0;
+    }
+  }
+  if(spinz == undefined) {
+    spinz = defaultGlobalParams['spinz'];
+    if(spinz == undefined) {
+      spinz = 0;
+    }
+  }
   if(width == undefined) {
     width = defaultGlobalParams['width'];
     /*if(width == undefined) {
@@ -1902,6 +2005,10 @@ function resolveParams(params) {
   resolvedParams["endsize"] = endsize;
   resolvedParams["width"] = width;
   resolvedParams["height"] = height;
+  resolvedParams["spin"] = spin;
+  resolvedParams["spinx"] = spinx;
+  resolvedParams["spiny"] = spiny;
+  resolvedParams["spinz"] = spinz;
 
   return resolvedParams;
 }
@@ -2249,16 +2356,17 @@ function testEverything() {
   	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
   	  	*/
-        scene.add(createBubbleKnot(parseParams('y 300 width 17')));
-        scene.add(createBubble(parseParams('y 100 x 100')));
+            setDefaultGlobalParams('spin x');
+        scene.add(createCone(parseParams('size 60 x 350 y 177 color maroon ambient turquoise')));
+        scene.add(createCube(parseParams('spin z y 100 x 100')));
         scene.add(createBubble(parseParams('y 200 x -150')));
-        scene.add(createSphere(parseParams('size 60 x 350 y 177 color maroon ambient turquoise')));
+        scene.add(createBubbleKnot(parseParams('y 300 width 17')));
         scene.add(createTorusKnot(parseParams('color chartreuse ambient magenta x 50 y 50 z - 60 size 950 width 27')));
 
             setDefaultGlobalParams('size 55 and 10 ');
 
-  var testspheres2 = createManySpheres(
-    parseParams('color forest transparent true amount 5 x 220 and 200 y 100 and 0 z -170 and 170'));
+  var testspheres2 = createManyCubes(
+    parseParams('spin z color forest transparent true amount 5 x 220 and 200 y 100 and 0 z -170 and 170'));
         
         for(var i = 0; i < testspheres2.length; i++) {
           scene.add(testspheres2[i]);         
@@ -2274,7 +2382,7 @@ function testEverything() {
         setDefaultGlobalParams('texture random transparent true size 55');
   
   var testrings = createManyWalls(
-    parseParams('amount 2 size 500 and 500 x -560 and 600'));
+    parseParams('amount 2 size 500 and 500 x -660 and 660'));
         
         for(var i = 0; i < testrings.length; i++) {
           scene.add(testrings[i]);          
@@ -2301,11 +2409,12 @@ function testEverything() {
         setDefaultGlobalParams('size 505 and 500');
 
 
-        scene.add(createFloor({y: -20}));
+        scene.add(createFloor({y: -120}));
         scene.add(createBackWall(parseParams('texture checkers')));
 
         
 initDefaultGlobalParams();
+        scene.add(createFloor({y: -20}));
 
 
 }
