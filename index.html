@@ -107,6 +107,10 @@
 <br />
   - 'tranparent' followed by 'true' or 'false'
 <br />
+  - 'spin' followed by 'x', 'y', or 'z'
+<br />
+  - 'move' followed by a range of 'x', 'y', or 'z', ex: move x 0 and 250
+<br />
   - you can set a parameter range by using the keyword end(or and), ex: create many cubes x 0 end 100
 <br />
   ranges currently only function for x,y,z, and size
@@ -262,7 +266,7 @@ function init() {
 	initDefaultGlobalParams();
   initBubble();
   hidePauseScreen();
-  //showPauseScreen();
+  showPauseScreen();
 
 //testEverything();//TODO remove
 
@@ -2191,6 +2195,7 @@ function initConsole() {
         console.log(cli.value);
         submitCommand(cli.value);
         cli.value='';
+        closeConsole();
     }
   });
   document.getElementById('submitButton').addEventListener("click", function(){
@@ -2202,6 +2207,7 @@ function initConsole() {
 
 }
 function openConsole() {
+  document.getElementById('consoleBox').value = '';
   document.getElementById('submitButton').style.visibility = 'visible';
   document.getElementById('consoleBox').style.visibility = 'visible';
   document.getElementById('consoleBox').focus();
@@ -2519,9 +2525,9 @@ function testEverything() {
   	  	*/
             //setDefaultGlobalParams('spin x');
        scene.add(createCone(parseParams('size 60 move x -350 and 350 move y 0 and 350 move z -175 and 175 y 177 color maroon ambient turquoise')));
-        scene.add(createCube(parseParams('move x -300 and 300 y 200')));
+        scene.add(createCube(parseParams('x 0 move x -300 and 300 y 200')));
         scene.add(createBubble(parseParams('y 200 x -150')));
-        scene.add(createTorusKnot(parseParams('move z -350 and 350 move y 0 and 350 color chartreuse ambient magenta size 105 width 37')));
+        scene.add(createTorusKnot(parseParams('move z -350 and 350 move y 0 and 350 color chartreuse ambient magenta size 15 width 7')));
 
 
   var testknots = createManyTorusKnots(

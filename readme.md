@@ -148,22 +148,20 @@ You'll need [nodejs](http://nodejs.org/) installed
 
 ## To Do
 
-  - a lot
-  - bugs when given y coordiante and y movement start&end points
-  - bubble as a texture option instead of seperate geometry
-  - add random as an option, ex: color random or texture random, size & coordinates also
+  - motion bugs, only have one dir var right now so multiple things moving causes issues
   - export function so users can save whatever they create
   - add dat.GUI, for default params
   - improve cli w/ list of recently submitted commands & auto complete
   - ability to manipulate & remove existing geometries
   - enhance start/pause screen
+  - bubble as a texture option instead of seperate geometry
+  - add random as an option, ex: color random or texture random, size & coordinates also
   - ctrl+z is buggy
   - use updated version of three.js
   - create self command, for third person view
   - better controls to navigate in 3D space
   - add parameters for dimensions, rotation, etc.
   - problems with people talking fast
-  - geometries in motion
   - more geometries
   - more colors and textures
   - ability to set default parameters for specific geometries 
@@ -171,7 +169,6 @@ You'll need [nodejs](http://nodejs.org/) installed
   - lights, fog, skyBox, etc.
   - built-in models and user uploaded models
   - better debugging
-  - usage & list of commands
   - display message when browser does not support speech recognition
   - refactor
 
