@@ -14,8 +14,8 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'create ring' w/ optional parameters
   - say 'create knot' w/ optional parameters
   - say 'create cylinder' w/ optional parameters
-  - say 'create floor' w/ optional parameters (only has y coordinate right now)
-  - say 'create wall' w/ optional parameters (only has x,y coordinate right now)
+  - say 'create floor' w/ optional parameters (only has x,y,size right now)
+  - say 'create wall' or 'create back wall' w/ optional parameters (only has x,y,size right now)
   - say 'create many cubes/spheres/rings/knots/cylinders/floors/walls' w/ optional parameters, provide amount param and two params on atleast one axis(x,y, or z) or two size params ex: 'create many spheres amount 5 z 0 and 250' or 'create many cubes amount 5 size 10 and 110 transparent true'
   - say 'create text' then say whatever you want
   - say 'set default' w/ parameters ex: 'set default transparent true color blue' or 'set default amount 10 size 20 x 0 and 200'

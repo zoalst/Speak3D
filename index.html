@@ -508,6 +508,15 @@ function init() {
           scene.add(walls[i]);          
         }
       },
+      'create back wall': function() {
+        console.log('create back wall');
+        scene.add(createBackWall({x:0,y:500,z:-500,size:1000}));
+      },
+      'create back wall *params': function(params) {
+        console.log('create back wall params: '+params);
+        var parsedParams = parseParams(params);
+        scene.add(createBackWall(parsedParams));
+      },
    	  'create text *text': function(text) {
   	  	console.log('create text: '+text);
   	  	scene.add(create3DText(text));
@@ -817,10 +826,14 @@ function createWall(params) {
 	return createFloorOrWall(params, 'Wall');
 }
 
+function createBackWall(params) {
+  return createFloorOrWall(params, 'BackWall');
+}
 function createFloorOrWall(params, floorOrWall) {
   var x = params['x'];
   var y = params['y'];
   var size = params['size'];
+  var transparent = params['transparent'];
   var texture = params['texture'];
   if(x == undefined){
     x = 0;
@@ -830,6 +843,13 @@ function createFloorOrWall(params, floorOrWall) {
   }
   if(size == undefined){
     size = 1000;
+  }
+  var btrans;
+  if(transparent == undefined) {
+    btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
+  }
+  else {
+    btrans = convertWordToBoolean(transparent);
   }
   if(texture == undefined) {
     texture = defaultGlobalParams['texture'];
@@ -852,7 +872,7 @@ function createFloorOrWall(params, floorOrWall) {
   }
   planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping; 
   planeTexture.repeat.set( 10, 10 );
-  var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide } );
+  var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide, transparent: btrans } );
   var geometry = new THREE.PlaneGeometry(size, size, 10, 10);
   var mesh = new THREE.Mesh(geometry, material);
   mesh.position.x = x;
@@ -862,6 +882,10 @@ function createFloorOrWall(params, floorOrWall) {
   }
   else if(floorOrWall == 'Wall') {
     mesh.rotation.y = Math.PI / 2;
+  }
+  //TODO z param for backwall
+  else if(floorOrWall == 'BackWall') {
+    mesh.position.z = -500;
   }
   addToMeshs(mesh);
   return mesh;
@@ -1173,7 +1197,7 @@ function createManyFloorsOrWalls(params,floorOrWall) {
   var y = params['y'];
   var z = params['z'];
   var size = params['size'];
-  //var transparent = params['transparent'];
+  var transparent = params['transparent'];
   var amount = params['amount'];
   var endx = params['endx'];
   var endy = params['endy'];
@@ -1196,12 +1220,12 @@ function createManyFloorsOrWalls(params,floorOrWall) {
     size = 1000;
   }
   var btrans;
-  /*if(transparent == undefined) {
+  if(transparent == undefined) {
     btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
   }
   else {
     btrans = convertWordToBoolean(transparent);
-  }*/
+  }
   if(amount == undefined) {
     amount = defaultGlobalParams['amount'];
   }
@@ -1255,7 +1279,7 @@ function createManyFloorsOrWalls(params,floorOrWall) {
   }
   planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping; 
   planeTexture.repeat.set( 10, 10 );
-  var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide } );
+  var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide, transparent: btrans } );
   var meshs = [];
   var divisor = amount - 1;
   var xIncrement = +(endx-x)/divisor;
@@ -2007,16 +2031,18 @@ function testEverything() {
   	  		scene.add(testknotsc[i]);  	  		
   	  	}
                 setDefaultGlobalParams('color forest');
+        setDefaultGlobalParams('size 505 and 500');
 
-  /*var testrings = createManyFloorsOrWalls(
+  var testrings = createManyFloorsOrWalls(
   	parseParams(''),'Wall');
   	  	
   	  	for(var i = 0; i < testrings.length; i++) {
   	  		scene.add(testrings[i]);  	  		
-  	  	}*/
+  	  	}
         
 
         scene.add(createFloor({y: 0}));
+        scene.add(createBackWall(parseParams('y 750 texture electric')));
     setDefaultGlobalParams('size 55 and 10 ');
 
   var testspheres2 = createManySpheres(
