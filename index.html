@@ -211,9 +211,11 @@ function init() {
 
 	// SKYBOX/FOG
 	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
-	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
+  var skyBoxTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures['cloud'] );    
+
+	var skyBoxMaterial = new THREE.MeshBasicMaterial( { texture: skyBoxTexture, side: THREE.DoubleSide } );
 	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
-	// scene.add(skyBox);
+	 scene.add(skyBox);
 	scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
 
   // USER, renamed person from http://stemkoski.github.io/7DFPS/3JSFPS.html
@@ -2058,7 +2060,7 @@ function testEverything() {
         scene.add(createBubble(parseParams('size 200 y 400 x -300')));
         scene.add(createBubble(parseParams('y 100 x 100')));
         scene.add(createBubble(parseParams('y 200')));
-        scene.add(createSphere(parseParams('size 1000 texture cloud')));
+        //scene.add(createSphere(parseParams('size 1000 texture cloud')));
         scene.add(createTorusKnot(parseParams('color forest ambient pink y 250 z - 600 size 750 width 27')));
         setDefaultGlobalParams('texture random transparent true size 55');
   
