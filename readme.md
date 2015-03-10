@@ -22,8 +22,24 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'undo' or press ctrl+z
   - say 'open console' to submit typed out commands(submit with enter); say 'close console' to close it
   - say 'test everything' to see a bunch of stuff at once
-  - optional parameters are x (number), y (number), z (number), size (number), width (number), color (color name), ambient (ambient color name), texture (texture name), transparent (true or false)
-  - examples: say 'create cube x 50 y 100 z 100 size 75' or 'create ball size 100 y 150'
+
+## Parameters
+
+  - 'x','y', or 'z' followed by a number
+  - 'size' or 'width' followed by a number
+  - 'color' or 'ambient' followed by a color name
+  - 'texture' followed by a texture name
+  - 'transparent' followed by a 'true' or 'false'
+  - you can set a parameter range by using the keyword end(or and), ex: create many cubes x 0 end 100
+
+## Examples
+
+  - say 'create cube color blue'
+  - say 'create knot width 9 texture cloud'
+  - say 'create cube x 50 y 100 z 100' 
+  - say 'set default transparent true size 50 and 100', then 'create many spheres color magenta'
+  - say 'set default texture random', then 'create floor', then 'create many walls x -500 and 500'
+
 
 ##Usage
 
@@ -140,12 +156,11 @@ You'll need [nodejs](http://nodejs.org/) installed
   - use updated version of three.js
   - create self command, for third person view
   - better controls to navigate in 3D space
-  - textures
   - add parameters for dimensions, rotation, etc.
   - problems with people talking fast
   - geometries in motion
   - more geometries
-  - more colors
+  - more colors and textures
   - ability to set default parameters for specific geometries 
   - spin(command would be spin x, spin y, spin z)
   - lights, fog, skyBox, etc.
