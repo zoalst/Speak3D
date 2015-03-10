@@ -31,6 +31,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - 'texture' followed by a texture name
   - 'transparent' followed by a 'true' or 'false'
   - 'spin' followed by 'x', 'y', or 'z'
+  - 'move' followed by a range of 'x', 'y', or 'z', ex: move x 0 and 250
   - you can set a parameter range by using the keyword end(or and), ex: create many cubes x 0 end 100
 
 ## Examples
@@ -148,6 +149,7 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - a lot
+  - bugs when given y coordiante and y movement start&end points
   - bubble as a texture option instead of seperate geometry
   - add random as an option, ex: color random or texture random, size & coordinates also
   - export function so users can save whatever they create

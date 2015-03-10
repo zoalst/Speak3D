@@ -166,6 +166,12 @@ var bubbles = false;
 var spinningMeshs = [];
 var spinningParams = [];
 
+var movingMeshs = [];
+var movingParams = [];
+var xdir = 1; //1 = left to right, -1 = right to left
+var ydir = 1;
+var zdir = 1;
+
 var user;
 //var useOtherControls = true;
 var consoleOpen = false;
@@ -258,7 +264,7 @@ function init() {
   hidePauseScreen();
   //showPauseScreen();
 
-testEverything();//TODO remove
+//testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -573,7 +579,7 @@ testEverything();//TODO remove
       },
       'create back wall': function() {
         console.log('create back wall');
-        scene.add(createBackWall({x:0,y:500,z:-500,size:1000}));
+        scene.add(createBackWall({x:0,y:0,z:-500,size:1000}));
       },
       'create back wall *params': function(params) {
         console.log('create back wall params: '+params);
@@ -821,6 +827,75 @@ function render() {
     spinningMeshs[i].rotation.z +=spinParams['z'];;
   }
 
+  //movement/oscillations
+  if(movingMeshs.length > 0) {
+    var moveParams;
+    var currentx;
+    var startx;
+    var endx;
+    var currenty;
+    var starty;
+    var endy;
+    var currentz;
+    var startz;
+    var endz;
+    //var dir = 1;//1 = positive direction on that axis, -1 = right to left
+    for (var i = 0; i < movingMeshs.length; i++) {
+      moveParams = movingParams[i];
+      currentx = +movingMeshs[i].position.x;
+      startx = +moveParams['movex'];
+      endx = +moveParams['endmovex'];
+      if(currentx <=endx && currentx >= startx) {
+      //if(currentx <=startx && currentx >= endx) {
+        movingMeshs[i].position.x += +(0.75*xdir);
+      }
+      else {
+        if(xdir == 1) {
+          movingMeshs[i].position.x = +endx-1;
+          xdir = -1;
+        }
+        else {
+          movingMeshs[i].position.x = +startx+1;
+          xdir = 1;
+        }
+      }
+      //move along y axis
+      currenty = +movingMeshs[i].position.y;
+      starty = +moveParams['movey'];
+      endy = +moveParams['endmovey'];
+      if(currenty <=endy && currenty >= starty) {
+        movingMeshs[i].position.y += +(0.75*ydir);
+      }
+      else {
+        if(ydir == 1) {
+          movingMeshs[i].position.y = +endy-1;
+          ydir = -1;
+        }
+        else {
+          movingMeshs[i].position.y = +starty+1;
+          ydir = 1;
+        }
+      }
+      //move along z axis
+      currentz = +movingMeshs[i].position.z;
+      startz = +moveParams['movez'];
+      endz = +moveParams['endmovez'];
+      console.log('currx: '+currentx+', curry: '+currenty+', currz: '+currentz+'\n');
+      if(currentz <=endz && currentz >= startz) {
+        movingMeshs[i].position.z += +(0.75*zdir);
+      }
+      else {
+        if(zdir == 1) {
+          movingMeshs[i].position.z = +endz-1;
+          zdir = -1;
+        }
+        else {
+          movingMeshs[i].position.z = +startz+1;
+          zdir = 1;
+        }
+      }
+    }
+  }
 	renderer.render( scene, camera );
 }
 
@@ -1034,6 +1109,13 @@ function createGeometry(params, geometry) {
   var spinx = resolvedParams['spinx'];
   var spiny = resolvedParams['spiny'];
   var spinz = resolvedParams['spinz'];
+  var move = resolvedParams['move'];
+  var movex = resolvedParams['movex'];
+  var endmovex = resolvedParams['endmovex'];
+  var movey = resolvedParams['movey'];
+  var endmovey = resolvedParams['endmovey'];
+  var movez = resolvedParams['movez'];
+  var endmovez = resolvedParams['endmovez'];
 
   //first check if there is a default texture
   if(texture == undefined) {
@@ -1150,6 +1232,15 @@ function createGeometry(params, geometry) {
     spinningMeshs.push(mesh);
     spinningParams.push({'x':spinx, 'y':spiny, 'z':spinz});
   }
+  if(move == true) {
+    console.log('move');
+    movingMeshs.push(mesh);
+    movingParams.push({
+      'movex':movex, 'endmovex':endmovex, 
+      'movey':movey, 'endmovey':endmovey, 
+      'movez':movez, 'endmovez':endmovez
+    });
+  }
   addToMeshs(mesh);//increases numberOfMeshs by 1
 	return mesh;
 }
@@ -1175,6 +1266,13 @@ function createManyGeometries(params, geometry) {
   var spinx = resolvedParams['spinx'];
   var spiny = resolvedParams['spiny'];
   var spinz = resolvedParams['spinz'];
+  var move = resolvedParams['move'];
+  var movex = resolvedParams['movex'];
+  var endmovex = resolvedParams['endmovex'];
+  var movey = resolvedParams['movey'];
+  var endmovey = resolvedParams['endmovey'];
+  var movez = resolvedParams['movez'];
+  var endmovez = resolvedParams['endmovez'];
 
   //first check if there is a default texture
   if(texture == undefined) {
@@ -1241,41 +1339,50 @@ function createManyGeometries(params, geometry) {
       else {
         var geom = new THREE.CylinderGeometry(width,width,size);          
       }
-		}
-		else if(geometry == 'RingGeometry'){
+    }
+    else if(geometry == 'RingGeometry'){
       if(width == undefined) {
         var geom = new THREE.RingGeometry(size/5,size);
       }
       else {
         var geom = new THREE.RingGeometry((size-width),size);          
       }
-		}
-		else if(geometry == 'TorusKnotGeometry'){
+    }
+    else if(geometry == 'TorusKnotGeometry'){
       if(width == undefined) {
         var geom = new THREE.TorusKnotGeometry(size);
       }
       else {
         var geom = new THREE.TorusKnotGeometry(size, width);          
       }
-		}
+    }
     else if(geometry == 'ConeGeometry') {
-    if(width == undefined) {
-      var geom = new THREE.CylinderGeometry(0,size*2/5,size);
+      if(width == undefined) {
+        var geom = new THREE.CylinderGeometry(0,size*2/5,size);
+      }
+      else {
+        var geom = new THREE.CylinderGeometry(0,width,size);          
+      }
     }
-    else {
-      var geom = new THREE.CylinderGeometry(0,width,size);          
-    }
-  }
-		for(var i = 0; i < amount; i++) {
-			var mesh = new THREE.Mesh(geom, material );	
-			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-			meshs[i] = mesh;
+    for(var i = 0; i < amount; i++) {
+      var mesh = new THREE.Mesh(geom, material );	
+      mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+      meshs[i] = mesh;
       if(spin == true) {
         initSpinMesh(mesh,spinx,spiny,spinz);
       }
-			addToMeshs(mesh);
-		}
-	}
+      /*if(move == true) {
+        console.log('move');
+        movingMeshs.push(mesh);
+        movingParams.push({
+          'movex':movex, 'endmovex':endmovex, 
+          'movey':movey, 'endmovey':endmovey, 
+          'movez':movez, 'endmovez':endmovez
+        });
+      }*/
+      addToMeshs(mesh);
+    }
+  }
 	else {
 		var sizeIncrement = (endsize-size)/divisor;
 		var newSize;
@@ -1404,8 +1511,8 @@ function createManyFloorsOrWalls(params,floorOrWall) {
     //x = -150;
   }
   if(y == undefined){
-    y = defaultGlobalParams['y'];
-    //y = 500;
+    //y = defaultGlobalParams['y'];
+    y = 0;
   }
   if(z == undefined){
     z = defaultGlobalParams['z'];
@@ -1621,8 +1728,37 @@ function parseParams(params) {
 			else if(lastParamType == 'color') {
 				parsedParams['endcolor'] = paramsArray[i+1];
 			}
+      else if(lastParamType == 'movex') {
+        parsedParams['endmovex'] = paramsArray[i+1];
+      }
+      else if(lastParamType == 'movey') {
+        parsedParams['endmovey'] = paramsArray[i+1];
+      }
+      else if(lastParamType == 'movez') {
+        parsedParams['endmovez'] = paramsArray[i+1];
+      }
 			lastParamType = '';
 		}
+    //move/oscillate
+    else if(paramsArray[i].toLowerCase() == 'move') {
+      parsedParams['move'] = true;
+      var dir = paramsArray[i+1];
+      if(dir == 'x') {
+        parsedParams['movex'] = paramsArray[i+2];
+        i++;
+        lastParamType = 'movex'; 
+      }
+      else if(dir == 'y') {
+        parsedParams['movey'] = paramsArray[i+2];
+        i++;
+        lastParamType = 'movey'; 
+      }
+      else if(dir == 'z') {
+        parsedParams['movez'] = paramsArray[i+2];
+        i++;        
+        lastParamType = 'movez'; 
+      }
+    }
     //spin
     else if(paramsArray[i].toLowerCase() == 'spin') {
       parsedParams['spin'] = true;
@@ -1637,6 +1773,7 @@ function parseParams(params) {
       else if(dir == 'z') {
         parsedParams['spinz'] = 0.001;        
       }
+      lastParamType = 'spin'; 
     }
 		//sometimes annyang hears announced instead of amount
 		else if(paramsArray[i].toLowerCase() == 'announced') {
@@ -1654,6 +1791,141 @@ function parseParams(params) {
 		}
 	}
 	return parsedParams;
+}
+
+//resolves params except color/ambient/texture
+function resolveParams(params) {
+  var resolvedParams = {};
+  var x = params['x'];
+  var y = params['y'];
+  var z = params['z'];
+  var size = params['size'];
+  /*var color = params['color'];
+  var ambient = params['ambient'];
+  var texture = params['texture'];*/
+  var transparent = params['transparent'];
+  var amount = params['amount'];
+  var endx = params['endx'];
+  var endy = params['endy'];
+  var endz = params['endz'];
+  var endsize = params['endsize'];
+  var spin = params['spin'];
+  var spinx = params['spinx'];
+  var spiny = params['spiny'];
+  var spinz = params['spinz'];
+  var width = params['width'];
+  var height = params['height'];
+  var move = params['move'];
+  var movex = params['movex'];
+  var endmovex = params['endmovex'];
+  var movey = params['movey'];
+  var endmovey = params['endmovey'];
+  var movez = params['movez'];
+  var endmovez = params['endmovez'];
+
+  if(x == undefined) {
+    x = defaultGlobalParams['x'];
+  }
+  if(y == undefined) {
+    y = defaultGlobalParams['y'];
+  }
+  if(z == undefined) {
+    z = defaultGlobalParams['z'];
+  }
+  if(size == undefined) {
+    size = defaultGlobalParams['size'];
+  }
+  var btrans;
+  if(transparent == undefined) {
+    btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
+  }
+  else {
+    btrans = convertWordToBoolean(transparent);
+  }
+  if(amount == undefined) {
+    amount = defaultGlobalParams['amount'];
+  }
+  if(endx == undefined) {
+    endx = defaultGlobalParams['endx'];
+    if(endx == undefined) {
+      endx = x;
+    }
+  }
+  if(endy == undefined) {
+    endy = defaultGlobalParams['endy'];
+    if(endy == undefined) {
+      endy = y;
+    }
+  }
+  if(endz == undefined) {
+    endz = defaultGlobalParams['endz'];
+    if(endz == undefined) {
+      endz = z;
+    }
+  }
+  if(endsize == undefined) {
+    if(defaultGlobalParams['endsize'] != undefined) {
+      endsize = defaultGlobalParams['endsize'];
+    }
+  }
+  if(spin == undefined) {
+    spin = defaultGlobalParams['spin'];
+    if(spin == undefined) {
+      spin = false;
+    }
+  }
+  if(spinx == undefined) {
+    spinx = defaultGlobalParams['spinx'];
+    if(spinx == undefined) {
+      spinx = 0;
+    }
+  }
+  if(spiny == undefined) {
+    spiny = defaultGlobalParams['spiny'];
+    if(spiny == undefined) {
+      spiny = 0;
+    }
+  }
+  if(spinz == undefined) {
+    spinz = defaultGlobalParams['spinz'];
+    if(spinz == undefined) {
+      spinz = 0;
+    }
+  }
+  if(width == undefined) {
+    width = defaultGlobalParams['width'];
+    /*if(width == undefined) {
+      width = size;
+    }*/
+  }
+  if(height == undefined) {
+    height = defaultGlobalParams['height'];
+  }
+  resolvedParams["x"] = x;
+  resolvedParams["y"] = y;
+  resolvedParams["z"] = z;
+  resolvedParams["btrans"] = btrans;
+  resolvedParams["amount"] = amount;
+  resolvedParams["size"] = size;
+  resolvedParams["endx"] = endx;
+  resolvedParams["endy"] = endy;
+  resolvedParams["endz"] = endz;
+  resolvedParams["endsize"] = endsize;
+  resolvedParams["width"] = width;
+  resolvedParams["height"] = height;
+  resolvedParams["spin"] = spin;
+  resolvedParams["spinx"] = spinx;
+  resolvedParams["spiny"] = spiny;
+  resolvedParams["spinz"] = spinz;
+  resolvedParams["move"] = move;
+  resolvedParams["movex"] = movex;
+  resolvedParams["endmovex"] = endmovex;
+  resolvedParams["movey"] = movey;
+  resolvedParams["endmovey"] = endmovey;
+  resolvedParams["movez"] = movez;
+  resolvedParams["endmovez"] = endmovez;
+
+  return resolvedParams;
 }
 
 function setDefaultGlobalParams(params) {
@@ -1710,13 +1982,13 @@ function setDefaultGlobalParams(params) {
       defaultGlobalParams['spin'] = true;
       var dir = paramsArray[i+1];
       if(dir == 'x') {
-        defaultGlobalParams['spinx'] = 0.001;
+        defaultGlobalParams['spinx'] = 0.07;
       }
       else if(dir == 'y') {
-        defaultGlobalParams['spiny'] = 0.001;
+        defaultGlobalParams['spiny'] = 0.07;
       }
       else if(dir == 'z') {
-        defaultGlobalParams['spinz'] = 0.001;        
+        defaultGlobalParams['spinz'] = 0.07;        
       }
     }
 		//sometimes annyang hears announced instead of amount
@@ -1893,125 +2165,6 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-//resolves params except color/ambient/texture
-function resolveParams(params) {
-  var resolvedParams = {};
-  var x = params['x'];
-  var y = params['y'];
-  var z = params['z'];
-  var size = params['size'];
-  /*var color = params['color'];
-  var ambient = params['ambient'];
-  var texture = params['texture'];*/
-  var transparent = params['transparent'];
-  var amount = params['amount'];
-  var endx = params['endx'];
-  var endy = params['endy'];
-  var endz = params['endz'];
-  var endsize = params['endsize'];
-  var spin = params['spin'];
-  var spinx = params['spinx'];
-  var spiny = params['spiny'];
-  var spinz = params['spinz'];
-  var width = params['width'];
-  var height = params['height'];
-  if(x == undefined) {
-    x = defaultGlobalParams['x'];
-  }
-  if(y == undefined) {
-    y = defaultGlobalParams['y'];
-  }
-  if(z == undefined) {
-    z = defaultGlobalParams['z'];
-  }
-  if(size == undefined) {
-    size = defaultGlobalParams['size'];
-  }
-  var btrans;
-  if(transparent == undefined) {
-    btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
-  }
-  else {
-    btrans = convertWordToBoolean(transparent);
-  }
-  if(amount == undefined) {
-    amount = defaultGlobalParams['amount'];
-  }
-  if(endx == undefined) {
-    endx = defaultGlobalParams['endx'];
-    if(endx == undefined) {
-      endx = x;
-    }
-  }
-  if(endy == undefined) {
-    endy = defaultGlobalParams['endy'];
-    if(endy == undefined) {
-      endy = y;
-    }
-  }
-  if(endz == undefined) {
-    endz = defaultGlobalParams['endz'];
-    if(endz == undefined) {
-      endz = z;
-    }
-  }
-  if(endsize == undefined) {
-    if(defaultGlobalParams['endsize'] != undefined) {
-      endsize = defaultGlobalParams['endsize'];
-    }
-  }
-  if(spin == undefined) {
-    spin = defaultGlobalParams['spin'];
-    if(spin == undefined) {
-      spin = false;
-    }
-  }
-  if(spinx == undefined) {
-    spinx = defaultGlobalParams['spinx'];
-    if(spinx == undefined) {
-      spinx = 0;
-    }
-  }
-  if(spiny == undefined) {
-    spiny = defaultGlobalParams['spiny'];
-    if(spiny == undefined) {
-      spiny = 0;
-    }
-  }
-  if(spinz == undefined) {
-    spinz = defaultGlobalParams['spinz'];
-    if(spinz == undefined) {
-      spinz = 0;
-    }
-  }
-  if(width == undefined) {
-    width = defaultGlobalParams['width'];
-    /*if(width == undefined) {
-      width = size;
-    }*/
-  }
-  if(height == undefined) {
-    height = defaultGlobalParams['height'];
-  }
-  resolvedParams["x"] = x;
-  resolvedParams["y"] = y;
-  resolvedParams["z"] = z;
-  resolvedParams["btrans"] = btrans;
-  resolvedParams["amount"] = amount;
-  resolvedParams["size"] = size;
-  resolvedParams["endx"] = endx;
-  resolvedParams["endy"] = endy;
-  resolvedParams["endz"] = endz;
-  resolvedParams["endsize"] = endsize;
-  resolvedParams["width"] = width;
-  resolvedParams["height"] = height;
-  resolvedParams["spin"] = spin;
-  resolvedParams["spinx"] = spinx;
-  resolvedParams["spiny"] = spiny;
-  resolvedParams["spinz"] = spinz;
-
-  return resolvedParams;
-}
   //////////////////////////////////////////////
  //END OF METHODS FOR DEALING WITH PARAMETERS//
 //////////////////////////////////////////////
@@ -2356,12 +2509,50 @@ function testEverything() {
   	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
   	  	*/
-            setDefaultGlobalParams('spin x');
-        scene.add(createCone(parseParams('size 60 x 350 y 177 color maroon ambient turquoise')));
-        scene.add(createCube(parseParams('spin z y 100 x 100')));
+            //setDefaultGlobalParams('spin x');
+       scene.add(createCone(parseParams('size 60 move x -350 and 350 move y 0 and 350 move z -175 and 175 y 177 color maroon ambient turquoise')));
+        scene.add(createCube(parseParams('spin z y 200 x 100')));
         scene.add(createBubble(parseParams('y 200 x -150')));
-        scene.add(createBubbleKnot(parseParams('y 300 width 17')));
-        scene.add(createTorusKnot(parseParams('color chartreuse ambient magenta x 50 y 50 z - 60 size 950 width 27')));
+        scene.add(createTorusKnot(parseParams('spin y color chartreuse ambient magenta x 50 y 250 z - 60 size 35 width 7')));
+
+
+  var testknots = createManyTorusKnots(
+    parseParams('amount 6 size 60 z -600 width 11 x -1350 and 1300 texture cloud'));
+        
+        for(var i = 0; i < testknots.length; i++) {
+          scene.add(testknots[i]);          
+        }
+                    setDefaultGlobalParams('transparent true');
+
+  var testspheres2 = createManyCubes(
+    parseParams('amount 5 x -450 and 350 y 150 z 200 size 100 color magenta ambient green'));
+        
+        for(var i = 0; i < testspheres2.length; i++) {
+          scene.add(testspheres2[i]);         
+        }
+
+  var testspheres22 = createManyCubes(
+    parseParams('amount 5 x -350 and 450 z 200 size 100 color blue ambient pink'));
+        
+        for(var i = 0; i < testspheres22.length; i++) {
+          scene.add(testspheres22[i]);         
+        }
+                    setDefaultGlobalParams('transparent false');
+                    //setDefaultGlobalParams('spin y spin z');
+
+  var testspheres2 = createManyCones(
+    parseParams('amount 5 x -450 and 350 y 400 z 150 size 50 color magenta ambient chartreuse'));
+        
+        for(var i = 0; i < testspheres2.length; i++) {
+          scene.add(testspheres2[i]);         
+        }
+
+  var testspheres22 = createManyCones(
+    parseParams('amount 5 x -350 and 450 y 350 z 150 size 50 color aqua ambient pink'));
+        
+        for(var i = 0; i < testspheres22.length; i++) {
+          scene.add(testspheres22[i]);         
+        }
 
             setDefaultGlobalParams('size 55 and 10 ');
 
@@ -2382,21 +2573,14 @@ function testEverything() {
         setDefaultGlobalParams('texture random transparent true size 55');
   
   var testrings = createManyWalls(
-    parseParams('amount 2 size 500 and 500 x -660 and 660'));
+    parseParams('amount 2 size 1000 and 1000 x -500 and 500'));
         
         for(var i = 0; i < testrings.length; i++) {
           scene.add(testrings[i]);          
         }
         
         setDefaultGlobalParams('transparent false z - 600 color chartreuse ambient red amount 6 size 150 and 15 width 11');
-  	       
 
-  var testknots = createManyTorusKnots(
-    parseParams('x -1350 and 1300 texture cloud'));
-        
-        for(var i = 0; i < testknots.length; i++) {
-          scene.add(testknots[i]);          
-        }
                 setDefaultGlobalParams('color forest');
 
   var testknotsc = createManyCylinders(
@@ -2409,12 +2593,15 @@ function testEverything() {
         setDefaultGlobalParams('size 505 and 500');
 
 
-        scene.add(createFloor({y: -120}));
-        scene.add(createBackWall(parseParams('texture checkers')));
+        scene.add(createFloor({y: -500}));
+        console.log('def y: '+defaultGlobalParams['y']);
+        //TODO: figure out why y needs to be set here!
+        scene.add(createBackWall(parseParams('y 0 size 1000 texture checkers')));
 
         
 initDefaultGlobalParams();
         scene.add(createFloor({y: -20}));
+        scene.add(createFloor({y: 500}));
 
 
 }
