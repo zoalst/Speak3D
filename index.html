@@ -80,13 +80,13 @@
 <br />
   - 'create knot *parameters*'
 <br />
-  - 'create cylinder *parameters*'
+  - 'create cylinder *parameters*' or 'create cone *parameters*'
 <br />
   - 'create floor *parameters*'
 <br />
   - 'create wall *parameters*'
 <br />
-  - 'create bubble *parameters*'
+  - 'create bubble *parameters*' or 'create bubble cube *parameters*' or 'create bubble knot *parameters*'
 <br />
   - 'create many cubes/spheres/rings/knots/cylinders/floors/walls *parameters*' 
 <br />
@@ -118,7 +118,7 @@
 <br />
   - say 'create knot width 9 texture cloud'
 <br />
-  - say 'set default transparent true amount 5', then 'create many cubes size 10 and 150'
+  - say 'set default amount 5 transparent true', then 'create many cubes size 10 and 150'
 <br />
   - say 'set default texture random', then 'create floor', then 'create many walls x -500 and 500'
 <br />
@@ -254,7 +254,6 @@ function init() {
   initBubble();
   showPauseScreen();
 
-//openConsole();
 //testEverything();//TODO remove
 
 	//Speech Recognition
@@ -389,6 +388,30 @@ function init() {
   	  		scene.add(cylinders[i]);  	  		
   	  	}
   	  },
+      'create cone': function() {
+        console.log('create cone');
+        scene.add(createCone(defaultGlobalParams));
+      },
+      'create cone *params': function(params) {
+        console.log('create cone params: '+params);
+        var parsedParams = parseParams(params);
+        scene.add(createCone(parsedParams));
+      },
+      'create many cones': function() {
+        console.log('create many cones');
+        var cones = createManyCones(defaultGlobalParams);
+        for(var i = 0; i < cones.length; i++) {
+          scene.add(cones[i]);          
+        }
+      },
+      'create many cones *params': function(params) {
+        console.log('create many cones params: '+params);
+        var parsedParams = parseParams(params);
+        var cones = createManyCones(parsedParams);
+        for(var i = 0; i < cones.length; i++) {
+          scene.add(cones[i]);          
+        }
+      },
   	  /*'create octa': function() {
   	  	console.log('create octahedron');
   	  	scene.add(createOctahedron(0,50,0,50,0xffb6c1));
@@ -477,6 +500,24 @@ function init() {
         console.log('create bubble params: '+params);
         var parsedParams = parseParams(params);
         scene.add(createBubble(parsedParams));
+      },
+      'create bubble cube': function() {
+        console.log('create bubble cube');
+        scene.add(createBubbleCube(defaultGlobalParams));
+      },
+      'create bubble cube *params': function(params) {
+        console.log('create bubble cube params: '+params);
+        var parsedParams = parseParams(params);
+        scene.add(createBubbleCube(parsedParams));
+      },
+      'create bubble not': function() {
+        console.log('create bubble knot');
+        scene.add(createBubbleKnot(defaultGlobalParams));
+      },
+      'create bubble not *params': function(params) {
+        console.log('create bubble knot params: '+params);
+        var parsedParams = parseParams(params);
+        scene.add(createBubbleKnot(parsedParams));
       },
  			'create floor': function() {
   	  	console.log('create floor');
@@ -567,10 +608,14 @@ function init() {
         console.log('close console');
         closeConsole();
       },
-  	  'test everything': function() {
-  	  	console.log('test everything');
-  	  	testEverything();
-  	  }
+      'test everything': function() {
+        console.log('test everything');
+        testEverything();
+      },
+      'test': function() {
+        console.log('test');
+        testEverything();
+      }
   	};
 
   	// Add our commands to annyang
@@ -827,9 +872,23 @@ function createCylinder(params) {
 	return createGeometry(params,'CylinderGeometry');
 }
 
+function createCone(params) {
+  return createGeometry(params,'ConeGeometry');
+}
+
 function createBubble(params) {
   bubbles = true;
   return createGeometry(params,'Bubble');
+}
+
+function createBubbleCube(params) {
+  bubbles = true;
+  return createGeometry(params,'BubbleCube');
+}
+
+function createBubbleKnot(params) {
+  bubbles = true;
+  return createGeometry(params,'BubbleKnot'); 
 }
 
 /*function createOctahedron(x,y,z,size,color,transparent) {
@@ -942,6 +1001,10 @@ function createManyCylinders(params) {
 	return createManyGeometries(params, 'CylinderGeometry');
 }
 
+function createManyCones(params) {
+  return createManyGeometries(params, 'ConeGeometry');
+}
+
 function createGeometry(params, geometry) {
   var color = params['color'];
   var ambient = params['ambient'];
@@ -1030,8 +1093,35 @@ function createGeometry(params, geometry) {
       var geom = new THREE.TorusKnotGeometry(size, width);      
     }
 	}
+  else if(geometry == 'ConeGeometry') {
+    if(width == undefined) {
+      var geom = new THREE.CylinderGeometry(0,size*2/5,size);
+    }
+    else {
+      var geom = new THREE.CylinderGeometry(0,width,size);          
+    }
+  }
   else if(geometry == 'Bubble') {
     var geom = new THREE.SphereGeometry(size);
+    bubbleMesh = new THREE.Mesh(geom, bubbleMaterial);
+    bubbleMesh.position.set( x, y, z );
+    addToMeshs(bubbleMesh);
+    return bubbleMesh;
+  }
+  else if(geometry == 'BubbleCube') {
+    var geom = new THREE.CubeGeometry(size,size,size);
+    bubbleMesh = new THREE.Mesh(geom, bubbleMaterial);
+    bubbleMesh.position.set( x, y, z );
+    addToMeshs(bubbleMesh);
+    return bubbleMesh;
+  }
+  else if(geometry == 'BubbleKnot') {
+    if(width == undefined) {
+      var geom = new THREE.TorusKnotGeometry(size);
+    }
+    else {
+      var geom = new THREE.TorusKnotGeometry(size, width);      
+    }
     bubbleMesh = new THREE.Mesh(geom, bubbleMaterial);
     bubbleMesh.position.set( x, y, z );
     addToMeshs(bubbleMesh);
@@ -1143,6 +1233,14 @@ function createManyGeometries(params, geometry) {
         var geom = new THREE.TorusKnotGeometry(size, width);          
       }
 		}
+    else if(geometry == 'ConeGeometry') {
+    if(width == undefined) {
+      var geom = new THREE.CylinderGeometry(0,size*2/5,size);
+    }
+    else {
+      var geom = new THREE.CylinderGeometry(0,width,size);          
+    }
+  }
 		for(var i = 0; i < amount; i++) {
 			var mesh = new THREE.Mesh(geom, material );	
 			mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
@@ -1218,6 +1316,21 @@ function createManyGeometries(params, geometry) {
 				addToMeshs(mesh);
 			}
 		}
+    else if(geometry == 'ConeGeometry') {
+      for(var i = 0; i < amount; i++) {
+        newSize = +size+i*sizeIncrement;
+        if(width == undefined) {
+          var geom = new THREE.CylinderGeometry(0,newSize*2/5,newSize);
+        }
+        else {
+          var geom = new THREE.CylinderGeometry(0,width,newSize);      
+        }
+        var mesh = new THREE.Mesh(geom, material ); 
+        mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+        meshs[i] = mesh;
+        addToMeshs(mesh);
+      }
+    }
 	}
 	return meshs;	
 }
@@ -1983,6 +2096,72 @@ function submitCommand(command) {
       }    
     }
   }
+  else if(command.indexOf('create cone') === 0) {
+    var len = 'create cone'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create cone params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createCone(parsedParams));    
+    }
+    else {
+      scene.add(createCone(defaultGlobalParams));
+    }
+  }
+  else if(command.indexOf('create many cones') === 0) {
+    var len = 'create many cones'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create many cones params: '+params);
+      var parsedParams = parseParams(params);
+      var geoms = createManyCones(parsedParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }
+    }
+    else {
+      var geoms = createManyCones(defaultGlobalParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }    
+    }
+  }
+  else if(command.indexOf('create bubble cube') === 0) {
+    var len = 'create bubble cube'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create bubble cube params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createBubbleCube(parsedParams));    
+    }
+    else {
+      scene.add(createBubbleCube(defaultGlobalParams));
+    }
+  } 
+  else if(command.indexOf('create bubble knot') === 0) {
+    var len = 'create bubble knot'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create bubble knot params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createBubbleKnot(parsedParams));    
+    }
+    else {
+      scene.add(createBubbleKnot(defaultGlobalParams));
+    }
+  } 
+  else if(command.indexOf('create bubble') === 0) {
+    var len = 'create bubble'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      console.log('create bubble params: '+params);
+      var parsedParams = parseParams(params);
+      scene.add(createBubble(parsedParams));    
+    }
+    else {
+      scene.add(createBubble(defaultGlobalParams));
+    }
+  } 
   else if(command.indexOf('create floor') === 0) {
     var len = 'create floor'.length;
     if(command.length > len) {
@@ -2059,7 +2238,7 @@ function submitCommand(command) {
       setDefaultGlobalParams(params);
     }
   }
-  else if(command.indexOf('test everything') === 0) {
+  else if(command.indexOf('test') === 0 ) {
     testEverything();
   }
 }
@@ -2070,22 +2249,22 @@ function testEverything() {
   	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
   	  	*/
-        scene.add(createBubble(parseParams('size 20 y 100 x -300')));
+        scene.add(createBubbleKnot(parseParams('y 300 width 17')));
         scene.add(createBubble(parseParams('y 100 x 100')));
-        scene.add(createBubble(parseParams('y 200')));
-        //scene.add(createSphere(parseParams('size 1000 texture cloud')));
+        scene.add(createBubble(parseParams('y 200 x -150')));
+        scene.add(createSphere(parseParams('size 60 x 350 y 177 color maroon ambient turquoise')));
         scene.add(createTorusKnot(parseParams('color chartreuse ambient magenta x 50 y 50 z - 60 size 950 width 27')));
 
             setDefaultGlobalParams('size 55 and 10 ');
 
   var testspheres2 = createManySpheres(
-    parseParams('color lawn transparent true amount 5 x 220 and 200 y 100 and 0 z -170 and 170'));
+    parseParams('color forest transparent true amount 5 x 220 and 200 y 100 and 0 z -170 and 170'));
         
         for(var i = 0; i < testspheres2.length; i++) {
           scene.add(testspheres2[i]);         
         }
 
-  var testspheres = createManyCubes(
+  var testspheres = createManyCones(
     parseParams('color magenta transparent true amount 5 x - 220 and - 200 y 100 and 0 z -170 and 170'));
         
         for(var i = 0; i < testspheres.length; i++) {
@@ -2101,11 +2280,11 @@ function testEverything() {
           scene.add(testrings[i]);          
         }
         
-        setDefaultGlobalParams('transparent false z - 600 x -1350 and 1300 color chartreuse ambient red amount 6 size 150 and 15 width 11');
+        setDefaultGlobalParams('transparent false z - 600 color chartreuse ambient red amount 6 size 150 and 15 width 11');
   	       
 
   var testknots = createManyTorusKnots(
-    parseParams('texture cloud'));
+    parseParams('x -1350 and 1300 texture cloud'));
         
         for(var i = 0; i < testknots.length; i++) {
           scene.add(testknots[i]);          
@@ -2113,7 +2292,7 @@ function testEverything() {
                 setDefaultGlobalParams('color forest');
 
   var testknotsc = createManyCylinders(
-  	parseParams('z -77'));
+  	parseParams('texture cloud z -77 and 41 x -50 and 50'));
   	  	
   	  	for(var i = 0; i < testknotsc.length; i++) {
   	  		scene.add(testknotsc[i]);  	  		
@@ -2122,7 +2301,7 @@ function testEverything() {
         setDefaultGlobalParams('size 505 and 500');
 
 
-        scene.add(createFloor({y: 0}));
+        scene.add(createFloor({y: -20}));
         scene.add(createBackWall(parseParams('texture checkers')));
 
         

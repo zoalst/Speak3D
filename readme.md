@@ -9,11 +9,11 @@ Built off of the Text3D example in Lee Stemkoski's
 
 ## List of Commands & Examples
 
-  - say 'create cube' w/ optional parameters
+  - say 'create cube' or 'create bubble cube' w/ optional parameters
   - say 'create sphere' or 'create bubble' w/ optional parameters
   - say 'create ring' w/ optional parameters
-  - say 'create knot' w/ optional parameters
-  - say 'create cylinder' w/ optional parameters
+  - say 'create knot' or 'create bubble knot' w/ optional parameters
+  - say 'create cylinder' or 'create cone' w/ optional parameters
   - say 'create floor' w/ optional parameters (only has x,y,size right now)
   - say 'create wall' or 'create back wall' w/ optional parameters (only has x,y,size right now)
   - say 'create many cubes/spheres/rings/knots/cylinders/floors/walls' w/ optional parameters, provide amount param and two params on atleast one axis(x,y, or z) or two size params ex: 'create many spheres amount 5 z 0 and 250' or 'create many cubes amount 5 size 10 and 110 transparent true'
@@ -21,7 +21,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'set default' w/ parameters ex: 'set default transparent true color blue' or 'set default amount 10 size 20 x 0 and 200'
   - say 'undo' or press ctrl+z
   - say 'open console' to submit typed out commands(submit with enter); say 'close console' to close it
-  - say 'test everything' to see a bunch of stuff at once
+  - say 'test' or 'test everything' to see a bunch of stuff at once
 
 ## Parameters
 
@@ -147,6 +147,7 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - a lot
+  - bubble as a texture option instead of seperate geometry
   - add random as an option, ex: color random or texture random, size & coordinates also
   - export function so users can save whatever they create
   - add dat.GUI, for default params
