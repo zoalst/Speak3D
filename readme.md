@@ -10,7 +10,7 @@ Built off of the Text3D example in Lee Stemkoski's
 ## List of Commands & Examples
 
   - say 'create cube' w/ optional parameters
-  - say 'create sphere' w/ optional parameters
+  - say 'create sphere' or 'create bubble' w/ optional parameters
   - say 'create ring' w/ optional parameters
   - say 'create knot' w/ optional parameters
   - say 'create cylinder' w/ optional parameters
@@ -149,6 +149,7 @@ You'll need [nodejs](http://nodejs.org/) installed
   - a lot
   - add random as an option, ex: color random or texture random, size & coordinates also
   - export function so users can save whatever they create
+  - add dat.GUI, for default params
   - improve cli w/ list of recently submitted commands & auto complete
   - ability to manipulate & remove existing geometries
   - enhance start/pause screen

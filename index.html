@@ -43,6 +43,8 @@
 <script src="js/THREEx.FullScreen.js"></script>
 <script src="js/THREEx.WindowResize.js"></script>
 
+<script src="js/shaders/FresnelShader.js"></script>
+
 <!-- load fonts -->
 <script src="fonts/gentilis_bold.typeface.js"></script>
 <script src="fonts/gentilis_regular.typeface.js"></script>
@@ -83,6 +85,8 @@
   - 'create floor *parameters*'
 <br />
   - 'create wall *parameters*'
+<br />
+  - 'create bubble *parameters*'
 <br />
   - 'create many cubes/spheres/rings/knots/cylinders/floors/walls *parameters*' 
 <br />
@@ -156,6 +160,7 @@ var undoing = false;
 var defaultGlobalParams = {};
 var texturesLength;
 var textures = getTextures();
+var bubbleMaterial;
 
 var user;
 //var useOtherControls = true;
@@ -243,10 +248,11 @@ function init() {
 	////////////
   initConsole();
 	initDefaultGlobalParams();
+  initBubble();
   showPauseScreen();
 
 //openConsole();
-//testEverything();//TODO remove
+testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -738,6 +744,11 @@ else {
 }
 
 function render() {
+  //bubble
+  bubbleMesh.visible = false;
+  refractSphereCamera.updateCubeMap( renderer, scene );
+  bubbleMesh.visible = true;
+
 	renderer.render( scene, camera );
 }
 
@@ -800,6 +811,10 @@ function createTorusKnot(params) {
 
 function createCylinder(params) {
 	return createGeometry(params,'CylinderGeometry');
+}
+
+function createBubble(params) {
+  return createGeometry(params,'Bubble');
 }
 
 /*function createOctahedron(x,y,z,size,color,transparent) {
@@ -912,7 +927,6 @@ function createManyCylinders(params) {
 	return createManyGeometries(params, 'CylinderGeometry');
 }
 
-
 function createGeometry(params, geometry) {
   var color = params['color'];
   var ambient = params['ambient'];
@@ -1001,6 +1015,13 @@ function createGeometry(params, geometry) {
       var geom = new THREE.TorusKnotGeometry(size, width);      
     }
 	}
+  else if(geometry == 'Bubble') {
+    var geom = new THREE.SphereGeometry(size);
+    bubbleMesh = new THREE.Mesh(geom, bubbleMaterial);
+    bubbleMesh.position.set( x, y, z );
+    addToMeshs(bubbleMesh);
+    return bubbleMesh;
+  }
 	var mesh = new THREE.Mesh(geom, material );	
 	mesh.position.set( x, y, z );
 	addToMeshs(mesh);
@@ -1319,6 +1340,30 @@ function createManyFloorsOrWalls(params,floorOrWall) {
     }
   }
   return meshs;
+}
+
+function initBubble() {
+  this.refractSphereCamera = new THREE.CubeCamera( 0.1, 5000, 512 );
+  scene.add( refractSphereCamera );
+
+  var fShader = THREE.FresnelShader;
+  
+  var fresnelUniforms = 
+  {
+    "mRefractionRatio": { type: "f", value: 1.02 },
+    "mFresnelBias":   { type: "f", value: 0.1 },
+    "mFresnelPower":  { type: "f", value: 2.0 },
+    "mFresnelScale":  { type: "f", value: 1.0 },
+    "tCube":      { type: "t", value: refractSphereCamera.renderTarget } //  textureCube }
+  };
+  
+  // create custom material for the shader
+  bubbleMaterial = new THREE.ShaderMaterial( 
+  {
+      uniforms:     fresnelUniforms,
+    vertexShader:   fShader.vertexShader,
+    fragmentShader: fShader.fragmentShader
+  }   );
 }
   //////////////////////////////////////////
  //END OF METHODS FOR CREATING GEOMETRIES//
@@ -2010,12 +2055,23 @@ function testEverything() {
   	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
   	  	*/
-        scene.add(createTorusKnot(parseParams('color forest ambient pink y 250 z - 600 size 150 width 27')));
+        scene.add(createBubble(parseParams('size 200 y 400 x -300')));
+        scene.add(createBubble(parseParams('y 100 x 100')));
+        scene.add(createBubble(parseParams('y 200')));
+        scene.add(createSphere(parseParams('size 1000 texture cloud')));
+        scene.add(createTorusKnot(parseParams('color forest ambient pink y 250 z - 600 size 750 width 27')));
         setDefaultGlobalParams('texture random transparent true size 55');
-  	  	scene.add(createCube({x: 300}));
   
+  var testrings = createManyFloorsOrWalls(
+    parseParams('amount 2 x -560 and 600'),'Wall');
+        
+        for(var i = 0; i < testrings.length; i++) {
+          scene.add(testrings[i]);          
+        }
+        
         setDefaultGlobalParams('transparent false z - 600 x -1350 and 1300 color chartreuse ambient red amount 6 size 150 and 15 width 11');
   	       
+
   var testknots = createManyTorusKnots(
     parseParams('texture cloud'));
         
@@ -2033,16 +2089,9 @@ function testEverything() {
                 setDefaultGlobalParams('color forest');
         setDefaultGlobalParams('size 505 and 500');
 
-  var testrings = createManyFloorsOrWalls(
-  	parseParams(''),'Wall');
-  	  	
-  	  	for(var i = 0; i < testrings.length; i++) {
-  	  		scene.add(testrings[i]);  	  		
-  	  	}
-        
 
         scene.add(createFloor({y: 0}));
-        scene.add(createBackWall(parseParams('y 750 texture electric')));
+        scene.add(createBackWall(parseParams('texture glow')));
     setDefaultGlobalParams('size 55 and 10 ');
 
   var testspheres2 = createManySpheres(
