@@ -5,6 +5,33 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link rel=stylesheet href="css/base.css"/>
+  <style>
+    #blocker {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+    }
+    #instructions {
+      width: 100%;
+      height: 100%;
+      display: -webkit-box;
+      display: -moz-box;
+      display: box;
+      -webkit-box-orient: horizontal;
+      -moz-box-orient: horizontal;
+      box-orient: horizontal;
+      -webkit-box-pack: center;
+      -moz-box-pack: center;
+      box-pack: center;
+      -webkit-box-align: center;
+      -moz-box-align: center;
+      box-align: center;
+      color: #ffffff;
+      text-align: center;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
@@ -35,8 +62,75 @@
 <!-- ------------------------------------------------------------ -->
 
 <div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+
+<!-- pause/start screen -->
+<div id="blocker">
+<div id="instructions">
+<span style="font-size:10px">Click Anywhere To Unpause (or press u)</span>
+<br />
+<span style="font-size:40px">List of Commands</span>
+<br />
+  - 'create cube *parameters*'
+<br />
+  - 'create sphere *parameters*'
+<br />
+  - 'create ring *parameters*'
+<br />
+  - 'create knot *parameters*'
+<br />
+  - 'create cylinder *parameters*'
+<br />
+  - 'create floor *parameters*'
+<br />
+  - 'create wall *parameters*'
+<br />
+  - 'create many cubes/spheres/rings/knots/cylinders/floors/walls *parameters*' 
+<br />
+  - 'set default *parameters*'
+<br />
+<br />
+<span style="font-size:40px">*Parameters*</span>
+<br />
+  - 'x', 'y', or 'z' followed by a number
+<br />
+  - 'size' or 'width' followed by a number
+<br />
+  - 'amount' followed by a number
+<br />
+  - 'color' or 'ambient' followed by a color name
+<br />
+  - 'texture' followed by a texture name
+<br />
+  - 'tranparent' followed by 'true' or 'false'
+<br />
+  - you can set a parameter range by using the keyword end(or and), ex: create many cubes x 0 end 100
+<br />
+  ranges currently only function for x,y,z, and size
+<br />
+<br />
+<span style="font-size:40px">Examples</span>
+<br />
+  - say 'create sphere color magenta'
+<br />
+  - say 'create knot width 9 texture cloud'
+<br />
+  - say 'set default transparent true amount 5', then 'create many cubes size 10 and 150'
+<br />
+  - say 'set default texture random', then 'create floor', then 'create many walls x -500 and 500'
+<br />
+<br />
+<span style="font-size:40px">Controls</span>
+<br />
+(W, A, S, D, R, F = Move, MOUSE = Look around)
+<br />
+(O = Display command line, ctrl+0 = Close command line, P = Pause, U = Unpause)
+</div>
+</div>
+
 <!-- cli -->
-<input id="consoleBox" type="text" command="command" size="66" style="position: absolute; right:10px; bottom:10px; visibility:hidden"/>
+<button id = "submitButton" type="button" style="position: absolute; right:0px; bottom:10px; visibility:hidden">!!</button> 
+<input id="consoleBox" type="text" command="command" size="66" style="position: absolute; right:20px; bottom:10px; visibility:hidden"/>
+
 <script>
 /*
 	Speak3D
@@ -66,7 +160,9 @@ var textures = getTextures();
 var user;
 //var useOtherControls = true;
 var consoleOpen = false;
-
+var paused = false;
+var blocker = document.getElementById( 'blocker' );
+var instructions = document.getElementById( 'instructions' );
 
 init();
 animate();
@@ -92,7 +188,7 @@ function init() {
 	container.appendChild( renderer.domElement );
 	// EVENTS
 	THREEx.WindowResize(renderer, camera);
-	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+	THREEx.FullScreen.bindKey({ charCode : '/'.charCodeAt(0) });
 	// CONTROLS
 	//controls = new THREE.OrbitControls( camera, renderer.domElement );//TODO
 	// STATS
@@ -147,7 +243,9 @@ function init() {
 	////////////
   initConsole();
 	initDefaultGlobalParams();
+  showPauseScreen();
 
+//openConsole();
 //testEverything();//TODO remove
 
 	//Speech Recognition
@@ -373,7 +471,7 @@ function init() {
   	  },	
       'create many floors': function() {
         console.log('create many floors');
-        var floors = createManyFloorsOrWalls(defaultGlobalParams,'Floor');
+        var floors = createManyFloors(defaultGlobalParams);
         for(var i = 0; i < floors.length; i++) {
           scene.add(floors[i]);          
         }
@@ -381,7 +479,7 @@ function init() {
       'create many floors *params': function(params) {
         console.log('create many floors params: '+params);
         var parsedParams = parseParams(params);
-        var floors = createManyFloorsOrWalls(parsedParams,'Floor');
+        var floors = createManyFloors(parsedParams);
         for(var i = 0; i < floors.length; i++) {
           scene.add(floors[i]);          
         }
@@ -397,9 +495,7 @@ function init() {
   	  },
       'create many walls': function() {
         console.log('create many walls');
-        var testrings = createManyFloorsOrWalls(
-    parseParams(''),'Wall');
-        
+        var testrings = createManyWalls(parseParams('')); 
         for(var i = 0; i < testrings.length; i++) {
           scene.add(testrings[i]);          
         }
@@ -407,7 +503,7 @@ function init() {
       'create many walls *params': function(params) {
         console.log('create many walls params: '+params);
         var parsedParams = parseParams(params);
-        var walls = createManyFloorsOrWalls(parsedParams,'Wall');
+        var walls = createManyWalls(parsedParams);
         for(var i = 0; i < walls.length; i++) {
           scene.add(walls[i]);          
         }
@@ -427,6 +523,14 @@ function init() {
       'save': function() {
         console.log('save');
         save();
+      },
+      'pause': function() {
+        console.log('pause');
+        showPauseScreen();
+      },
+      'unpause': function() {
+        console.log('unpause');
+        hidePauseScreen();
       },
       'open console': function() {
         console.log('open console');
@@ -454,11 +558,15 @@ function init() {
   this.mouseLook = { x:0, y:0 };
   document.addEventListener( 'click', function ( event ) 
   {
+    if(!consoleOpen){
     var havePointerLock = 'pointerLockElement' in document ||
                'mozPointerLockElement' in document ||
             'webkitPointerLockElement' in document;
     if ( !havePointerLock ) return;
-    
+
+    if(paused) {
+      hidePauseScreen();
+    } 
     var element = document.body;
     // Ask the browser to lock the pointer
     element.requestPointerLock = element.requestPointerLock ||
@@ -474,7 +582,7 @@ function init() {
     
     // Hook mouse move events
     // document.addEventListener("mousemove", this.moveCallback, false);
-    
+    }
   }, false );
 }
 
@@ -526,7 +634,10 @@ function update() {
 	//controls.update();//TODO, have both????
   //controls from http://stemkoski.github.io/7DFPS/3JSFPS.html
   var delta = clock.getDelta(); // seconds since last update
-  
+  if (keyboard.pressed("O")) {
+    openConsole();
+  }
+
   var moveDistance = 200 * delta; // 200 pixels per second  // should be velocity?
   var rotateAngle = Math.PI / 4 * delta;   // pi/4 radians (45 degrees) per second
   var cursorSpeed = 200 * delta;
@@ -594,6 +705,24 @@ function update() {
     camera.rotateX( -6 * camera.rotation.x * rotateAngle );
   
   user.translateY( user.velocity.y );
+  if(!paused) {
+    if ( keyboard.pressed("P") ) {
+      //pause
+      showPauseScreen();
+    }
+  }
+  else {
+    if ( keyboard.pressed("U") ) {
+      //unpause
+      hidePauseScreen();
+    }
+  }
+
+}
+else {
+  if (keyboard.pressed("ctrl+0")) {
+    closeConsole();
+  }
 }
 
 	stats.update();
@@ -603,6 +732,17 @@ function render() {
 	renderer.render( scene, camera );
 }
 
+function showPauseScreen() {
+  blocker.style.display = '-webkit-box';
+  blocker.style.display = '-moz-box';
+  blocker.style.display = 'box';
+  instructions.style.display = '';
+  paused = true;
+}
+function hidePauseScreen() {
+  blocker.style.display = 'none';    
+  paused = false;
+}
   ///////////////////////////////////
  //METHODS FOR CREATING GEOMETRIES//
 ///////////////////////////////////
@@ -683,7 +823,7 @@ function createFloorOrWall(params, floorOrWall) {
   var size = params['size'];
   var texture = params['texture'];
   if(x == undefined){
-    x = -150;
+    x = 0;
   }
   if(y == undefined){
     y = 500;
@@ -1010,7 +1150,7 @@ function createManyGeometries(params, geometry) {
 				  var geom = new THREE.TorusKnotGeometry(newSize);
         }
         else {
-          var geom = new THREE.TorusKnotGeometry(newSize, width,64,8,2,13);      
+          var geom = new THREE.TorusKnotGeometry(newSize, width);      
         }
 				var mesh = new THREE.Mesh(geom, material );	
 				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
@@ -1021,7 +1161,12 @@ function createManyGeometries(params, geometry) {
 	}
 	return meshs;	
 }
-
+function createManyFloors(params) {
+  return createManyFloorsOrWalls(params,'Floor');
+}
+function createManyWalls(params) {
+  return createManyFloorsOrWalls(params,'Wall');
+}
 function createManyFloorsOrWalls(params,floorOrWall) {
   var texture = params['texture'];
   var x = params['x'];
@@ -1169,7 +1314,17 @@ function undo() {
 	numberOfMeshs--;
   scene.remove(meshs[numberOfMeshs]);
 }
-
+function pauseScreen() {
+  document.getElementById('submitButton').style.visibility = 'visible';
+  document.getElementById('consoleBox').style.visibility = 'visible';
+  document.getElementById('consoleBox').focus();
+  consoleOpen = true;
+}
+function closeConsole() {
+  document.getElementById('submitButton').style.visibility = 'hidden';
+  document.getElementById('consoleBox').style.visibility = 'hidden';
+  consoleOpen = false;
+}
   ///////////////////////////////////////
  //METHODS FOR DEALING WITH PARAMETERS//
 ///////////////////////////////////////
@@ -1573,13 +1728,22 @@ function initConsole() {
         cli.value='';
     }
   });
+  document.getElementById('submitButton').addEventListener("click", function(){
+    var cli = document.getElementById("consoleBox");
+    submitCommand(cli.value);
+    cli.value='';
+ });
+
+
 }
 function openConsole() {
+  document.getElementById('submitButton').style.visibility = 'visible';
   document.getElementById('consoleBox').style.visibility = 'visible';
   document.getElementById('consoleBox').focus();
   consoleOpen = true;
 }
 function closeConsole() {
+  document.getElementById('submitButton').style.visibility = 'hidden';
   document.getElementById('consoleBox').style.visibility = 'hidden';
   consoleOpen = false;
 }
@@ -1753,13 +1917,13 @@ function submitCommand(command) {
       var params = command.substring(len+1);
       console.log('create many floors params: '+params);
       var parsedParams = parseParams(params);
-      var geoms = createManyFloorsOrWalls(parsedParams,'Floor');
+      var geoms = createManyFloors(parsedParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }
     }
     else {
-      var geoms = createManyFloorsOrWalls(defaultGlobalParams,'Floor');
+      var geoms = createManyFloors(defaultGlobalParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }    
@@ -1774,7 +1938,7 @@ function submitCommand(command) {
       scene.add(createWall(parsedParams));    
     }
     else {
-      scene.add(createWall({x:-150,y:500,size:1000}));
+      scene.add(createWall({x:0,y:500,size:1000}));
     }
   }
   else if(command.indexOf('create many walls') === 0) {
@@ -1783,13 +1947,13 @@ function submitCommand(command) {
       var params = command.substring(len+1);
       console.log('create many walls params: '+params);
       var parsedParams = parseParams(params);
-      var geoms = createManyFloorsOrWalls(parsedParams,'Wall');
+      var geoms = createManyWalls(parsedParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }
     }
     else {
-      var geoms = createManyFloorsOrWalls(defaultGlobalParams,'Wall');
+      var geoms = createManyWalls(defaultGlobalParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }    

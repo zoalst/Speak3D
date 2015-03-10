@@ -133,9 +133,9 @@ You'll need [nodejs](http://nodejs.org/) installed
   - a lot
   - add random as an option, ex: color random or texture random, size & coordinates also
   - export function so users can save whatever they create
-  - cli alternative to send commands
+  - improve cli w/ list of recently submitted commands & auto complete
   - ability to manipulate & remove existing geometries
-  - have start/pause screen that has usage & commands & examples
+  - enhance start/pause screen
   - ctrl+z is buggy
   - use updated version of three.js
   - create self command, for third person view
