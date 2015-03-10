@@ -161,6 +161,7 @@ var defaultGlobalParams = {};
 var texturesLength;
 var textures = getTextures();
 var bubbleMaterial;
+var bubbles = false;
 
 var user;
 //var useOtherControls = true;
@@ -254,7 +255,7 @@ function init() {
   showPauseScreen();
 
 //openConsole();
-testEverything();//TODO remove
+//testEverything();//TODO remove
 
 	//Speech Recognition
 	if (annyang) {
@@ -468,6 +469,15 @@ testEverything();//TODO remove
   	  	scene.add(createIcosahedron(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  },*/
+      'create bubble': function() {
+        console.log('create bubble');
+        scene.add(createBubble(defaultGlobalParams));
+      },
+      'create bubble *params': function(params) {
+        console.log('create bubble params: '+params);
+        var parsedParams = parseParams(params);
+        scene.add(createBubble(parsedParams));
+      },
  			'create floor': function() {
   	  	console.log('create floor');
   	  	scene.add(createFloor({y:0,size:1000}));
@@ -747,9 +757,11 @@ else {
 
 function render() {
   //bubble
-  bubbleMesh.visible = false;
-  refractSphereCamera.updateCubeMap( renderer, scene );
-  bubbleMesh.visible = true;
+  if(bubbles) {
+    bubbleMesh.visible = false;
+    refractSphereCamera.updateCubeMap( renderer, scene );
+    bubbleMesh.visible = true;
+  }
 
 	renderer.render( scene, camera );
 }
@@ -816,6 +828,7 @@ function createCylinder(params) {
 }
 
 function createBubble(params) {
+  bubbles = true;
   return createGeometry(params,'Bubble');
 }
 
@@ -2057,15 +2070,32 @@ function testEverything() {
   	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
   	  	*/
-        scene.add(createBubble(parseParams('size 200 y 400 x -300')));
+        scene.add(createBubble(parseParams('size 20 y 100 x -300')));
         scene.add(createBubble(parseParams('y 100 x 100')));
         scene.add(createBubble(parseParams('y 200')));
         //scene.add(createSphere(parseParams('size 1000 texture cloud')));
-        scene.add(createTorusKnot(parseParams('color forest ambient pink y 250 z - 600 size 750 width 27')));
+        scene.add(createTorusKnot(parseParams('color chartreuse ambient magenta x 50 y 50 z - 60 size 950 width 27')));
+
+            setDefaultGlobalParams('size 55 and 10 ');
+
+  var testspheres2 = createManySpheres(
+    parseParams('color lawn transparent true amount 5 x 220 and 200 y 100 and 0 z -170 and 170'));
+        
+        for(var i = 0; i < testspheres2.length; i++) {
+          scene.add(testspheres2[i]);         
+        }
+
+  var testspheres = createManyCubes(
+    parseParams('color magenta transparent true amount 5 x - 220 and - 200 y 100 and 0 z -170 and 170'));
+        
+        for(var i = 0; i < testspheres.length; i++) {
+          scene.add(testspheres[i]);          
+        }
+
         setDefaultGlobalParams('texture random transparent true size 55');
   
-  var testrings = createManyFloorsOrWalls(
-    parseParams('amount 2 x -560 and 600'),'Wall');
+  var testrings = createManyWalls(
+    parseParams('amount 2 size 500 and 500 x -560 and 600'));
         
         for(var i = 0; i < testrings.length; i++) {
           scene.add(testrings[i]);          
@@ -2093,24 +2123,10 @@ function testEverything() {
 
 
         scene.add(createFloor({y: 0}));
-        scene.add(createBackWall(parseParams('texture glow')));
-    setDefaultGlobalParams('size 55 and 10 ');
+        scene.add(createBackWall(parseParams('texture checkers')));
 
-  var testspheres2 = createManySpheres(
-  	parseParams('color lawn transparent true amount 5 x 220 and 200 y 100 and 0 z -170 and 170'));
-  	  	
-  	  	for(var i = 0; i < testspheres2.length; i++) {
-  	  		scene.add(testspheres2[i]);  	  		
-  	  	}
-
-  var testspheres = createManyCubes(
-  	parseParams('color lemon transparent true amount 5 x - 220 and - 200 y 100 and 0 z -170 and 170'));
-  	  	
-  	  	for(var i = 0; i < testspheres.length; i++) {
-  	  		scene.add(testspheres[i]);  	  		
-  	  	}
         
-
+initDefaultGlobalParams();
 
 
 }
