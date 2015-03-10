@@ -172,9 +172,7 @@ var spinningParams = [];
 
 var movingMeshs = [];
 var movingParams = [];
-var xdir = 1; //1 = left to right, -1 = right to left
-var ydir = 1;
-var zdir = 1;
+
 
 var user;
 //var useOtherControls = true;
@@ -843,6 +841,9 @@ function render() {
     var currentz;
     var startz;
     var endz;
+    var xdir; //1 = positive direction on axis, -1 = negative direction on axis
+    var ydir;
+    var zdir;
     //var dir = 1;//1 = positive direction on that axis, -1 = right to left
     for (var i = 0; i < movingMeshs.length; i++) {
       moveParams = movingParams[i];
@@ -852,18 +853,19 @@ function render() {
         currentx = +movingMeshs[i].position.x;
         startx = +moveParams['movex'];
         endx = +moveParams['endmovex'];
+        xdir = +moveParams['xdir'];
         if(currentx <=endx && currentx >= startx) {
         //if(currentx <=startx && currentx >= endx) {
-          movingMeshs[i].position.x += +(0.75*xdir);
+          movingMeshs[i].position.x += xdir*0.75;
         }
         else {
           if(xdir == 1) {
             movingMeshs[i].position.x = +endx-1;
-            xdir = -1;
+            moveParams['xdir'] = -1;
           }
           else {
             movingMeshs[i].position.x = +startx+1;
-            xdir = 1;
+            moveParams['xdir'] = 1;
           }
         }
       }
@@ -872,17 +874,18 @@ function render() {
         currenty = +movingMeshs[i].position.y;
         starty = +moveParams['movey'];
         endy = +moveParams['endmovey'];
+        ydir = +moveParams['ydir'];
         if(currenty <=endy && currenty >= starty) {
-          movingMeshs[i].position.y += +(0.75*ydir);
+          movingMeshs[i].position.y += ydir*0.75;
         }
         else {
           if(ydir == 1) {
             movingMeshs[i].position.y = +endy-1;
-            ydir = -1;
+            moveParams['ydir'] = -1;
           }
           else {
             movingMeshs[i].position.y = +starty+1;
-            ydir = 1;
+            moveParams['ydir'] = 1;
           }
         }
       }
@@ -891,18 +894,19 @@ function render() {
         currentz = +movingMeshs[i].position.z;
         startz = +moveParams['movez'];
         endz = +moveParams['endmovez'];
+        zdir = +moveParams['zdir'];
         //console.log('currx: '+currentx+', curry: '+currenty+', currz: '+currentz+'\n');
         if(currentz <=endz && currentz >= startz) {
-          movingMeshs[i].position.z += +(0.75*zdir);
+          movingMeshs[i].position.z += zdir*0.75;
         }
         else {
           if(zdir == 1) {
             movingMeshs[i].position.z = +endz-1;
-            zdir = -1;
+            moveParams['zdir'] = -1;
           }
           else {
             movingMeshs[i].position.z = +startz+1;
-            zdir = 1;
+            moveParams['zdir'] = 1;
           }
         }
       }
@@ -1247,10 +1251,12 @@ function createGeometry(params, geometry) {
   if(move == true) {
     console.log('move');
     movingMeshs.push(mesh);
+    //TODO, calculate dir depending on if start/end is +/- or -/+
     movingParams.push({
       'movex':movex, 'endmovex':endmovex, 
       'movey':movey, 'endmovey':endmovey, 
-      'movez':movez, 'endmovez':endmovez
+      'movez':movez, 'endmovez':endmovez,
+      'xdir':1, 'ydir':1, 'zdir':1
     });
   }
   addToMeshs(mesh);//increases numberOfMeshs by 1
@@ -2207,13 +2213,13 @@ function initConsole() {
 
 }
 function openConsole() {
-  document.getElementById('consoleBox').value = '';
   document.getElementById('submitButton').style.visibility = 'visible';
   document.getElementById('consoleBox').style.visibility = 'visible';
   document.getElementById('consoleBox').focus();
   consoleOpen = true;
 }
 function closeConsole() {
+  document.getElementById('consoleBox').value = '';
   document.getElementById('submitButton').style.visibility = 'hidden';
   document.getElementById('consoleBox').style.visibility = 'hidden';
   consoleOpen = false;
@@ -2524,14 +2530,15 @@ function testEverything() {
   	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
   	  	*/
             //setDefaultGlobalParams('spin x');
-       scene.add(createCone(parseParams('size 60 move x -350 and 350 move y 0 and 350 move z -175 and 175 y 177 color maroon ambient turquoise')));
-        scene.add(createCube(parseParams('x 0 move x -300 and 300 y 200')));
+       //scene.add(createCone(parseParams('size 60 move x -350 and 350 move y 0 and 350 move z -175 and 175 y 177 color maroon ambient turquoise')));
+       scene.add(createCone(parseParams('size 60 move z -350 and 350 move x 0 and 350 move y 300 and 340 color maroon ambient turquoise')));
+        scene.add(createCube(parseParams('move z 0 and 50 move x -300 and 300 move y 50 and 475')));
         scene.add(createBubble(parseParams('y 200 x -150')));
-        scene.add(createTorusKnot(parseParams('move z -350 and 350 move y 0 and 350 color chartreuse ambient magenta size 15 width 7')));
+        //scene.add(createTorusKnot(parseParams('move z -350 and 350 move y 0 and 350 color chartreuse ambient magenta size 15 width 7')));
 
 
   var testknots = createManyTorusKnots(
-    parseParams('amount 6 size 60 z -600 width 11 x -1350 and 1300 texture cloud'));
+    parseParams('amount 6 size 60 and 456 z -600 width 11 x -1350 and 1300 texture cloud'));
         
         for(var i = 0; i < testknots.length; i++) {
           scene.add(testknots[i]);          

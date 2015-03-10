@@ -148,7 +148,8 @@ You'll need [nodejs](http://nodejs.org/) installed
 
 ## To Do
 
-  - motion bugs, only have one dir var right now so multiple things moving causes issues
+  - motion w/ create many geometry commands
+  - when creating many geometries w/ one command, morph them into one geometry (maybe when amount >= a certian amount)
   - export function so users can save whatever they create
   - add dat.GUI, for default params
   - improve cli w/ list of recently submitted commands & auto complete
