@@ -20,7 +20,7 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'create text' then say whatever you want
   - say 'set default' w/ parameters ex: 'set default transparent true color blue' or 'set default amount 10 size 20 x 0 and 200'
   - say 'undo' or press ctrl+z
-  - say 'open console' or press 'o' to submit typed out commands in the bottom right corner(submit with enter); say 'close console' to close it
+  - say 'open console' or press 'o' to submit typed out commands in the top right corner(submit with enter); say 'close console' to close it
   - say 'test' or 'test everything' to see a bunch of stuff at once
 
 ## Parameters
@@ -152,7 +152,8 @@ You'll need [nodejs](http://nodejs.org/) installed
   - export function so users can save whatever they create
   - add dat.GUI, for default params
   - GUI for user uploaded textures and models
-  - improve cli w/ list of recently submitted commands & auto complete
+  - improve cli's auto-complete
+  - improve cli w/ list of recently submitted commands
   - ability to manipulate & remove existing geometries
   - enhance start/pause screen
   - bubble as a texture option instead of seperate geometry

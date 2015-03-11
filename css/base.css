@@ -6,3 +6,7 @@ body
 	margin: 0px;
 	overflow: hidden;
 }
+
+.autocomplete-suggestions { border: 1px solid #999; background-color:rgba(255,255,255,0.85); cursor: default; overflow: auto; }
+.autocomplete-selected { background: #f0f000; }
+.autocomplete-suggestions strong { font-weight: normal; color: #cc5700; }

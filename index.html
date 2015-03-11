@@ -60,6 +60,10 @@
 <!-- Speech Recognition using annyang -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/1.5.0/annyang.min.js"></script>
 
+<!-- jquery auto complete for cli -->
+<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="js/jquery.autocomplete.min.js"></script>
+<script type="text/javascript" src="js/speak3d-autocomplete.js"></script>
 
 <!-- ------------------------------------------------------------ -->
 
@@ -137,7 +141,7 @@
 
 <!-- cli -->
 <button id = "submitButton" type="button" style="position: absolute; right:0px; bottom:10px; visibility:hidden">!!</button> 
-<input id="consoleBox" type="text" command="command" size="66" style="position: absolute; right:20px; bottom:10px; visibility:hidden"/>
+<input id="consoleBox" type="text" command="command" size="66" style="position: absolute; right:20px; top:10px; visibility:hidden"/>
 
 <script>
 /*
@@ -852,18 +856,17 @@ function render() {
         startx = +moveParams['movex'];
         endx = +moveParams['endmovex'];
         xdir = +moveParams['xdir'];
-        if(currentx <=endx && currentx >= startx) {
+        if(currentx <= endx && currentx >= startx) {
           movingMeshs[i].position.x += xdir*0.75;
         }
         else {
           if(xdir == 1) {
             movingMeshs[i].position.x = +endx-1;
-            moveParams['xdir'] = -1;
           }
           else {
             movingMeshs[i].position.x = +startx+1;
-            moveParams['xdir'] = 1;
           }
+          moveParams['xdir'] = -1*xdir;
         }
       }
       //move along y axis
@@ -878,12 +881,11 @@ function render() {
         else {
           if(ydir == 1) {
             movingMeshs[i].position.y = +endy-1;
-            moveParams['ydir'] = -1;
           }
           else {
             movingMeshs[i].position.y = +starty+1;
-            moveParams['ydir'] = 1;
           }
+          moveParams['ydir'] = -1*ydir;
         }
       }
       //move along z axis
@@ -898,12 +900,11 @@ function render() {
         else {
           if(zdir == 1) {
             movingMeshs[i].position.z = +endz-1;
-            moveParams['zdir'] = -1;
           }
           else {
             movingMeshs[i].position.z = +startz+1;
-            moveParams['zdir'] = 1;
           }
+          moveParams['zdir'] = -1*zdir;
         }
       }
     }
@@ -1798,15 +1799,6 @@ function parseParams(params) {
           parsedParams['end'+lastParamType] = paramsArray[i+1];     
         }
       }
-      /*else if(lastParamType == 'movex') {
-        parsedParams['endmovex'] = paramsArray[i+1];
-      }
-      else if(lastParamType == 'movey') {
-        parsedParams['endmovey'] = paramsArray[i+1];
-      }
-      else if(lastParamType == 'movez') {
-        parsedParams['endmovez'] = paramsArray[i+1];
-      }*/
 			lastParamType = '';
 		}
     //move/oscillate
