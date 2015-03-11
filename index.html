@@ -643,19 +643,19 @@ function init() {
   document.addEventListener( 'click', function ( event ) 
   {
     if(!consoleOpen){
-    var havePointerLock = 'pointerLockElement' in document ||
-               'mozPointerLockElement' in document ||
-            'webkitPointerLockElement' in document;
-    if ( !havePointerLock ) return;
+      var havePointerLock = 'pointerLockElement' in document ||
+      'mozPointerLockElement' in document ||
+      'webkitPointerLockElement' in document;
+      if ( !havePointerLock ) return;
 
-    if(paused) {
-      hidePauseScreen();
-    } 
-    var element = document.body;
+      if(paused) {
+        hidePauseScreen();
+      } 
+      var element = document.body;
     // Ask the browser to lock the pointer
     element.requestPointerLock = element.requestPointerLock ||
-                  element.mozRequestPointerLock ||
-                 element.webkitRequestPointerLock;
+    element.mozRequestPointerLock ||
+    element.webkitRequestPointerLock;
     // Ask the browser to lock the pointer
     element.requestPointerLock();
     
@@ -713,102 +713,102 @@ function update() {
 		setInterval(function() {undoing=false;}, 1000);
 	}
 
-  //don't want controls to work when user is typing in a command
-  if(!consoleOpen) {
-	//controls.update();//TODO, have both????
-  //controls from http://stemkoski.github.io/7DFPS/3JSFPS.html
+  //original controls from http://stemkoski.github.io/7DFPS/3JSFPS.html
   var delta = clock.getDelta(); // seconds since last update
-  if (keyboard.pressed("O")) {
-    openConsole();
-  }
-
-  var moveDistance = 200 * delta; // 200 pixels per second  // should be velocity?
   var rotateAngle = Math.PI / 4 * delta;   // pi/4 radians (45 degrees) per second
-  var cursorSpeed = 200 * delta;
-  // movement controls  
   var move = { xDist: 0, yAngle: 0, zDist: 0 };
-  // keyboard fallback
-  
-  // forwards/backwards
-  if (keyboard.pressed("W"))
-    move.zDist -= moveDistance;
-  if (keyboard.pressed("S"))
-    move.zDist += moveDistance;
-  // turn left/right
-  if (keyboard.pressed("Q"))
-    move.yAngle += rotateAngle;
-  if (keyboard.pressed("E"))
-    move.yAngle -= rotateAngle;
-  // left/right (strafe)
-  if ( keyboard.pressed("A") )
-    move.xDist -= moveDistance;
-  if ( keyboard.pressed("D") )
-    move.xDist += moveDistance;
-    
+
   // process data from mouse look
   //  (if inactive, there will be no change)
   move.yAngle -= rotateAngle * mouseLook.x * 0.1;
-  mouseLook.x = 0;
-  
-  // up/down (debugging fly)
-  if ( keyboard.pressed("R") )
-  {
-    user.velocity = new THREE.Vector3(0,0,0);
-    user.translateY( moveDistance );
-  }
-  if ( keyboard.pressed("F") )
-  {
-    user.velocity = new THREE.Vector3(0,0,0);
-    user.translateY( -moveDistance );
-  }
-
-  user.translateZ( move.zDist );
+  mouseLook.x = 0;    
   user.rotateY( move.yAngle );
-  user.translateX( move.xDist );
-  user.updateMatrix();
-
-  // look up/down
-  if ( keyboard.pressed("3") ) // third-person view
-    camera.position.set(0,50,250);
-  if ( keyboard.pressed("1") ) // first-person view
-    camera.position.set(0,35,10);
-  if ( keyboard.pressed("T") )
-    camera.rotateX(  rotateAngle );
-  if ( keyboard.pressed("G") )
-    camera.rotateX( -rotateAngle );
-    
   // process data from mouse look
   //  (if inactive, there will be no change)
   camera.rotateX( -rotateAngle * mouseLook.y * 0.05 );
   mouseLook.y = 0;
-    
   // limit camera to +/- 45 degrees (0.7071 radians) or +/- 60 degrees (1.04 radians)
   camera.rotation.x = THREE.Math.clamp( camera.rotation.x, -1.04, 1.04 );
-  // pressing both buttons moves look angle to horizon
-  if ( keyboard.pressed("R") && keyboard.pressed("F") )
-    camera.rotateX( -6 * camera.rotation.x * rotateAngle );
+
+  //don't want keyboard controls to work when user is typing in a command
+  if(!consoleOpen) {
+	 //controls.update();//TODO, have both????
+    if (keyboard.pressed("O")) {
+      openConsole();
+    }
+
+    var moveDistance = 200 * delta; // 200 pixels per second  // should be velocity?
+    var cursorSpeed = 200 * delta;
   
-  user.translateY( user.velocity.y );
-  if(!paused) {
-    if ( keyboard.pressed("P") ) {
-      //pause
-      showPauseScreen();
+    // forwards/backwards
+    if (keyboard.pressed("W"))
+      move.zDist -= moveDistance;
+    if (keyboard.pressed("S"))
+      move.zDist += moveDistance;
+    // turn left/right
+    if (keyboard.pressed("Q"))
+      move.yAngle += rotateAngle;
+    if (keyboard.pressed("E"))
+      move.yAngle -= rotateAngle;
+    // left/right (strafe)
+    if ( keyboard.pressed("A") )
+      move.xDist -= moveDistance;
+    if ( keyboard.pressed("D") )
+      move.xDist += moveDistance;
+    
+    // up/down (debugging fly)
+    if ( keyboard.pressed("R") )
+    {
+      user.velocity = new THREE.Vector3(0,0,0);
+      user.translateY( moveDistance );
+    }
+    if ( keyboard.pressed("F") )
+    {
+      user.velocity = new THREE.Vector3(0,0,0);
+      user.translateY( -moveDistance );
+    }
+
+    user.translateZ( move.zDist );
+    user.rotateY( move.yAngle );
+    user.translateX( move.xDist );
+    user.updateMatrix();
+
+    // look up/down
+    if ( keyboard.pressed("3") ) // third-person view
+      camera.position.set(0,50,250);
+    if ( keyboard.pressed("1") ) // first-person view
+      camera.position.set(0,35,10);
+    if ( keyboard.pressed("T") )
+      camera.rotateX(  rotateAngle );
+    if ( keyboard.pressed("G") )
+      camera.rotateX( -rotateAngle );
+    
+  // limit camera to +/- 45 degrees (0.7071 radians) or +/- 60 degrees (1.04 radians)
+  /*camera.rotation.x = THREE.Math.clamp( camera.rotation.x, -1.04, 1.04 );*/
+
+    // pressing both buttons moves look angle to horizon
+    if ( keyboard.pressed("R") && keyboard.pressed("F") )
+      camera.rotateX( -6 * camera.rotation.x * rotateAngle );
+  
+    user.translateY( user.velocity.y );
+    //if not paused
+    if(!paused) {
+      if ( keyboard.pressed("P") ) {
+        //pause
+        showPauseScreen();
+      }
+    }
+    //if paused
+    else if ( keyboard.pressed("U") ) {
+        //unpause
+        hidePauseScreen();
     }
   }
   else {
-    if ( keyboard.pressed("U") ) {
-      //unpause
-      hidePauseScreen();
+    if (keyboard.pressed("ctrl+0")) {
+      closeConsole();
     }
   }
-
-}
-else {
-  if (keyboard.pressed("ctrl+0")) {
-    closeConsole();
-  }
-}
-
 	stats.update();
 }
 
@@ -844,10 +844,8 @@ function render() {
     var xdir; //1 = positive direction on axis, -1 = negative direction on axis
     var ydir;
     var zdir;
-    //var dir = 1;//1 = positive direction on that axis, -1 = right to left
     for (var i = 0; i < movingMeshs.length; i++) {
       moveParams = movingParams[i];
-
       //move along x-axis
       if(moveParams['movex'] != undefined && moveParams['endmovex'] != undefined) {
         currentx = +movingMeshs[i].position.x;
@@ -855,7 +853,6 @@ function render() {
         endx = +moveParams['endmovex'];
         xdir = +moveParams['xdir'];
         if(currentx <=endx && currentx >= startx) {
-        //if(currentx <=startx && currentx >= endx) {
           movingMeshs[i].position.x += xdir*0.75;
         }
         else {
@@ -895,7 +892,6 @@ function render() {
         startz = +moveParams['movez'];
         endz = +moveParams['endmovez'];
         zdir = +moveParams['zdir'];
-        //console.log('currx: '+currentx+', curry: '+currenty+', currz: '+currentz+'\n');
         if(currentz <=endz && currentz >= startz) {
           movingMeshs[i].position.z += zdir*0.75;
         }
@@ -1727,6 +1723,8 @@ function addToMeshs(mesh) {
 	meshs[numberOfMeshs] = mesh;
 	numberOfMeshs++;
 }
+//remove last geometry that was created
+//TODO, undo other things like set default params
 function undo() {
   //if spinning remove associated data from those arrays as well
   if(spinningMeshs.lastIndexOf(meshs[numberOfMeshs]) >= 0) {
@@ -1737,6 +1735,7 @@ function undo() {
   scene.remove(meshs[numberOfMeshs]);
   meshs.pop();
 }
+
   ///////////////////////////////////////
  //METHODS FOR DEALING WITH PARAMETERS//
 ///////////////////////////////////////

@@ -149,7 +149,6 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - when creating many geometries w/ one command, morph them into one geometry (maybe when amount >= a certian amount)
-  - cli + mouse = buggy
   - export function so users can save whatever they create
   - add dat.GUI, for default params
   - GUI for user uploaded textures and models
@@ -158,6 +157,7 @@ You'll need [nodejs](http://nodejs.org/) installed
   - enhance start/pause screen
   - bubble as a texture option instead of seperate geometry
   - add random as an option, ex: color random, size & coordinates also
+  - esc from pointer lock when mouse is in motion can cause camera to be angled somewhere else
   - ctrl+z is buggy
   - use updated version of three.js
   - create self command, for third person view
