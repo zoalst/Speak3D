@@ -1245,19 +1245,12 @@ function createGeometry(params, geometry) {
 	var mesh = new THREE.Mesh(geom, material );	
 	mesh.position.set( x, y, z );
   if(spin == true) {
-    spinningMeshs.push(mesh);
-    spinningParams.push({'x':spinx, 'y':spiny, 'z':spinz});
+    initSpinMesh(mesh,spinx,spiny,spinz);
+//    spinningMeshs.push(mesh);
+   // spinningParams.push({'x':spinx, 'y':spiny, 'z':spinz});
   }
   if(move == true) {
-    console.log('move');
-    movingMeshs.push(mesh);
-    //TODO, calculate dir depending on if start/end is +/- or -/+
-    movingParams.push({
-      'movex':movex, 'endmovex':endmovex, 
-      'movey':movey, 'endmovey':endmovey, 
-      'movez':movez, 'endmovez':endmovez,
-      'xdir':1, 'ydir':1, 'zdir':1
-    });
+    initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
   }
   addToMeshs(mesh);//increases numberOfMeshs by 1
 	return mesh;
@@ -1684,12 +1677,40 @@ function initSpinMesh(mesh,spinx,spiny,spinz) {
 
 function initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez) {
         movingMeshs.push(mesh);
-        //TODO, calculate dir depending on if start/end is +/- or -/+
+        //TODO, change movement speed by changing xyzdir value to > or < 1/-1
+        var xdir, ydir, zdir, temp;
+        if(movex < endmovex) {
+          xdir = 1;
+        }
+        else {
+          xdir = -1;
+          temp = movex;
+          movex = endmovex;
+          endmovex = temp;
+        }
+        if(movey < endmovey) {
+          ydir = 1;
+        }
+        else {
+          ydir = -1;
+          temp = movey;
+          movey = endmovey;
+          endmovey = temp;
+        }
+        if(movez < endmovez) {
+          zdir = 1;
+        }
+        else {
+          zdir = -1;
+          temp = movez;
+          movez = endmovez;
+          endmovez = temp;
+        }
         movingParams.push({
           'movex':movex, 'endmovex':endmovex, 
           'movey':movey, 'endmovey':endmovey, 
           'movez':movez, 'endmovez':endmovez,
-          'xdir':1, 'ydir':1, 'zdir':1
+          'xdir':xdir, 'ydir':ydir, 'zdir':zdir
         });
 }
   //////////////////////////////////////////
@@ -1769,7 +1790,16 @@ function parseParams(params) {
 			else if(lastParamType == 'color') {
 				parsedParams['endcolor'] = paramsArray[i+1];
 			}
-      else if(lastParamType == 'movex') {
+      else if(lastParamType == 'movex' || lastParamType == 'movey' || lastParamType == 'movez') {
+        if(paramsArray[i+1] == '-') {
+          parsedParams['end'+lastParamType] = paramsArray[i+1] + paramsArray[i+2]; 
+          i++;    
+        }
+        else {
+          parsedParams['end'+lastParamType] = paramsArray[i+1];     
+        }
+      }
+      /*else if(lastParamType == 'movex') {
         parsedParams['endmovex'] = paramsArray[i+1];
       }
       else if(lastParamType == 'movey') {
@@ -1777,7 +1807,7 @@ function parseParams(params) {
       }
       else if(lastParamType == 'movez') {
         parsedParams['endmovez'] = paramsArray[i+1];
-      }
+      }*/
 			lastParamType = '';
 		}
     //move/oscillate
@@ -2554,8 +2584,8 @@ function testEverything() {
   	  	*/
             //setDefaultGlobalParams('spin x');
        //scene.add(createCone(parseParams('size 60 move x -350 and 350 move y 0 and 350 move z -175 and 175 y 177 color maroon ambient turquoise')));
-       scene.add(createCone(parseParams('size 60 move z -350 and 350 move x 0 and 350 move y 300 and 340 color maroon ambient turquoise')));
-        scene.add(createCube(parseParams('move z 0 and 50 move x -300 and 300 move y 50 and 475')));
+       scene.add(createCone(parseParams('spin x size 60 move z 350 and -350 move x 500 and -350 move y 300 and 340 color maroon ambient turquoise')));
+        scene.add(createCube(parseParams('move z 0 and 50 move x -300 and 300 move y 450 and 375')));
         scene.add(createBubble(parseParams('y 200 x -150')));
         //scene.add(createTorusKnot(parseParams('move z -350 and 350 move y 0 and 350 color chartreuse ambient magenta size 15 width 7')));
 
