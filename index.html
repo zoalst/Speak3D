@@ -1389,15 +1389,9 @@ function createManyGeometries(params, geometry) {
       if(spin == true) {
         initSpinMesh(mesh,spinx,spiny,spinz);
       }
-      /*if(move == true) {
-        console.log('move');
-        movingMeshs.push(mesh);
-        movingParams.push({
-          'movex':movex, 'endmovex':endmovex, 
-          'movey':movey, 'endmovey':endmovey, 
-          'movez':movez, 'endmovez':endmovez
-        });
-      }*/
+      if(move == true) {
+        initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+      }
       addToMeshs(mesh);
     }
   }
@@ -1414,7 +1408,10 @@ function createManyGeometries(params, geometry) {
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
-				addToMeshs(mesh);
+        if(move == true) {
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+        }
+  			addToMeshs(mesh);
 			}
 		}
 		else if(geometry == 'SphereGeometry'){
@@ -1426,6 +1423,9 @@ function createManyGeometries(params, geometry) {
 				meshs[i] = mesh;
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
+        }
+        if(move == true) {
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
         }
 				addToMeshs(mesh);
 			}
@@ -1445,6 +1445,9 @@ function createManyGeometries(params, geometry) {
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
+        if(move == true) {
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+        }
 				addToMeshs(mesh);
 			}
 		}
@@ -1462,6 +1465,9 @@ function createManyGeometries(params, geometry) {
 				meshs[i] = mesh;
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
+        }
+        if(move == true) {
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
         }
 				addToMeshs(mesh);
 			}
@@ -1481,6 +1487,9 @@ function createManyGeometries(params, geometry) {
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
+        if(move == true) {
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+        }
 				addToMeshs(mesh);
 			}
 		}
@@ -1498,6 +1507,9 @@ function createManyGeometries(params, geometry) {
         meshs[i] = mesh;
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
+        }
+        if(move == true) {
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
         }
         addToMeshs(mesh);
       }
@@ -1668,6 +1680,17 @@ function initBubble() {
 function initSpinMesh(mesh,spinx,spiny,spinz) {
     spinningMeshs.push(mesh);
     spinningParams.push({'x':spinx, 'y':spiny, 'z':spinz});
+}
+
+function initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez) {
+        movingMeshs.push(mesh);
+        //TODO, calculate dir depending on if start/end is +/- or -/+
+        movingParams.push({
+          'movex':movex, 'endmovex':endmovex, 
+          'movey':movey, 'endmovey':endmovey, 
+          'movez':movez, 'endmovez':endmovez,
+          'xdir':1, 'ydir':1, 'zdir':1
+        });
 }
   //////////////////////////////////////////
  //END OF METHODS FOR CREATING GEOMETRIES//
@@ -2538,7 +2561,7 @@ function testEverything() {
 
 
   var testknots = createManyTorusKnots(
-    parseParams('amount 6 size 60 and 456 z -600 width 11 x -1350 and 1300 texture cloud'));
+    parseParams('spin y amount 4 size 34 and 206 move z -600 and 600 width 11 x -1350 and 1300 texture cloud'));
         
         for(var i = 0; i < testknots.length; i++) {
           scene.add(testknots[i]);          
@@ -2546,7 +2569,7 @@ function testEverything() {
                     setDefaultGlobalParams('transparent true');
 
   var testspheres2 = createManyCubes(
-    parseParams('amount 5 x -450 and 350 y 150 z 200 size 100 color magenta ambient green'));
+    parseParams('amount 5 x -450 and 350 y 150 move z -200 and 300 size 100 color magenta ambient green'));
         
         for(var i = 0; i < testspheres2.length; i++) {
           scene.add(testspheres2[i]);         
