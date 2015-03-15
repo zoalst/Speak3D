@@ -143,7 +143,13 @@
 <button id = "submitButton" type="button" style="position: absolute; right:0px; top:10px; visibility:hidden">!!</button> 
 <input id="consoleBox" type="text" command="command" size="66" style="position: absolute; right:20px; top:10px; visibility:hidden"/>
 
-<div id="notify" style="position: absolute; right:20px; bottom:10px;"/>
+<!-- TODO unique filenames -->
+<a href="" id="link" download="Speak3D.txt"> </a>
+<button id = "saveButton" type="button" style="position: absolute; left:0px; top:5px;">Save</button> 
+<input id="uploadFile" type="file" style="position: absolute; left:50px; top:5px;"/>
+<!--<button id = "loadButton" type="button" style="position: absolute; left:45px; top:5px;">Load</button>
+-->
+<div id="notify" style="position: absolute; right:20px; bottom:10px;"/> 
 
 <script>
 /*
@@ -186,6 +192,8 @@ var consoleOpen = false;
 var paused = false;
 var blocker = document.getElementById( 'blocker' );
 var instructions = document.getElementById( 'instructions' );
+
+var saveLog = '';
 
 init();
 animate();
@@ -267,6 +275,7 @@ function init() {
 	// CUSTOM //
 	////////////
   initConsole();
+  initSaveLoadButtons();
 	initDefaultGlobalParams();
   initBubble();
   hidePauseScreen();
@@ -608,7 +617,11 @@ function init() {
   	  },
       'save': function() {
         notify('save');
-        save();
+        document.getElementById('link').click();
+      },
+      'upload': function() {
+        notify('upload');
+        document.getElementById('uploadFile').click();
       },
       'pause': function() {
         notify('pause');
@@ -646,7 +659,9 @@ function init() {
   //controls from http://stemkoski.github.io/7DFPS/3JSFPS.html
   // Mouse Look (Free Look) controls 
   this.mouseLook = { x:0, y:0 };
-  document.addEventListener( 'click', function ( event ) 
+  //document.addEventListener( 'click', function ( event ) 
+  //want pointer lock only on the ThreeJS div, not the overlaying UI
+  container.addEventListener( 'click', function ( event ) 
   {
     if(!consoleOpen){
       var havePointerLock = 'pointerLockElement' in document ||
@@ -654,9 +669,6 @@ function init() {
       'webkitPointerLockElement' in document;
       if ( !havePointerLock ) return;
 
-      if(paused) {
-        hidePauseScreen();
-      } 
       var element = document.body;
     // Ask the browser to lock the pointer
     element.requestPointerLock = element.requestPointerLock ||
@@ -673,6 +685,13 @@ function init() {
     // Hook mouse move events
     // document.addEventListener("mousemove", this.moveCallback, false);
     }
+  }, false );
+
+  blocker.addEventListener( 'click', function ( event ) 
+  {
+      if(paused) {
+        hidePauseScreen();
+      } 
   }, false );
 }
 
@@ -2300,6 +2319,29 @@ function save() {
   //how will this work?
 }
 
+function initSaveLoadButtons() {
+
+  document.getElementById('link').onclick = function() {
+        this.href = 'data:text/plain;charset=utf-8,'
+          + encodeURIComponent(saveLog);
+      };
+  var save = document.getElementById("saveButton");
+  save.addEventListener("click", function(){
+    document.getElementById('link').click();
+  });
+
+  var uploadFile = document.getElementById('uploadFile');
+  uploadFile.addEventListener("change", function(){
+    var reader = new FileReader();
+    reader.onload = function(){
+      var data = reader.result;
+      submitCommandsFromFile(data);
+    };
+    reader.readAsText(uploadFile.files[0], 'utf-8');
+  });
+
+}
+
 function initConsole() {
   var cli = document.getElementById("consoleBox");
   cli.addEventListener("keydown", function (e) {
@@ -2330,6 +2372,13 @@ function closeConsole() {
   document.getElementById('submitButton').style.visibility = 'hidden';
   document.getElementById('consoleBox').style.visibility = 'hidden';
   consoleOpen = false;
+}
+
+function submitCommandsFromFile(commands) {
+  var lines = commands.split('\n');
+  for(var line = 0; line < lines.length; line++){
+    submitCommand(lines[line]);
+  }
 }
 
 function submitCommand(command) {
@@ -2618,6 +2667,12 @@ function notify(notification) {
   setTimeout(function(){
     document.getElementById("notify").innerHTML="";
   },2500);
+  //also add command to save log so users can save their creations
+  if(notification != 'save' && notification != 'load' 
+    && notification != 'pause' && notification != 'unpause'
+    && notification != 'open console' && notification != 'close console') {
+    saveLog += notification + "\n";
+  }
 }
 //test method
 function testEverything() {
