@@ -143,6 +143,8 @@
 <button id = "submitButton" type="button" style="position: absolute; right:0px; top:10px; visibility:hidden">!!</button> 
 <input id="consoleBox" type="text" command="command" size="66" style="position: absolute; right:20px; top:10px; visibility:hidden"/>
 
+<div id="notify" style="position: absolute; right:20px; bottom:10px;"/>
+
 <script>
 /*
 	Speak3D
@@ -284,23 +286,23 @@ function init() {
   	  //--will it interpret words way more incorrect? maybe annyang takes "create sphere" and really knows it's looking for sphere when otherwise it would choose another similiar sounding word
   	  //--will it be faster because once annyang has a large list of commands it doesn't really work?
   	  'create sphere': function() {
-  	  	console.log('create sphere');
+        notify('create sphere');
   	  	scene.add(createSphere(defaultGlobalParams));
   	  },
   	  'create sphere *params': function(params) {
-  	  	console.log('create sphere '+params);
+        notify('create sphere '+params);
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createSphere(parsedParams));
   	  },	  
       'create many spheres': function() {
-        console.log('create many spheres');
+        notify('create many spheres');
         var spheres = createManySpheres(defaultGlobalParams);
         for(var i = 0; i < spheres.length; i++) {
           scene.add(spheres[i]);          
         }
       },
   	  'create many spheres *params': function(params) {
-  	  	console.log('create many spheres '+params);
+        notify('create many spheres '+params);
   	  	var parsedParams = parseParams(params);
   	  	var spheres = createManySpheres(parsedParams);
   	  	for(var i = 0; i < spheres.length; i++) {
@@ -308,23 +310,23 @@ function init() {
   	  	}
   	  },
    	  'create cube': function() {
-  	  	console.log('create cube');
+        notify('create cube');
   	  	scene.add(createCube(defaultGlobalParams));
   	  },
   	  'create cube *params': function(params) {
-  	  	console.log('create cube '+params);
+        notify('create cube '+params);
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createCube(parsedParams));
   	  },	
       'create many cubes': function() {
-        console.log('create many cubes');
+        notify('create many cubes');
         var cubes = createManyCubes(defaultGlobalParams);
         for(var i = 0; i < cubes.length; i++) {
           scene.add(cubes[i]);          
         }
       },
   	  'create many cubes *params': function(params) {
-  	  	console.log('create many cubes '+params);
+        notify('create many cubes '+params);
   	  	var parsedParams = parseParams(params);
   	  	var cubes = createManyCubes(parsedParams);
   	  	for(var i = 0; i < cubes.length; i++) {
@@ -332,23 +334,23 @@ function init() {
   	  	}
   	  },
   	  'create ring': function() {
-  	  	console.log('create ring');
+        notify('create ring');
   	  	scene.add(createRing(defaultGlobalParams));
   	  },
   	  'create ring *params': function(params) {
-  	  	console.log('create ring '+params);
+        notify('create ring '+params);
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createRing(parsedParams));
   	  },
       'create many rings': function() {
-        console.log('create many rings');
+        notify('create many rings');
         var rings = createManyRings(defaultGlobalParams);
         for(var i = 0; i < rings.length; i++) {
           scene.add(rings[i]);          
         }
       },
   	  'create many rings *params': function(params) {
-  	  	console.log('create many rings '+params);
+        notify('create many rings '+params);
   	  	var parsedParams = parseParams(params);
   	  	var rings = createManyRings(parsedParams);
   	  	for(var i = 0; i < rings.length; i++) {
@@ -357,23 +359,23 @@ function init() {
   	  },
    	  //TorusKnot, annyang usually picks up 'not' instead of 'knot'
   	  'create not': function() {
-  	  	console.log('create knot');
+        notify('create knot');
   	  	scene.add(createTorusKnot(defaultGlobalParams));
   	  },
   	  'create not *params': function(params) {
-  	  	console.log('create knot '+params);
+        notify('create knot '+params);
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createTorusKnot(parsedParams));
   	  },	
       'create many knots': function() {
-        console.log('create many knots');
+        notify('create many knots');
         var knots = createManyTorusKnots(defaultGlobalParams);
         for(var i = 0; i < knots.length; i++) {
           scene.add(knots[i]);          
         }
       },
   	  'create many knots *params': function(params) {
-  	  	console.log('create many knots '+params);
+        notify('create many knots '+params);
   	  	var parsedParams = parseParams(params);
   	  	var knots = createManyTorusKnots(parsedParams);
   	  	for(var i = 0; i < knots.length; i++) {
@@ -381,23 +383,23 @@ function init() {
   	  	}
   	  },
    	  'create cylinder': function() {
-  	  	console.log('create cylinder');
+        notify('create cylinder');
   	  	scene.add(createCylinder(defaultGlobalParams));
   	  },
   	  'create cylinder *params': function(params) {
-  	  	console.log('create cylinder '+params);
+        notify('create cylinder '+params);
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createCylinder(parsedParams));
   	  },
       'create many cylinders': function() {
-        console.log('create many cylinders');
+        notify('create many cylinders');
         var cylinders = createManyCylinders(defaultGlobalParams);
         for(var i = 0; i < cylinders.length; i++) {
           scene.add(cylinders[i]);          
         }
       },
   	  'create many cylinders *params': function(params) {
-  	  	console.log('create many cylinders '+params);
+        notify('create many cylinders '+params);
   	  	var parsedParams = parseParams(params);
   	  	var cylinders = createManyCylinders(parsedParams);
   	  	for(var i = 0; i < cylinders.length; i++) {
@@ -405,23 +407,23 @@ function init() {
   	  	}
   	  },
       'create cone': function() {
-        console.log('create cone');
+        notify('create cone');
         scene.add(createCone(defaultGlobalParams));
       },
       'create cone *params': function(params) {
-        console.log('create cone '+params);
+        notify('create cone '+params);
         var parsedParams = parseParams(params);
         scene.add(createCone(parsedParams));
       },
       'create many cones': function() {
-        console.log('create many cones');
+        notify('create many cones');
         var cones = createManyCones(defaultGlobalParams);
         for(var i = 0; i < cones.length; i++) {
           scene.add(cones[i]);          
         }
       },
       'create many cones *params': function(params) {
-        console.log('create many cones '+params);
+        notify('create many cones '+params);
         var parsedParams = parseParams(params);
         var cones = createManyCones(parsedParams);
         for(var i = 0; i < cones.length; i++) {
@@ -429,130 +431,130 @@ function init() {
         }
       },
   	  /*'create octa': function() {
-  	  	console.log('create octahedron');
+        notify('create octahedron');
   	  	scene.add(createOctahedron(0,50,0,50,0xffb6c1));
   	  },
   	  'create octa *params': function(params) {
-  	  	console.log('create octahedron '+params);
+        notify('create octahedron '+params);
   	  	var pp = parseParams(params);
   	  	scene.add(createOctahedron(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  }, 
   	  'create octahedron': function() {
-  	  	console.log('create octahedron');
+        notify('create octahedron');
   	  	scene.add(createOctahedron(0,50,0,50,0xffb6c1));
   	  },
   	  'create octahedron *params': function(params) {
-  	  	console.log('create octahedron '+params);
+        notify('create octahedron '+params);
   	  	var pp = parseParams(params);
   	  	scene.add(createOctahedron(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  }, 
    	  'create tetra': function() {
-  	  	console.log('create tetrahedron');
+        notify('create tetrahedron');
   	  	scene.add(createTetrahedron(0,50,0,50,0xffb6c1));
   	  },
   	  'create tetra *params': function(params) {
-  	  	console.log('create tetrahedron '+params);
+        notify('create tetrahedron '+params);
   	  	var pp = parseParams(params);
   	  	scene.add(createTetrahedron(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  },    	  
   	  'create tetrahedron': function() {
-  	  	console.log('create tetrahedron');
+        notify('create tetrahedron');
   	  	scene.add(createTetrahedron(0,50,0,50,0xffb6c1));
   	  },
   	  'create tetrahedron *params': function(params) {
-  	  	console.log('create tetrahedron '+params);
+        notify('create tetrahedron '+params);
   	  	var pp = parseParams(params);
   	  	scene.add(createTetrahedron(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  },
    	  'create dodeca': function() {
-  	  	console.log('create dodecahedron');
+        notify('create dodecahedron');
   	  	scene.add(createDodecahedron(0,50,0,50,0xffb6c1));
   	  },
   	  'create dodeca *params': function(params) {
-  	  	console.log('create dodecahedron '+params);
+        notify('create dodecahedron '+params);
   	  	var pp = parseParams(params);
   	  	scene.add(createDodecahedron(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  },    	  
   	  'create dodecahedron': function() {
-  	  	console.log('create dodecahedron');
+        notify('create dodecahedron');
   	  	scene.add(createDodecahedron(0,50,0,50,0xffb6c1));
   	  },
   	  'create dodecahedron *params': function(params) {
-  	  	console.log('create dodecahedron '+params);
+        notify('create dodecahedron '+params);
   	  	var pp = parseParams(params);
   	  	scene.add(createDodecahedron(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  },
    	  'create icosa': function() {
-  	  	console.log('create icosahedron');
+        notify('create icosahedron');
   	  	scene.add(createIcosahedron(0,50,0,50,0xffb6c1));
   	  },
   	  'create icosa *params': function(params) {
-  	  	console.log('create icosahedron '+params);
+        notify('create icosahedron '+params);
   	  	var pp = parseParams(params);
   	  	scene.add(createIcosahedron(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  },    	  
   	  'create icosahedron': function() {
-  	  	console.log('create icosahedron');
+        notify('create icosahedron');
   	  	scene.add(createIcosahedron(0,50,0,50,0xffb6c1));
   	  },
   	  'create icosahedron *params': function(params) {
-  	  	console.log('create icosahedron '+params);
+        notify('create icosahedron '+params);
   	  	var pp = parseParams(params);
   	  	scene.add(createIcosahedron(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  },*/
       'create bubble cube': function() {
-        console.log('create bubble cube');
+        notify('create bubble cube');
         scene.add(createBubbleCube(defaultGlobalParams));
       },
       'create bubble cube *params': function(params) {
-        console.log('create bubble cube '+params);
+        notify('create bubble cube '+params);
         var parsedParams = parseParams(params);
         scene.add(createBubbleCube(parsedParams));
       },
       'create bubble not': function() {
-        console.log('create bubble knot');
+        notify('create bubble knot');
         scene.add(createBubbleKnot(defaultGlobalParams));
       },
       'create bubble not *params': function(params) {
-        console.log('create bubble knot '+params);
+        notify('create bubble knot '+params);
         var parsedParams = parseParams(params);
         scene.add(createBubbleKnot(parsedParams));
       },
       'create bubble': function() {
-        console.log('create bubble');
+        notify('create bubble');
         scene.add(createBubble(defaultGlobalParams));
       },
       'create bubble *params': function(params) {
-        console.log('create bubble '+params);
+        notify('create bubble '+params);
         var parsedParams = parseParams(params);
         scene.add(createBubble(parsedParams));
       },
  			'create floor': function() {
-  	  	console.log('create floor');
+        notify('create floor');
   	  	scene.add(createFloor({y:0,size:1000}));
   	  },
    	  'create floor *params': function(params) {
-  	  	console.log('create floor '+params);
+        notify('create floor '+params);
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createFloor(parsedParams));
   	  },	
       'create many floors': function() {
-        console.log('create many floors');
+        notify('create many floors');
         var floors = createManyFloors(defaultGlobalParams);
         for(var i = 0; i < floors.length; i++) {
           scene.add(floors[i]);          
         }
       },      
       'create many floors *params': function(params) {
-        console.log('create many floors '+params);
+        notify('create many floors '+params);
         var parsedParams = parseParams(params);
         var floors = createManyFloors(parsedParams);
         for(var i = 0; i < floors.length; i++) {
@@ -560,23 +562,23 @@ function init() {
         }
       },
  			'create wall': function() {
-  	  	console.log('create wall');
+        notify('create wall');
   	  	scene.add(createWall({x:-150,y:500,size:1000}));
   	  },
    	  'create wall *params': function(params) {
-  	  	console.log('create wall '+params);
+        notify('create wall '+params);
   	  	var parsedParams = parseParams(params);
   	  	scene.add(createWall(parsedParams));
   	  },
       'create many walls': function() {
-        console.log('create many walls');
+        notify('create many walls');
         var testrings = createManyWalls(parseParams('')); 
         for(var i = 0; i < testrings.length; i++) {
           scene.add(testrings[i]);          
         }
       },
       'create many walls *params': function(params) {
-        console.log('create many walls '+params);
+        notify('create many walls '+params);
         var parsedParams = parseParams(params);
         var walls = createManyWalls(parsedParams);
         for(var i = 0; i < walls.length; i++) {
@@ -584,52 +586,52 @@ function init() {
         }
       },
       'create back wall': function() {
-        console.log('create back wall');
+        notify('create back wall');
         scene.add(createBackWall({x:0,y:0,z:-500,size:1000}));
       },
       'create back wall *params': function(params) {
-        console.log('create back wall '+params);
+        notify('create back wall '+params);
         var parsedParams = parseParams(params);
         scene.add(createBackWall(parsedParams));
       },
    	  'create text *text': function(text) {
-  	  	console.log('create text: '+text);
+        notify('create text '+text);
   	  	scene.add(create3DText(text));
   	  },
   	  'set default *params': function(params) {
-  	  	console.log('set default: '+params);
+        notify('set default '+params);
   	  	setDefaultGlobalParams(params);
   	  },
   	  'undo': function() {
-  	  	console.log('undo');
+        notify('undo');
   	  	undo();
   	  },
       'save': function() {
-        console.log('save');
+        notify('save');
         save();
       },
       'pause': function() {
-        console.log('pause');
+        notify('pause');
         showPauseScreen();
       },
       'unpause': function() {
-        console.log('unpause');
+        notify('unpause');
         hidePauseScreen();
       },
       'open console': function() {
-        console.log('open console');
+        notify('open console');
         openConsole();
       },
       'close console': function() {
-        console.log('close console');
+        notify('close console');
         closeConsole();
       },
       'test everything': function() {
-        console.log('test everything');
+        notify('test everything');
         testEverything();
       },
       'test': function() {
-        console.log('test');
+        notify('test');
         testEverything();
       }
   	};
@@ -1243,8 +1245,6 @@ function createGeometry(params, geometry) {
 	mesh.position.set( x, y, z );
   if(spin == true) {
     initSpinMesh(mesh,spinx,spiny,spinz);
-//    spinningMeshs.push(mesh);
-   // spinningParams.push({'x':spinx, 'y':spiny, 'z':spinz});
   }
   if(move == true) {
     initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
@@ -1676,7 +1676,7 @@ function initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez) {
         movingMeshs.push(mesh);
         //TODO, change movement speed by changing xyzdir value to > or < 1/-1
         var xdir, ydir, zdir, temp;
-        if(movex < endmovex) {
+        if(+movex < +endmovex) {
           xdir = 1;
         }
         else {
@@ -1685,7 +1685,7 @@ function initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez) {
           movex = endmovex;
           endmovex = temp;
         }
-        if(movey < endmovey) {
+        if(+movey < +endmovey) {
           ydir = 1;
         }
         else {
@@ -1694,7 +1694,7 @@ function initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez) {
           movey = endmovey;
           endmovey = temp;
         }
-        if(movez < endmovez) {
+        if(+movez < +endmovez) {
           zdir = 1;
         }
         else {
@@ -1745,7 +1745,7 @@ function parseParams(params) {
 	var paramsArray = params.split(" ");
 	var parsedParams = {};
 	var lastParamType = '';
-  var currParam;
+  var currParam = '';
 	for(var i = 0; i < paramsArray.length-1; i+=2) {
     currParam = paramsArray[i].toLowerCase();
 		if(currParam == 'color' || currParam == 'colour') {
@@ -1829,13 +1829,13 @@ function parseParams(params) {
       var dir = paramsArray[i+1].toLowerCase();
       //TODO, variable spin value
       if(dir == 'x') {
-        parsedParams['spinx'] = 0.001;
+        parsedParams['spinx'] = 0.01;
       }
       else if(dir == 'y' || dir == 'why') {
-        parsedParams['spiny'] = 0.001;
+        parsedParams['spiny'] = 0.01;
       }
       else if(dir == 'z') {
-        parsedParams['spinz'] = 0.001;        
+        parsedParams['spinz'] = 0.01;        
       }
       lastParamType = 'spin'; 
     }
@@ -1865,7 +1865,7 @@ function parseParams(params) {
 function setDefaultGlobalParams(params) {
 	var paramsArray = params.split(" ");
 	var lastParamType = '';
-	var currParam;
+	var currParam = '';
   for(var i = 0; i < paramsArray.length-1; i+=2) {
     currParam = paramsArray[i].toLowerCase();
 		if(currParam == 'color' || currParam == 'colour') {
@@ -1945,15 +1945,15 @@ function setDefaultGlobalParams(params) {
     //spin
     else if(currParam == 'spin') {
       defaultGlobalParams['spin'] = true;
-      var dir = paramsArray[i+1];
+      var dir = paramsArray[i+1].toLowerCase();;
       if(dir == 'x') {
-        defaultGlobalParams['spinx'] = 0.07;
+        defaultGlobalParams['spinx'] = 0.01;
       }
       else if(dir == 'y' || dir == 'why') {
-        defaultGlobalParams['spiny'] = 0.07;
+        defaultGlobalParams['spiny'] = 0.01;
       }
       else if(dir == 'z') {
-        defaultGlobalParams['spinz'] = 0.07;        
+        defaultGlobalParams['spinz'] = 0.01;        
       }
     }
 		//sometimes annyang hears announced instead of amount
@@ -2333,11 +2333,12 @@ function closeConsole() {
 }
 
 function submitCommand(command) {
+  //notify user 
+  notify(command);
   if(command.indexOf('create sphere') === 0) {
     var len = 'create sphere'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create sphere '+params);
       var parsedParams = parseParams(params);
       scene.add(createSphere(parsedParams));    
     }
@@ -2349,7 +2350,6 @@ function submitCommand(command) {
     var len = 'create many spheres'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create many spheres '+params);
       var parsedParams = parseParams(params);
       var spheres = createManySpheres(parsedParams);
       for(var i = 0; i < spheres.length; i++) {
@@ -2367,7 +2367,6 @@ function submitCommand(command) {
     var len = 'create cube'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create cube '+params);
       var parsedParams = parseParams(params);
       scene.add(createCube(parsedParams));    
     }
@@ -2379,7 +2378,6 @@ function submitCommand(command) {
     var len = 'create many cubes'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create many cubes '+params);
       var parsedParams = parseParams(params);
       var geoms = createManyCubes(parsedParams);
       for(var i = 0; i < geoms.length; i++) {
@@ -2397,7 +2395,6 @@ function submitCommand(command) {
     var len = 'create ring'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create ring '+params);
       var parsedParams = parseParams(params);
       scene.add(createRing(parsedParams));    
     }
@@ -2409,7 +2406,6 @@ function submitCommand(command) {
     var len = 'create many rings'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create many rings '+params);
       var parsedParams = parseParams(params);
       var geoms = createManyRings(parsedParams);
       for(var i = 0; i < geoms.length; i++) {
@@ -2427,7 +2423,6 @@ function submitCommand(command) {
     var len = 'create knot'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create knot '+params);
       var parsedParams = parseParams(params);
       scene.add(createTorusKnot(parsedParams));    
     }
@@ -2439,7 +2434,6 @@ function submitCommand(command) {
     var len = 'create many knots'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create many knots '+params);
       var parsedParams = parseParams(params);
       var geoms = createManyTorusKnots(parsedParams);
       for(var i = 0; i < geoms.length; i++) {
@@ -2457,7 +2451,6 @@ function submitCommand(command) {
     var len = 'create cylinder'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create cylinder '+params);
       var parsedParams = parseParams(params);
       scene.add(createCylinder(parsedParams));    
     }
@@ -2469,7 +2462,6 @@ function submitCommand(command) {
     var len = 'create many cylinders'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create many cylinders '+params);
       var parsedParams = parseParams(params);
       var geoms = createManyCylinders(parsedParams);
       for(var i = 0; i < geoms.length; i++) {
@@ -2487,7 +2479,6 @@ function submitCommand(command) {
     var len = 'create cone'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create cone '+params);
       var parsedParams = parseParams(params);
       scene.add(createCone(parsedParams));    
     }
@@ -2499,7 +2490,6 @@ function submitCommand(command) {
     var len = 'create many cones'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create many cones '+params);
       var parsedParams = parseParams(params);
       var geoms = createManyCones(parsedParams);
       for(var i = 0; i < geoms.length; i++) {
@@ -2517,7 +2507,6 @@ function submitCommand(command) {
     var len = 'create bubble cube'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create bubble cube '+params);
       var parsedParams = parseParams(params);
       scene.add(createBubbleCube(parsedParams));    
     }
@@ -2529,7 +2518,6 @@ function submitCommand(command) {
     var len = 'create bubble knot'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create bubble knot '+params);
       var parsedParams = parseParams(params);
       scene.add(createBubbleKnot(parsedParams));    
     }
@@ -2541,7 +2529,6 @@ function submitCommand(command) {
     var len = 'create bubble'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create bubble '+params);
       var parsedParams = parseParams(params);
       scene.add(createBubble(parsedParams));    
     }
@@ -2553,7 +2540,6 @@ function submitCommand(command) {
     var len = 'create floor'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create floor '+params);
       var parsedParams = parseParams(params);
       scene.add(createFloor(parsedParams));    
     }
@@ -2565,7 +2551,6 @@ function submitCommand(command) {
     var len = 'create many floors'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create many floors '+params);
       var parsedParams = parseParams(params);
       var geoms = createManyFloors(parsedParams);
       for(var i = 0; i < geoms.length; i++) {
@@ -2583,7 +2568,6 @@ function submitCommand(command) {
     var len = 'create wall'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create wall '+params);
       var parsedParams = parseParams(params);
       scene.add(createWall(parsedParams));    
     }
@@ -2595,7 +2579,6 @@ function submitCommand(command) {
     var len = 'create many walls'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('create many walls '+params);
       var parsedParams = parseParams(params);
       var geoms = createManyWalls(parsedParams);
       for(var i = 0; i < geoms.length; i++) {
@@ -2613,7 +2596,6 @@ function submitCommand(command) {
     var len = 'create text'.length;
     if(command.length > len) {
       var text = command.substring(len+1);
-      console.log('create text: '+text);
       scene.add(create3DText(text));    
     }
   }
@@ -2621,13 +2603,21 @@ function submitCommand(command) {
     var len = 'set default'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      console.log('set default: '+params);
       setDefaultGlobalParams(params);
     }
   }
   else if(command.indexOf('test') === 0 ) {
     testEverything();
   }
+}
+
+//motify user command was received & log in console.log
+function notify(notification) {
+  console.log(notification);
+  document.getElementById("notify").innerHTML=notification;
+  setTimeout(function(){
+    document.getElementById("notify").innerHTML="";
+  },2500);
 }
 //test method
 function testEverything() {
