@@ -181,10 +181,16 @@ var bubbles = false;
 
 var spinningMeshs = [];
 var spinningParams = [];
+var globalSpinSlow = 0.002;
+var globalSpinFast = 0.05;
+var globalSpinMedium = 0.01;
+
 
 var movingMeshs = [];
 var movingParams = [];
-
+var globalMoveSlow = 1;
+var globalMoveFast = 5;
+var globalMoveMedium = 2;
 
 var user;
 //var useOtherControls = true;
@@ -881,7 +887,7 @@ function render() {
           movingMeshs[i].position.x += xdir*0.75;
         }
         else {
-          if(xdir == 1) {
+          if(xdir > 0) {
             movingMeshs[i].position.x = +endx-1;
           }
           else {
@@ -900,7 +906,7 @@ function render() {
           movingMeshs[i].position.y += ydir*0.75;
         }
         else {
-          if(ydir == 1) {
+          if(ydir > 0) {
             movingMeshs[i].position.y = +endy-1;
           }
           else {
@@ -919,7 +925,7 @@ function render() {
           movingMeshs[i].position.z += zdir*0.75;
         }
         else {
-          if(zdir == 1) {
+          if(zdir > 0) {
             movingMeshs[i].position.z = +endz-1;
           }
           else {
@@ -1145,10 +1151,13 @@ function createGeometry(params, geometry) {
   var spinz = resolvedParams['spinz'];
   var move = resolvedParams['move'];
   var movex = resolvedParams['movex'];
+  var movexspeed = resolvedParams['movexspeed'];
   var endmovex = resolvedParams['endmovex'];
   var movey = resolvedParams['movey'];
+  var moveyspeed = resolvedParams['moveyspeed'];
   var endmovey = resolvedParams['endmovey'];
   var movez = resolvedParams['movez'];
+  var movezspeed = resolvedParams['movezspeed'];
   var endmovez = resolvedParams['endmovez'];
 
   //first check if there is a default texture
@@ -1266,7 +1275,7 @@ function createGeometry(params, geometry) {
     initSpinMesh(mesh,spinx,spiny,spinz);
   }
   if(move == true) {
-    initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+    initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
   }
   addToMeshs(mesh);//increases numberOfMeshs by 1
 	return mesh;
@@ -1691,33 +1700,32 @@ function initSpinMesh(mesh,spinx,spiny,spinz) {
     spinningParams.push({'x':spinx, 'y':spiny, 'z':spinz});
 }
 
-function initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez) {
+function initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed) {
         movingMeshs.push(mesh);
-        //TODO, change movement speed by changing xyzdir value to > or < 1/-1
         var xdir, ydir, zdir, temp;
         if(+movex < +endmovex) {
-          xdir = 1;
+          xdir = +movexspeed;
         }
         else {
-          xdir = -1;
+          xdir = +movexspeed*-1;
           temp = movex;
           movex = endmovex;
           endmovex = temp;
         }
         if(+movey < +endmovey) {
-          ydir = 1;
+          ydir = +moveyspeed;
         }
         else {
-          ydir = -1;
+          ydir = +moveyspeed*-1;
           temp = movey;
           movey = endmovey;
           endmovey = temp;
         }
         if(+movez < +endmovez) {
-          zdir = 1;
+          zdir = movezspeed;
         }
         else {
-          zdir = -1;
+          zdir = +movezspeed*-1;
           temp = movez;
           movez = endmovez;
           endmovez = temp;
@@ -1828,6 +1836,29 @@ function parseParams(params) {
     else if(currParam == 'move' || currParam == 'mood') {
       parsedParams['move'] = true;
       var dir = paramsArray[i+1].toLowerCase();
+      var speed;
+      var moveSpeed;
+      if(paramsArray[i+2] != undefined) {
+        speed = paramsArray[i+2].toLowerCase();
+        if(speed == 'slow') {
+          moveSpeed = globalMoveSlow;
+          i++;
+        }
+        else if(speed == 'fast') {
+          moveSpeed = globalMoveFast;
+          i++;
+        } 
+        else if(speed == 'medium') {
+          moveSpeed = globalMoveMedium;
+          i++;
+        } 
+        else {
+          moveSpeed = globalMoveSlow;
+        }
+      }
+      else {
+        moveSpeed = globalMoveSlow;
+      }      
       var coor = paramsArray[i+2];
       if(coor == '-') {
         coor = paramsArray[i+2] + paramsArray[i+3];
@@ -1835,16 +1866,19 @@ function parseParams(params) {
       }
       if(dir == 'x') {
         parsedParams['movex'] = coor;
+        parsedParams['movexspeed'] = +moveSpeed;
         i++;
         lastParamType = 'movex'; 
       }
       else if(dir == 'y' || dir == 'why') {
         parsedParams['movey'] = coor;
+        parsedParams['moveyspeed'] = moveSpeed;
         i++;
         lastParamType = 'movey'; 
       }
       else if(dir == 'z') {
         parsedParams['movez'] = coor;
+        parsedParams['movezspeed'] = moveSpeed;
         i++;        
         lastParamType = 'movez'; 
       }
@@ -1853,15 +1887,37 @@ function parseParams(params) {
     else if(currParam == 'spin') {
       parsedParams['spin'] = true;
       var dir = paramsArray[i+1].toLowerCase();
-      //TODO, variable spin value
+      var speed;
+      var spinSpeed;
+      if(paramsArray[i+2] != undefined) {
+        speed = paramsArray[i+2].toLowerCase();
+        if(speed == 'slow') {
+          spinSpeed = globalSpinSlow;
+          i++;
+        }
+        else if(speed == 'fast') {
+          spinSpeed = globalSpinFast;
+          i++;
+        } 
+        else if(speed == 'medium') {
+          spinSpeed = globalSpinMedium;
+          i++;
+        } 
+        else {
+          spinSpeed = globalSpinMedium;        
+        }
+      }
+      else {
+        spinSpeed = globalSpinMedium;        
+      }
       if(dir == 'x') {
-        parsedParams['spinx'] = 0.01;
+        parsedParams['spinx'] = spinSpeed;
       }
       else if(dir == 'y' || dir == 'why') {
-        parsedParams['spiny'] = 0.01;
+        parsedParams['spiny'] = spinSpeed;
       }
       else if(dir == 'z') {
-        parsedParams['spinz'] = 0.01;        
+        parsedParams['spinz'] = spinSpeed;        
       }
       lastParamType = 'spin'; 
     }
@@ -1956,6 +2012,29 @@ function setDefaultGlobalParams(params) {
     else if(currParam == 'move' || currParam == 'mood') {
       defaultGlobalParams['move'] = true;
       var dir = paramsArray[i+1].toLowerCase();
+      var speed;
+      var moveSpeed;
+      if(paramsArray[i+2] != undefined) {
+        speed = paramsArray[i+2].toLowerCase();
+        if(speed == 'slow') {
+          moveSpeed = globalMoveSlow;
+          i++;
+        }
+        else if(speed == 'fast') {
+          moveSpeed = globalMoveFast;
+          i++;
+        } 
+        else if(speed == 'medium') {
+          moveSpeed = globalMoveMedium;
+          i++;
+        } 
+        else {
+          moveSpeed = globalMoveSlow;
+        }
+      }
+      else {
+        moveSpeed = globalMoveSlow;
+      } 
       var coor = paramsArray[i+2];
       if(coor == '-') {
         coor = paramsArray[i+2] + paramsArray[i+3];
@@ -1963,16 +2042,19 @@ function setDefaultGlobalParams(params) {
       }
       if(dir == 'x') {
         defaultGlobalParams['movex'] = coor;
+        defaultGlobalParams['movexspeed'] = +moveSpeed;
         i++;
         lastParamType = 'movex'; 
       }
       else if(dir == 'y' || dir == 'why') {
         defaultGlobalParams['movey'] = coor;
+        defaultGlobalParams['moveyspeed'] = moveSpeed;
         i++;
         lastParamType = 'movey'; 
       }
       else if(dir == 'z') {
         defaultGlobalParams['movez'] = coor;
+        defaultGlobalParams['movezspeed'] = moveSpeed;
         i++;        
         lastParamType = 'movez'; 
       }
@@ -1980,15 +2062,38 @@ function setDefaultGlobalParams(params) {
     //spin
     else if(currParam == 'spin') {
       defaultGlobalParams['spin'] = true;
-      var dir = paramsArray[i+1].toLowerCase();;
+      var dir = paramsArray[i+1].toLowerCase();
+      var speed;
+      var spinSpeed;
+      if(paramsArray[i+2] != undefined) {
+        speed = paramsArray[i+2].toLowerCase();
+        if(speed == 'slow') {
+          spinSpeed = globalSpinSlow;
+          i++;
+        }
+        else if(speed == 'fast') {
+          spinSpeed = globalSpinFast;
+          i++;
+        } 
+        else if(speed == 'medium') {
+          spinSpeed = globalSpinMedium;
+          i++;
+        } 
+        else {
+          spinSpeed = globalSpinMedium;        
+        }
+      }
+      else {
+        spinSpeed = globalSpinMedium;        
+      }
       if(dir == 'x') {
-        defaultGlobalParams['spinx'] = 0.01;
+        defaultGlobalParams['spinx'] = spinSpeed;
       }
       else if(dir == 'y' || dir == 'why') {
-        defaultGlobalParams['spiny'] = 0.01;
+        defaultGlobalParams['spiny'] = spinSpeed;
       }
       else if(dir == 'z') {
-        defaultGlobalParams['spinz'] = 0.01;        
+        defaultGlobalParams['spinz'] = spinSpeed;        
       }
     }
 		//sometimes annyang hears announced instead of amount
@@ -2038,10 +2143,13 @@ function resolveParams(params) {
   var height = params['height'];
   var move = params['move'];
   var movex = params['movex'];
+  var movexspeed = params['movexspeed'];
   var endmovex = params['endmovex'];
   var movey = params['movey'];
+  var moveyspeed = params['moveyspeed'];
   var endmovey = params['endmovey'];
   var movez = params['movez'];
+  var movezspeed = params['movezspeed'];
   var endmovez = params['endmovez'];
 
   if(x == undefined) {
@@ -2137,6 +2245,15 @@ function resolveParams(params) {
   if(endmovez == undefined) {
     endmovez = defaultGlobalParams['endmovez'];
   }
+  if(movexspeed == undefined) {
+    movexspeed = defaultGlobalParams['movexspeed'];
+  }
+  if(moveyspeed == undefined) {
+    moveyspeed = defaultGlobalParams['moveyspeed'];
+  }
+  if(movezspeed == undefined) {
+    movezspeed = defaultGlobalParams['movezspeed'];
+  }
   if(width == undefined) {
     width = defaultGlobalParams['width'];
     /*if(width == undefined) {
@@ -2164,10 +2281,13 @@ function resolveParams(params) {
   resolvedParams["spinz"] = spinz;
   resolvedParams["move"] = move;
   resolvedParams["movex"] = movex;
+  resolvedParams["movexspeed"] = movexspeed;
   resolvedParams["endmovex"] = endmovex;
   resolvedParams["movey"] = movey;
+  resolvedParams["moveyspeed"] = moveyspeed;
   resolvedParams["endmovey"] = endmovey;
   resolvedParams["movez"] = movez;
+  resolvedParams["movezspeed"] = movezspeed;
   resolvedParams["endmovez"] = endmovez;
 
   return resolvedParams;
@@ -2181,12 +2301,6 @@ function convertWordToBoolean(word) {
 		return false;
 	}
 }
-
-//Command Line Input 
-/*function processCLI(text) {//TODO
-  console.log(text);
-}*/
-
 
 //original code from
 //http://stackoverflow.com/questions/1573053/javascript-function-to-convert-color-names-to-hex-codes
