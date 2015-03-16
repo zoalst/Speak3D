@@ -16,9 +16,9 @@ Built off of the Text3D example in Lee Stemkoski's
   - say 'create cylinder' or 'create cone' w/ optional parameters
   - say 'create floor' w/ optional parameters (only has x,y,size right now)
   - say 'create wall' or 'create back wall' w/ optional parameters (only has x,y,size right now)
-  - say 'create many cubes/spheres/rings/knots/cylinders/floors/walls' w/ optional parameters, provide amount param and two params on atleast one axis(x,y, or z) or two size params ex: 'create many spheres amount 5 z 0 and 250' or 'create many cubes amount 5 size 10 and 110 transparent true'
+  - say 'create many cubes/spheres/rings/knots/cylinders/floors/walls' w/ optional parameters, provide amount param and two params on atleast one axis(x,y, or z) or two size params ex: 'create many spheres amount 5 z 0 until 250' or 'create many cubes amount 5 size 10 until 110 transparent true'
   - say 'create text' then say whatever you want
-  - say 'set default' w/ parameters ex: 'set default transparent true color blue' or 'set default amount 10 size 20 x 0 and 200'
+  - say 'set default' w/ parameters ex: 'set default transparent true color blue' or 'set default amount 10 size 20 x 0 until 200'
   - say 'undo' or press ctrl+z
   - say 'open console' or press 'o' to submit typed out commands in the top right corner(submit with enter); say 'close console' to close it
   - say 'test' or 'test everything' to see a bunch of stuff at once
@@ -31,16 +31,16 @@ Built off of the Text3D example in Lee Stemkoski's
   - 'texture' followed by a texture name
   - 'transparent' followed by a 'true' or 'false'
   - 'spin' followed by 'x', 'y', or 'z'
-  - 'move' followed by a range of 'x', 'y', or 'z', ex: move x 0 and 250
-  - you can set a parameter range by using the keyword end(or and), ex: create many cubes x 0 end 100
+  - 'move' followed by a range of 'x', 'y', or 'z', ex: move x 0 until 250
+  - you can set a parameter range by using the keyword until, ex: create many cubes x 0 until 100
 
 ## Examples
 
   - say 'create cube color blue'
   - say 'create knot width 9 texture cloud'
   - say 'create cube x 50 y 100 z 100' 
-  - say 'set default transparent true size 50 and 100', then 'create many spheres color magenta'
-  - say 'set default texture random', then 'create floor', then 'create many walls x -500 and 500'
+  - say 'set default transparent true size 50 until 100', then 'create many spheres color magenta'
+  - say 'set default texture random', then 'create floor', then 'create many walls x -500 until 500'
 
 
 ##Usage

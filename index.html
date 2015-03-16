@@ -143,7 +143,7 @@
 <button id = "submitButton" type="button" style="position: absolute; right:0px; top:10px; visibility:hidden">!!</button> 
 <input id="consoleBox" type="text" command="command" size="66" style="position: absolute; right:20px; top:10px; visibility:hidden"/>
 
-<!-- TODO unique filenames -->
+<!-- TODO unique filenames (timestamp) -->
 <a href="" id="link" download="Speak3D.txt"> </a>
 <button id = "saveButton" type="button" style="position: absolute; left:0px; top:5px;">Save</button> 
 <input id="uploadFile" type="file" style="position: absolute; left:50px; top:5px;"/>
@@ -193,6 +193,9 @@ var globalMoveFast = 5;
 var globalMoveMedium = 2;
 
 var user;
+var gravity = new THREE.Vector3(0,-4,0);//TODO user change gravity
+var solids = [];
+var gravAndColl = false;
 //var useOtherControls = true;
 var consoleOpen = false;
 var paused = false;
@@ -296,10 +299,6 @@ function init() {
   	  'hello': function() { 
   	  	scene.add(create3DText('Hello!'));
   	  },
-  	  //TODO::::
-  	  //look into just have create *params
-  	  //--will it interpret words way more incorrect? maybe annyang takes "create sphere" and really knows it's looking for sphere when otherwise it would choose another similiar sounding word
-  	  //--will it be faster because once annyang has a large list of commands it doesn't really work?
   	  'create sphere': function() {
         notify('create sphere');
   	  	scene.add(createSphere(defaultGlobalParams));
@@ -652,6 +651,14 @@ function init() {
       'test': function() {
         notify('test');
         testEverything();
+      },
+      'gravity on': function() {
+        notify('gravity on');
+        gravAndColl = true;
+      },
+      'gravity off': function() {
+        notify('gravity off');
+        gravAndColl = false;
       }
   	};
 
@@ -759,7 +766,8 @@ function update() {
   camera.rotateX( -rotateAngle * mouseLook.y * 0.05 );
   mouseLook.y = 0;
   // limit camera to +/- 45 degrees (0.7071 radians) or +/- 60 degrees (1.04 radians)
-  camera.rotation.x = THREE.Math.clamp( camera.rotation.x, -1.04, 1.04 );
+  // or +/- 74 degrees (1.31 radians)
+  camera.rotation.x = THREE.Math.clamp( camera.rotation.x, -1.31, 1.31 );
 
   //don't want keyboard controls to work when user is typing in a command
   if(!consoleOpen) {
@@ -805,10 +813,14 @@ function update() {
     user.updateMatrix();
 
     // look up/down
-    if ( keyboard.pressed("3") ) // third-person view
+    if ( keyboard.pressed("3") ) {// third-person view
       camera.position.set(0,50,250);
-    if ( keyboard.pressed("1") ) // first-person view
+      bounding.visible = true;
+    }
+    if ( keyboard.pressed("1") ) {// first-person view
       camera.position.set(0,35,10);
+      bounding.visible = false;
+    }
     if ( keyboard.pressed("T") )
       camera.rotateX(  rotateAngle );
     if ( keyboard.pressed("G") )
@@ -822,6 +834,36 @@ function update() {
       camera.rotateX( -6 * camera.rotation.x * rotateAngle );
   
     user.translateY( user.velocity.y );
+
+    //TODO have collision/gravity(aka real game controls) be turned on/off by user
+    if(gravAndColl) {
+      // collision detection!
+      if ( collision( solids ) )
+      {
+        user.translateX( -move.xDist );
+        user.rotateY( -move.yAngle );
+        user.translateY( 3 );
+        user.translateZ( -move.zDist );
+        user.updateMatrix();
+        if ( collision( solids ) ) {
+            console.log( "Something's wrong with collision..." );
+        }
+      }
+      if ( keyboard.pressed("space") && (user.velocity.y <= 0 )) {
+        user.velocity = new THREE.Vector3(0,7,0);
+      }
+      //dont speed up forever when falling
+      if(user.velocity.y < 14){
+        user.velocity.add( gravity.clone().multiplyScalar( delta ) );
+      }
+      user.translateY( user.velocity.y );
+      user.updateMatrix();
+      if ( collision(solids) ) {
+        user.translateY( -user.velocity.y );
+        user.updateMatrix();
+        user.velocity = new THREE.Vector3(0,0,0);
+      }
+    }
     //if not paused
     if(!paused) {
       if ( keyboard.pressed("P") ) {
@@ -841,6 +883,23 @@ function update() {
     }
   }
 	stats.update();
+}
+// returns true on intersection
+function collision( wallArray )
+{
+  // send rays from center of person to each vertex in bounding geometry
+  for (var vertexIndex = 0; vertexIndex < user.children[1].geometry.vertices.length; vertexIndex++)
+  {   
+    var localVertex = user.children[1].geometry.vertices[vertexIndex].clone();
+    var globalVertex = localVertex.applyMatrix4( user.matrix );
+    var directionVector = globalVertex.sub( user.position );
+    
+    var ray = new THREE.Raycaster( user.position, directionVector.clone().normalize() );
+    var collisionResults = ray.intersectObjects( wallArray );
+    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
+      return true;
+  }
+  return false;
 }
 
 function render() {
@@ -1105,6 +1164,7 @@ function createFloorOrWall(params, floorOrWall) {
     mesh.position.z = -500;
   }
   addToMeshs(mesh);
+  solids.push(mesh);
   return mesh;
 }
 
@@ -1178,7 +1238,7 @@ function createGeometry(params, geometry) {
     }
     var material = new THREE.MeshPhongMaterial( { 
       color: color, 
-      ambient: ambient,//TODO ambient param 
+      ambient: ambient, 
       transparent: btrans, 
       blending: THREE.AdditiveBlending 
     } );
@@ -1278,6 +1338,9 @@ function createGeometry(params, geometry) {
     initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
   }
   addToMeshs(mesh);//increases numberOfMeshs by 1
+  /*if(collidable) {
+    solids.push(mesh);
+  }*/
 	return mesh;
 }
 
@@ -1304,10 +1367,13 @@ function createManyGeometries(params, geometry) {
   var spinz = resolvedParams['spinz'];
   var move = resolvedParams['move'];
   var movex = resolvedParams['movex'];
+  var movexspeed = resolvedParams['movexspeed'];
   var endmovex = resolvedParams['endmovex'];
   var movey = resolvedParams['movey'];
+  var moveyspeed = resolvedParams['moveyspeed'];
   var endmovey = resolvedParams['endmovey'];
   var movez = resolvedParams['movez'];
+  var movezspeed = resolvedParams['movezspeed'];
   var endmovez = resolvedParams['endmovez'];
 
   //first check if there is a default texture
@@ -1328,7 +1394,7 @@ function createManyGeometries(params, geometry) {
     }
     var material = new THREE.MeshPhongMaterial( { 
       color: color, 
-      ambient: ambient,//TODO ambient param 
+      ambient: ambient,  
       transparent: btrans, 
       blending: THREE.AdditiveBlending 
     } );
@@ -1408,7 +1474,7 @@ function createManyGeometries(params, geometry) {
         initSpinMesh(mesh,spinx,spiny,spinz);
       }
       if(move == true) {
-        initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+        initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
       }
       addToMeshs(mesh);
     }
@@ -1427,7 +1493,7 @@ function createManyGeometries(params, geometry) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
-          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
   			addToMeshs(mesh);
 			}
@@ -1443,7 +1509,7 @@ function createManyGeometries(params, geometry) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
-          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
 				addToMeshs(mesh);
 			}
@@ -1464,7 +1530,7 @@ function createManyGeometries(params, geometry) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
-          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
 				addToMeshs(mesh);
 			}
@@ -1485,7 +1551,7 @@ function createManyGeometries(params, geometry) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
-          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
 				addToMeshs(mesh);
 			}
@@ -1506,7 +1572,7 @@ function createManyGeometries(params, geometry) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
-          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
 				addToMeshs(mesh);
 			}
@@ -1527,7 +1593,7 @@ function createManyGeometries(params, geometry) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
-          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez);
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
         addToMeshs(mesh);
       }
@@ -2442,13 +2508,6 @@ function getRandomInt(min, max) {
  //END OF METHODS FOR DEALING WITH PARAMETERS//
 //////////////////////////////////////////////
 
-
-//methods for saving creation
-function save() {
-  //TODO
-  //how will this work?
-}
-
 function initSaveLoadButtons() {
 
   document.getElementById('link').onclick = function() {
@@ -2787,6 +2846,12 @@ function submitCommand(command) {
   }
   else if(command.indexOf('test') === 0 ) {
     testEverything();
+  }
+  else if(command.indexOf('gravity on') === 0 ) {
+    gravAndColl = true;
+  }
+  else if(command.indexOf('gravity off') === 0 ) {
+    gravAndColl = false;
   }
 }
 
