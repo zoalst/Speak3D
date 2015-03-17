@@ -1182,30 +1182,31 @@ function createFloorOrWall(params, floorOrWall) {
 
 //functions for creating mulitple geometries of the same type with a single command
 function createManySpheres(params) {
-	return createManyGeometries(params, 'SphereGeometry');
+	return createGeometry(params, 'SphereGeometry',true);
 }
 
 function createManyCubes(params) {
-	return createManyGeometries(params, 'CubeGeometry');
+	return createGeometry(params, 'CubeGeometry',true);
 }
 
 function createManyRings(params) {
-	return createManyGeometries(params, 'RingGeometry');
+	return createGeometry(params, 'RingGeometry',true);
 }
 
 function createManyTorusKnots(params) {
-	return createManyGeometries(params, 'TorusKnotGeometry');
+	return createGeometry(params, 'TorusKnotGeometry',true);
 }
 
 function createManyCylinders(params) {
-	return createManyGeometries(params, 'CylinderGeometry');
+	return createGeometry(params, 'CylinderGeometry',true);
 }
 
 function createManyCones(params) {
-  return createManyGeometries(params, 'ConeGeometry');
+  return createGeometry(params, 'ConeGeometry',true);
 }
 
-function createGeometry(params, geometry) {
+//TODO bubbles
+function createGeometry(params, geometry, many) {
   var color = params['color'];
   var ambient = params['ambient'];
   var texture = params['texture'];
@@ -1216,167 +1217,11 @@ function createGeometry(params, geometry) {
   var z = resolvedParams['z'];
   var size = resolvedParams['size'];
   var btrans = resolvedParams['btrans'];
-  var width = resolvedParams['width'];
-  var spin = resolvedParams['spin'];
-  var spinx = resolvedParams['spinx'];
-  var spiny = resolvedParams['spiny'];
-  var spinz = resolvedParams['spinz'];
-  var move = resolvedParams['move'];
-  var movex = resolvedParams['movex'];
-  var movexspeed = resolvedParams['movexspeed'];
-  var endmovex = resolvedParams['endmovex'];
-  var movey = resolvedParams['movey'];
-  var moveyspeed = resolvedParams['moveyspeed'];
-  var endmovey = resolvedParams['endmovey'];
-  var movez = resolvedParams['movez'];
-  var movezspeed = resolvedParams['movezspeed'];
-  var endmovez = resolvedParams['endmovez'];
-
-  //first check if there is a default texture
-  if(texture == undefined) {
-    texture = defaultGlobalParams['texture'];
-  }
-  if(texture == undefined) {
-    if(color == undefined) {
-      color = defaultGlobalParams['color'];
-    }
-    if(ambient == undefined) {
-      if(defaultGlobalParams['ambient'] == undefined) {
-        ambient = color;
-      }
-      else {
-        ambient = defaultGlobalParams['ambient'];
-      }
-    }
-    var material = new THREE.MeshPhongMaterial( { 
-      color: color, 
-      ambient: ambient, 
-      transparent: btrans, 
-      blending: THREE.AdditiveBlending 
-    } );
-  }
-  else {
-    var wallTexture;
-    if(texture != 'random') {
-      wallTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[texture] );
-    }
-    else {
-      var rand = getRandomInt(0,texturesLength-1);
-      var i = 0;
-      for(var t in textures) {
-        if(rand == i) {
-          wallTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[t] );
-        }
-        i++;
-      }
-    }
-    if(wallTexture == undefined) {
-          wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );      
-    }
-    wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
-    if(size > 1000) {
-      wallTexture.repeat.set( 10, 10 );
-    }
-    else {
-      wallTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
-    }
-    var material = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide, transparent: btrans } );
-  }
-	if(geometry == 'CubeGeometry') {
-		var geom = new THREE.CubeGeometry(size,size,size);
-	}
-	else if(geometry == 'SphereGeometry') {
-		var geom = new THREE.SphereGeometry(size);
-	}
-	else if(geometry == 'CylinderGeometry') {
-    if(width == undefined) {
-      var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
-    }
-    else {
-      var geom = new THREE.CylinderGeometry(width,width,size);          
-    }
-	}
-	else if(geometry == 'RingGeometry') {
-    if(width == undefined) {
-      var geom = new THREE.RingGeometry(size/5,size);
-    }
-    else {
-      var geom = new THREE.RingGeometry((size-width),size);          
-    }
-	}
-	else if(geometry == 'TorusKnotGeometry') {
-    if(width == undefined) {
-		  var geom = new THREE.TorusKnotGeometry(size);
-    }
-    else {
-      var geom = new THREE.TorusKnotGeometry(size, width);      
-    }
-	}
-  else if(geometry == 'ConeGeometry') {
-    if(width == undefined) {
-      var geom = new THREE.CylinderGeometry(0,size*2/5,size);
-    }
-    else {
-      var geom = new THREE.CylinderGeometry(0,width,size);          
-    }
-  }
-  else if(geometry == 'Bubble') {
-    var geom = new THREE.SphereGeometry(size);
-    bubbleMesh = new THREE.Mesh(geom, bubbleMaterial);
-    bubbleMesh.position.set( x, y, z );
-    addToMeshs(bubbleMesh);
-    return bubbleMesh;
-  }
-  else if(geometry == 'BubbleCube') {
-    var geom = new THREE.CubeGeometry(size,size,size);
-    bubbleMesh = new THREE.Mesh(geom, bubbleMaterial);
-    bubbleMesh.position.set( x, y, z );
-    addToMeshs(bubbleMesh);
-    return bubbleMesh;
-  }
-  else if(geometry == 'BubbleKnot') {
-    if(width == undefined) {
-      var geom = new THREE.TorusKnotGeometry(size);
-    }
-    else {
-      var geom = new THREE.TorusKnotGeometry(size, width);      
-    }
-    bubbleMesh = new THREE.Mesh(geom, bubbleMaterial);
-    bubbleMesh.position.set( x, y, z );
-    addToMeshs(bubbleMesh);
-    return bubbleMesh;
-  }
-	var mesh = new THREE.Mesh(geom, material );	
-	mesh.position.set( x, y, z );
-  if(spin == true) {
-    initSpinMesh(mesh,spinx,spiny,spinz);
-  }
-  if(move == true) {
-    initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
-  }
-  addToMeshs(mesh);//increases numberOfMeshs by 1
-  /*if(collidable) {
-    solids.push(mesh);
-  }*/
-	return mesh;
-}
-
-function createManyGeometries(params, geometry) {
-  var color = params['color'];
-  var ambient = params['ambient'];
-  var texture = params['texture'];
-  //color/ambient/texture not yet resolved
-  var resolvedParams = resolveParams(params);
-	var x = resolvedParams['x'];
-	var y = resolvedParams['y'];
-	var z = resolvedParams['z'];
-  var size = resolvedParams['size'];
-  var btrans = resolvedParams['btrans'];
-	var amount = resolvedParams['amount'];
-	var endx = resolvedParams['endx'];
-	var endy = resolvedParams['endy'];
-	var endz = resolvedParams['endz'];
-	var endsize = resolvedParams['endsize'];
+  var amount = resolvedParams['amount'];
+  var endx = resolvedParams['endx'];
+  var endy = resolvedParams['endy'];
+  var endz = resolvedParams['endz'];
+  var endsize = resolvedParams['endsize'];
   var width = resolvedParams['width'];
   var spin = resolvedParams['spin'];
   var spinx = resolvedParams['spinx'];
@@ -1444,19 +1289,24 @@ function createManyGeometries(params, geometry) {
     var material = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide, transparent: btrans } );
   }
 
-	var meshs = [];
-	var divisor = amount - 1;
-	var xIncrement = +(endx-x)/divisor;
-	var yIncrement = +(endy-y)/divisor;
-	var zIncrement = +(endz-z)/divisor;
-	if(endsize == undefined) {
-		if(geometry == 'CubeGeometry'){
-			var geom = new THREE.CubeGeometry(size,size,size);
-		}
-		else if(geometry == 'SphereGeometry'){
-			var geom = new THREE.SphereGeometry(size);
-		}
-		else if(geometry == 'CylinderGeometry'){
+  if(many == undefined) {
+    many = false;
+  }
+
+  var meshs = [];
+  var divisor = amount - 1;
+  var xIncrement = +(endx-x)/divisor;
+  var yIncrement = +(endy-y)/divisor;
+  var zIncrement = +(endz-z)/divisor;
+  //if we only create one geometry or many of the same size
+  if(endsize == undefined || !many) {
+    if(geometry == 'CubeGeometry'){
+      var geom = new THREE.CubeGeometry(size,size,size);
+    }
+    else if(geometry == 'SphereGeometry'){
+      var geom = new THREE.SphereGeometry(size);
+    }
+    else if(geometry == 'CylinderGeometry'){
       if(width == undefined) {
         var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
       }
@@ -1488,117 +1338,136 @@ function createManyGeometries(params, geometry) {
         var geom = new THREE.CylinderGeometry(0,width,size);          
       }
     }
-    for(var i = 0; i < amount; i++) {
-      var mesh = new THREE.Mesh(geom, material );	
-      mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-      meshs[i] = mesh;
+    if(!many) {
+      var mesh = new THREE.Mesh(geom, material ); 
+      mesh.position.set( x, y, z );
       if(spin == true) {
         initSpinMesh(mesh,spinx,spiny,spinz);
       }
       if(move == true) {
         initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
       }
-      addToMeshs(mesh);
+      addToMeshs(mesh);//increases numberOfMeshs by 1
+      /*if(collidable) {//TODO
+        solids.push(mesh);
+      }*/
+      return mesh;
+    }
+    else {
+      for(var i = 0; i < amount; i++) {
+        var mesh = new THREE.Mesh(geom, material ); 
+        mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+        meshs[i] = mesh;
+        if(spin == true) {
+          initSpinMesh(mesh,spinx,spiny,spinz);
+        }
+        if(move == true) {
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
+        }
+        addToMeshs(mesh);
+      }
+      return meshs;
     }
   }
-	else {
-		var sizeIncrement = (endsize-size)/divisor;
-		var newSize;
-		if(geometry == 'CubeGeometry'){
-			for(var i = 0; i < amount; i++) {
-				newSize = +size+i*sizeIncrement;
-				var geom = new THREE.CubeGeometry(newSize,newSize,newSize);
-				var mesh = new THREE.Mesh(geom, material );	
-				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-				meshs[i] = mesh;
+  //else we are creating many geometries of different sizes
+  else {
+    var sizeIncrement = (endsize-size)/divisor;
+    var newSize;
+    if(geometry == 'CubeGeometry'){
+      for(var i = 0; i < amount; i++) {
+        newSize = +size+i*sizeIncrement;
+        var geom = new THREE.CubeGeometry(newSize,newSize,newSize);
+        var mesh = new THREE.Mesh(geom, material ); 
+        mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+        meshs[i] = mesh;
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-  			addToMeshs(mesh);
-			}
-		}
-		else if(geometry == 'SphereGeometry'){
-			for(var i = 0; i < amount; i++) {
-				newSize = +size+i*sizeIncrement;
-				var geom = new THREE.SphereGeometry(newSize);
-				var mesh = new THREE.Mesh(geom, material );	
-				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-				meshs[i] = mesh;
+        addToMeshs(mesh);
+      }
+    }
+    else if(geometry == 'SphereGeometry'){
+      for(var i = 0; i < amount; i++) {
+        newSize = +size+i*sizeIncrement;
+        var geom = new THREE.SphereGeometry(newSize);
+        var mesh = new THREE.Mesh(geom, material ); 
+        mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+        meshs[i] = mesh;
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-				addToMeshs(mesh);
-			}
-		}
-		else if(geometry == 'CylinderGeometry'){
-			for(var i = 0; i < amount; i++) {
-				newSize = +size+i*sizeIncrement;
+        addToMeshs(mesh);
+      }
+    }
+    else if(geometry == 'CylinderGeometry'){
+      for(var i = 0; i < amount; i++) {
+        newSize = +size+i*sizeIncrement;
         if(width == undefined) {
-  				var geom = new THREE.CylinderGeometry(newSize*2/5,newSize*2/5,newSize);
+          var geom = new THREE.CylinderGeometry(newSize*2/5,newSize*2/5,newSize);
         }
         else {
           var geom = new THREE.CylinderGeometry(width,width,newSize);          
         }
-				var mesh = new THREE.Mesh(geom, material );	
-				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-				meshs[i] = mesh;
+        var mesh = new THREE.Mesh(geom, material ); 
+        mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+        meshs[i] = mesh;
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-				addToMeshs(mesh);
-			}
-		}
-		else if(geometry == 'RingGeometry'){
-			for(var i = 0; i < amount; i++) {
-				newSize = +size+i*sizeIncrement;
+        addToMeshs(mesh);
+      }
+    }
+    else if(geometry == 'RingGeometry'){
+      for(var i = 0; i < amount; i++) {
+        newSize = +size+i*sizeIncrement;
         if(width == undefined) {
-				  var geom = new THREE.RingGeometry(newSize/5,newSize);
+          var geom = new THREE.RingGeometry(newSize/5,newSize);
         }
         else {
           var geom = new THREE.RingGeometry((newSize-width),newSize);          
         }
-				var mesh = new THREE.Mesh(geom, material );	
-				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-				meshs[i] = mesh;
+        var mesh = new THREE.Mesh(geom, material ); 
+        mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+        meshs[i] = mesh;
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-				addToMeshs(mesh);
-			}
-		}
-		else if(geometry == 'TorusKnotGeometry'){
-			for(var i = 0; i < amount; i++) {
-				newSize = +size+i*sizeIncrement;
+        addToMeshs(mesh);
+      }
+    }
+    else if(geometry == 'TorusKnotGeometry'){
+      for(var i = 0; i < amount; i++) {
+        newSize = +size+i*sizeIncrement;
         if(width == undefined) {
-				  var geom = new THREE.TorusKnotGeometry(newSize);
+          var geom = new THREE.TorusKnotGeometry(newSize);
         }
         else {
           var geom = new THREE.TorusKnotGeometry(newSize, width);      
         }
-				var mesh = new THREE.Mesh(geom, material );	
-				mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-				meshs[i] = mesh;
+        var mesh = new THREE.Mesh(geom, material ); 
+        mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+        meshs[i] = mesh;
         if(spin == true) {
           initSpinMesh(mesh,spinx,spiny,spinz);
         }
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-				addToMeshs(mesh);
-			}
-		}
+        addToMeshs(mesh);
+      }
+    }
     else if(geometry == 'ConeGeometry') {
       for(var i = 0; i < amount; i++) {
         newSize = +size+i*sizeIncrement;
@@ -1620,8 +1489,8 @@ function createManyGeometries(params, geometry) {
         addToMeshs(mesh);
       }
     }
-	}
-	return meshs;	
+    return meshs; 
+  }
 }
 function createManyFloors(params) {
   return createManyFloorsOrWalls(params,'Floor');
