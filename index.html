@@ -175,6 +175,8 @@ var undoing = false;
 //default parameters
 var defaultGlobalParams = {};
 var texturesLength;
+//divisor var, texture repeats for size/textureRepeatAmount
+var textureRepeatAmount = 100;
 var textures = getTextures();
 var bubbleMaterial;
 var bubbles = false;
@@ -614,7 +616,8 @@ function init() {
   	  },
   	  'set default *params': function(params) {
         notify('set default '+params);
-  	  	setDefaultGlobalParams(params);
+        //pass defaultGlobalParams as second arg to set the defaultGlobalParams
+        parseParams(params, defaultGlobalParams);
   	  },
   	  'undo': function() {
         notify('undo');
@@ -626,7 +629,11 @@ function init() {
       },
       'upload': function() {
         notify('upload');
-        document.getElementById('uploadFile').click();
+        document.getElementById('uploadFile').style.visibility = 'visible';
+      },
+      'upload *': function() {
+        notify('upload *');
+        document.getElementById('uploadFile').style.visibility = 'visible';
       },
       'pause': function() {
         notify('pause');
@@ -1147,7 +1154,12 @@ function createFloorOrWall(params, floorOrWall) {
     var planeTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[texture] );    
   }
   planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping; 
-  planeTexture.repeat.set( 10, 10 );
+  if(size > 1000) {
+    planeTexture.repeat.set( 10, 10 );
+  }
+  else {
+    planeTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
+  }
   var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide, transparent: btrans } );
   var geometry = new THREE.PlaneGeometry(size, size, 10, 10);
   var mesh = new THREE.Mesh(geometry, material);
@@ -1262,7 +1274,12 @@ function createGeometry(params, geometry) {
           wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );      
     }
     wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
-    wallTexture.repeat.set( 10, 10 );//TODO adjust acc to sze?
+    if(size > 1000) {
+      wallTexture.repeat.set( 10, 10 );
+    }
+    else {
+      wallTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
+    }
     var material = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide, transparent: btrans } );
   }
 	if(geometry == 'CubeGeometry') {
@@ -1418,7 +1435,12 @@ function createManyGeometries(params, geometry) {
           wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );      
     }
     wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
-    wallTexture.repeat.set( 10, 10 );//TODO adjust acc to sze?
+    if(size > 1000) {
+      wallTexture.repeat.set( 10, 10 );
+    }
+    else {
+      wallTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
+    }
     var material = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide, transparent: btrans } );
   }
 
@@ -1694,7 +1716,12 @@ function createManyFloorsOrWalls(params,floorOrWall) {
     var planeTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[texture] );    
   }
   planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping; 
-  planeTexture.repeat.set( 10, 10 );
+  if(size > 1000) {
+    planeTexture.repeat.set( 10, 10 );
+  }
+  else {
+    planeTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
+  }
   var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide, transparent: btrans } );
   var meshs = [];
   var divisor = amount - 1;
@@ -1833,19 +1860,24 @@ function undo() {
   ///////////////////////////////////////
  //METHODS FOR DEALING WITH PARAMETERS//
 ///////////////////////////////////////
-function parseParams(params) {
-	//TODO, if user speaks too fast comes in with no space (ex: z75)
-	var paramsArray = params.split(" ");
-	var parsedParams = {};
-	var lastParamType = '';
+
+//--params- string of parameters & their values
+//--parsedParams, assoc array to store param->value (use defaultGlobalParams to setDefaultParams)
+function parseParams(params, parsedParams) {
+  //TODO, if user speaks too fast comes in with no space (ex: z75)
+  var paramsArray = params.split(" ");
+  if(parsedParams == undefined) {
+    parsedParams = {};
+  }
+  var lastParamType = '';
   var currParam = '';
-	for(var i = 0; i < paramsArray.length-1; i+=2) {
+  for(var i = 0; i < paramsArray.length-1; i+=2) {
     currParam = paramsArray[i].toLowerCase();
-		if(currParam == 'color' || currParam == 'colour') {
-			parsedParams['color'] = colourNameToHex(paramsArray[i+1]);
-			lastParamType = 'color';
-		}
-		else if(currParam == 'x' || currParam == 'y' || currParam == 'z' ) {
+    if(currParam == 'color' || currParam == 'colour') {
+      parsedParams['color'] = colourNameToHex(paramsArray[i+1]);
+      lastParamType = 'color';
+    }
+    else if(currParam == 'x' || currParam == 'y' || currParam == 'z' ) {
       //negative numbers sometimes come in with a space, ex: - 100
       if(paramsArray[i+1] == '-') {
         parsedParams[currParam] = paramsArray[i+1] + paramsArray[i+2];
@@ -1853,10 +1885,10 @@ function parseParams(params) {
         i++;  
       }
       else {
-			  parsedParams[currParam] = paramsArray[i+1];
+        parsedParams[currParam] = paramsArray[i+1];
         lastParamType = currParam;
-      }			
-		}
+      }     
+    }
     //annyang sometimes thinks you are saying 'why' or 'by' instead of 'y'
     //mainly happens when y is your first or only coordinate input
     else if(currParam == 'why' || currParam == 'by' ) {
@@ -1869,24 +1901,23 @@ function parseParams(params) {
       }     
       lastParamType = 'y';
     }
-    //change terminology to 'until'
-    //because when you say x -200 and 50 it thinks you say -250
-		else if(currParam == 'until' || currParam == 'and' || currParam == 'end' || paramsArray[i] == '&') {
-			if(lastParamType == 'x' || lastParamType == 'y' || lastParamType == 'z') {
+    //change terminology to 'until' because when you say x -200 and 50 it thinks you say -250
+    else if(currParam == 'until' || currParam == 'and' || currParam == 'end' || paramsArray[i] == '&') {
+      if(lastParamType == 'x' || lastParamType == 'y' || lastParamType == 'z') {
         if(paramsArray[i+1] == '-') {
           parsedParams['end'+lastParamType] = paramsArray[i+1] + paramsArray[i+2]; 
           i++;    
         }
         else {
-				  parsedParams['end'+lastParamType] = paramsArray[i+1];			
+          parsedParams['end'+lastParamType] = paramsArray[i+1];     
         }
-			}
-			else if(lastParamType == 'size') {
-				parsedParams['endsize'] = paramsArray[i+1];
-			}
-			else if(lastParamType == 'color') {
-				parsedParams['endcolor'] = paramsArray[i+1];
-			}
+      }
+      else if(lastParamType == 'size') {
+        parsedParams['endsize'] = paramsArray[i+1];
+      }
+      else if(lastParamType == 'color') {
+        parsedParams['endcolor'] = paramsArray[i+1];
+      }
       else if(lastParamType == 'movex' || lastParamType == 'movey' || lastParamType == 'movez') {
         if(paramsArray[i+1] == '-') {
           parsedParams['end'+lastParamType] = paramsArray[i+1] + paramsArray[i+2]; 
@@ -1896,8 +1927,8 @@ function parseParams(params) {
           parsedParams['end'+lastParamType] = paramsArray[i+1];     
         }
       }
-			lastParamType = '';
-		}
+      lastParamType = '';
+    }
     //move/oscillate
     else if(currParam == 'move' || currParam == 'mood') {
       parsedParams['move'] = true;
@@ -2006,174 +2037,13 @@ function parseParams(params) {
       parsedParams['width'] = paramsArray[i+1];      
       lastParamType = 'width'; 
     }
-		else {
-			parsedParams[currParam] = paramsArray[i+1];			
-			lastParamType = currParam;
-		}
-	}
-	return parsedParams;
+    else {
+      parsedParams[currParam] = paramsArray[i+1];     
+      lastParamType = currParam;
+    }
+  }
+  return parsedParams;
 }
-
-function setDefaultGlobalParams(params) {
-	var paramsArray = params.split(" ");
-	var lastParamType = '';
-	var currParam = '';
-  for(var i = 0; i < paramsArray.length-1; i+=2) {
-    currParam = paramsArray[i].toLowerCase();
-		if(currParam == 'color' || currParam == 'colour') {
-			defaultGlobalParams['color'] = colourNameToHex(paramsArray[i+1]);
-			lastParamType = 'color';
-		}
-		else if(currParam == 'x' || currParam == 'y' || currParam == 'z' ) {
-      //negative numbers sometimes come in with a space, ex: - 100
-      if(paramsArray[i+1] == '-') {
-        defaultGlobalParams[currParam] = paramsArray[i+1] + paramsArray[i+2];
-        lastParamType = currParam;
-        i++;  
-      }
-      else {
-			  defaultGlobalParams[currParam] = paramsArray[i+1];
-        lastParamType = currParam;
-      }			
-		}
-    //annyang sometimes thinks you are saying 'why' or 'by' instead of 'y'
-    else if(currParam == 'why' || currParam == 'by' ) {
-      if(paramsArray[i+1] == '-') {
-        defaultGlobalParams['y'] = paramsArray[i+1] + paramsArray[i+2];
-        i++;  
-      }
-      else {
-        defaultGlobalParams['y'] = paramsArray[i+1];  
-      }   
-      lastParamType = 'y';
-    }
-		else if(currParam == 'until' || currParam == 'and' || currParam == 'end' || paramsArray[i] == '&') {
-      if(lastParamType == 'x' || lastParamType == 'y' || lastParamType == 'z') {
-        if(paramsArray[i+1] == '-') {
-          defaultGlobalParams['end'+lastParamType] = paramsArray[i+1] + paramsArray[i+2]; 
-          i++;    
-        }
-        else {
-          defaultGlobalParams['end'+lastParamType] = paramsArray[i+1];     
-        }
-      }
-			else if(lastParamType == 'size') {
-				defaultGlobalParams['endsize'] = paramsArray[i+1];
-			}
-			else if(lastParamType == 'color') {
-				defaultGlobalParams['endcolor'] = paramsArray[i+1];
-			}
-      else if(lastParamType == 'movex' || lastParamType == 'movey' || lastParamType == 'movez') {
-        if(paramsArray[i+1] == '-') {
-          defaultGlobalParams['end'+lastParamType] = paramsArray[i+1] + paramsArray[i+2]; 
-          i++;    
-        }
-        else {
-          defaultGlobalParams['end'+lastParamType] = paramsArray[i+1];     
-        }
-      }
-			lastParamType = '';
-		}
-    //move/oscillate
-    else if(currParam == 'move' || currParam == 'mood') {
-      defaultGlobalParams['move'] = true;
-      var dir = paramsArray[i+1].toLowerCase();
-      var speed;
-      var moveSpeed;
-      if(paramsArray[i+2] != undefined) {
-        speed = paramsArray[i+2].toLowerCase();
-        if(speed == 'slow') {
-          moveSpeed = globalMoveSlow;
-          i++;
-        }
-        else if(speed == 'fast') {
-          moveSpeed = globalMoveFast;
-          i++;
-        } 
-        else if(speed == 'medium') {
-          moveSpeed = globalMoveMedium;
-          i++;
-        } 
-        else {
-          moveSpeed = globalMoveSlow;
-        }
-      }
-      else {
-        moveSpeed = globalMoveSlow;
-      } 
-      var coor = paramsArray[i+2];
-      if(coor == '-') {
-        coor = paramsArray[i+2] + paramsArray[i+3];
-        i++;
-      }
-      if(dir == 'x') {
-        defaultGlobalParams['movex'] = coor;
-        defaultGlobalParams['movexspeed'] = +moveSpeed;
-        i++;
-        lastParamType = 'movex'; 
-      }
-      else if(dir == 'y' || dir == 'why') {
-        defaultGlobalParams['movey'] = coor;
-        defaultGlobalParams['moveyspeed'] = moveSpeed;
-        i++;
-        lastParamType = 'movey'; 
-      }
-      else if(dir == 'z') {
-        defaultGlobalParams['movez'] = coor;
-        defaultGlobalParams['movezspeed'] = moveSpeed;
-        i++;        
-        lastParamType = 'movez'; 
-      }
-    }
-    //spin
-    else if(currParam == 'spin') {
-      defaultGlobalParams['spin'] = true;
-      var dir = paramsArray[i+1].toLowerCase();
-      var speed;
-      var spinSpeed;
-      if(paramsArray[i+2] != undefined) {
-        speed = paramsArray[i+2].toLowerCase();
-        if(speed == 'slow') {
-          spinSpeed = globalSpinSlow;
-          i++;
-        }
-        else if(speed == 'fast') {
-          spinSpeed = globalSpinFast;
-          i++;
-        } 
-        else if(speed == 'medium') {
-          spinSpeed = globalSpinMedium;
-          i++;
-        } 
-        else {
-          spinSpeed = globalSpinMedium;        
-        }
-      }
-      else {
-        spinSpeed = globalSpinMedium;        
-      }
-      if(dir == 'x') {
-        defaultGlobalParams['spinx'] = spinSpeed;
-      }
-      else if(dir == 'y' || dir == 'why') {
-        defaultGlobalParams['spiny'] = spinSpeed;
-      }
-      else if(dir == 'z') {
-        defaultGlobalParams['spinz'] = spinSpeed;        
-      }
-    }
-		//sometimes annyang hears announced instead of amount
-		else if(currParam == 'announced') {
-		  defaultGlobalParams['amount'] = paramsArray[i+1];			
-			lastParamType = 'amount';	
-		}
-		else {
-			defaultGlobalParams[currParam] = paramsArray[i+1];			
-			lastParamType = currParam;
-		}
-	}
-}
-
 function initDefaultGlobalParams() {
   defaultGlobalParams = {};
 	defaultGlobalParams['x'] = 0;
@@ -2527,6 +2397,8 @@ function initSaveLoadButtons() {
       submitCommandsFromFile(data);
     };
     reader.readAsText(uploadFile.files[0], 'utf-8');
+    //
+    uploadFile.style.visibility = 'hidden';
   });
 
 }
@@ -2830,6 +2702,17 @@ function submitCommand(command) {
       }    
     }
   }
+  else if(command.indexOf('create back wall') === 0) {
+    var len = 'create back wall'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      var parsedParams = parseParams(params);
+      scene.add(createBackWall(parsedParams));    
+    }
+    else {
+      scene.add(createBackWall({x:0,y:500,size:1000}));
+    }
+  }
   else if(command.indexOf('create text') === 0) {
     var len = 'create text'.length;
     if(command.length > len) {
@@ -2841,7 +2724,8 @@ function submitCommand(command) {
     var len = 'set default'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      setDefaultGlobalParams(params);
+      //pass defaultGlobalParams as second arg to set the defaultGlobalParams
+      parseParams(params, defaultGlobalParams);
     }
   }
   else if(command.indexOf('test') === 0 ) {

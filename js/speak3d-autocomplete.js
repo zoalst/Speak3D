@@ -11,6 +11,7 @@ $(function(){
     'create cone',
     'create floor',
     'create wall',
+    'create back wall',
     'create many cubes',
     'create many spheres',
     'create many cylinders',
@@ -23,7 +24,9 @@ $(function(){
     'create bubble',
     'create bubble cube',
     'create bubble knot',
-    'test'
+    'test',
+    'gravity on',
+    'gravity off'
 
   ];
   

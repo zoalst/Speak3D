@@ -148,13 +148,13 @@ You'll need [nodejs](http://nodejs.org/) installed
 
 ## To Do
 
-  - when creating many geometries w/ one command, morph them into one geometry (maybe when amount >= a certian amount)
+
   - export function so users can save whatever they create
   - add dat.GUI, for default params
   - GUI for user uploaded textures and models
   - improve cli's auto-complete
   - improve cli w/ list of recently submitted commands
-  - ability to manipulate & remove existing geometries
+  - ability to manipulate & remove existing geometries, incl. voice command to stop all motion
   - enhance start/pause screen
   - bubble as a texture option instead of seperate geometry
   - add random as an option, ex: color random, size & coordinates also
@@ -162,6 +162,7 @@ You'll need [nodejs](http://nodejs.org/) installed
   - ctrl+z is buggy
   - use updated version of three.js
   - create self command, for third person view
+  - when creating many geometries w/ one command, morph them into one geometry (maybe when amount >= a certian amount)
   - better controls to navigate in 3D space
   - add parameters for dimensions, rotation, etc.
   - problems with people talking fast
