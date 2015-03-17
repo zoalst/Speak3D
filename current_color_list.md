@@ -15,6 +15,21 @@
   - coral
   - crimson
   - cyan
+  - darkblue
+  - darkcyan
+  - darkgoldenrod
+  - darkgray
+  - darkgreen
+  - darkkhaki
+  - darkmagenta
+  - darkolive
+  - darkorange
+  - darkorchid
+  - darkred
+  - darksalmon
+  - darkseagreen
+  - darkturquoise
+  - darkviolet
   - fire
   - forest
   - fuchsia
@@ -22,8 +37,7 @@
   - ghost
   - gold
   - goldenrod
-  - gray
-  - grey
+  - gray(grey)
   - green
   - honeydew
   - indigo
@@ -32,14 +46,33 @@
   - lavender
   - lawn
   - lemon
+  - lightblue
+  - lightcoral
+  - lightcyan
+  - lightgoldenrod
+  - lightgray(lightgrey)
+  - lightgreen
+  - lightpink
+  - lightsalmon
+  - lightyellow
   - lime
   - linen
   - magenta
   - maroon
+  - mediumaquamarine
+  - mediumblue
+  - mediumorchid
+  - mediumpurple
+  - mediumturquoise
+  - mediumviolet
   - navy
   - olive
   - orange
   - orchid
+  - palegoldenrod
+  - palegreen
+  - paleturquoise
+  - paleviolet
   - papaya
   - peach
   - pink

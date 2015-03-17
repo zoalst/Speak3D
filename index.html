@@ -1808,7 +1808,15 @@ function parseParams(params, parsedParams) {
   for(var i = 0; i < paramsArray.length-1; i+=2) {
     currParam = paramsArray[i].toLowerCase();
     if(currParam == 'color' || currParam == 'colour') {
-      parsedParams['color'] = colourNameToHex(paramsArray[i+1]);
+      //check if color starts w/ dark, medium, light, or pale
+      var next = paramsArray[i+1];
+      if(next == 'dark' || next == 'medium' || next == 'light' || next == 'pale') {
+        parsedParams['color'] = colourNameToHex(next+paramsArray[i+2]);
+        i++;
+      }
+      else{
+        parsedParams['color'] = colourNameToHex(next);
+      }
       lastParamType = 'color';
     }
     else if(currParam == 'x' || currParam == 'y' || currParam == 'z' ) {
@@ -2203,9 +2211,23 @@ function colourNameToHex(colour) {
     	//"cornsilk":"#fff8dc",
     	"crimson":"#dc143c",
     	"cyan":"#00ffff",
-    	//"darkblue":"#00008b","darkcyan":"#008b8b","darkgoldenrod":"#b8860b","darkgray":"#a9a9a9","darkgreen":"#006400","darkkhaki":"#bdb76b","darkmagenta":"#8b008b","darkolivegreen":"#556b2f",
-    	//"darkorange":"#ff8c00","darkorchid":"#9932cc","darkred":"#8b0000","darksalmon":"#e9967a","darkseagreen":"#8fbc8f","darkslateblue":"#483d8b","darkslategray":"#2f4f4f","darkturquoise":"#00ced1",
-    	//"darkviolet":"#9400d3","deeppink":"#ff1493","deepskyblue":"#00bfff","dimgray":"#696969","dodgerblue":"#1e90ff",
+    	"darkblue":"#00008b",
+      "darkcyan":"#008b8b",
+      "darkgoldenrod":"#b8860b",
+      "darkgray":"#a9a9a9",
+      "darkgreen":"#006400",
+      "darkkhaki":"#bdb76b",
+      "darkmagenta":"#8b008b",
+      "darkolive":"#556b2f",
+    	"darkorange":"#ff8c00",
+      "darkorchid":"#9932cc",
+      "darkred":"#8b0000",
+      "darksalmon":"#e9967a",
+      "darkseagreen":"#8fbc8f",
+      //"darkslateblue":"#483d8b","darkslategray":"#2f4f4f",
+      "darkturquoise":"#00ced1",
+    	"darkviolet":"#9400d3",
+      //"deeppink":"#ff1493","deepskyblue":"#00bfff","dimgray":"#696969","dodgerblue":"#1e90ff",
     	"fire":"#b22222",
       //"floralwhite":"#fffaf0",
       "forest":"#228b22",
@@ -2227,16 +2249,29 @@ function colourNameToHex(colour) {
     	//"lavenderblush":"#fff0f5",
       "lawn":"#7cfc00",
       "lemon":"#fffacd",
-      //"lightblue":"#add8e6","lightcoral":"#f08080","lightcyan":"#e0ffff","lightgoldenrodyellow":"#fafad2",
-    	//"lightgrey":"#d3d3d3","lightgreen":"#90ee90","lightpink":"#ffb6c1","lightsalmon":"#ffa07a","lightseagreen":"#20b2aa","lightskyblue":"#87cefa","lightslategray":"#778899","lightsteelblue":"#b0c4de",
-    	//"lightyellow":"#ffffe0",
+      "lightblue":"#add8e6",
+      "lightcoral":"#f08080",
+      "lightcyan":"#e0ffff",
+      "lightgoldenrod":"#fafad2", //actually light  goldenrod yellow
+      "lightgray":"#d3d3d3",
+      "lightgrey":"#d3d3d3",
+      "lightgreen":"#90ee90",
+      "lightpink":"#ffb6c1",
+      "lightsalmon":"#ffa07a",
+      //"lightseagreen":"#20b2aa","lightskyblue":"#87cefa","lightslategray":"#778899","lightsteelblue":"#b0c4de",
+    	"lightyellow":"#ffffe0",
     	"lime":"#00ff00",
     	//"limegreen":"#32cd32",
     	"linen":"#faf0e6",
     	"magenta":"#ff00ff",
     	"maroon":"#800000",
-    	//"mediumaquamarine":"#66cdaa","mediumblue":"#0000cd","mediumorchid":"#ba55d3","mediumpurple":"#9370d8","mediumseagreen":"#3cb371","mediumslateblue":"#7b68ee",
-    	//"mediumspringgreen":"#00fa9a","mediumturquoise":"#48d1cc","mediumvioletred":"#c71585",
+    	"mediumaquamarine":"#66cdaa",
+      "mediumblue":"#0000cd",
+      "mediumorchid":"#ba55d3",
+      "mediumpurple":"#9370d8",
+      //"mediumseagreen":"#3cb371","mediumslateblue":"#7b68ee","mediumspringgreen":"#00fa9a",
+      "mediumturquoise":"#48d1cc",
+      "mediumviolet":"#c71585", //actually medium violet red
       "midnight":"#191970",
       "mint":"#f5fffa",
       //"mistyrose":"#ffe4e1",
@@ -2247,7 +2282,10 @@ function colourNameToHex(colour) {
     	"orange":"#ffa500",
     	//"orangered":"#ff4500",
     	"orchid":"#da70d6",
-    	//"palegoldenrod":"#eee8aa","palegreen":"#98fb98","paleturquoise":"#afeeee","palevioletred":"#d87093",
+    	"palegoldenrod":"#eee8aa",
+      "palegreen":"#98fb98",
+      "paleturquoise":"#afeeee",
+      "paleviolet":"#d87093", //actually pale violet red
       "papaya":"#ffefd5",
       "peach":"#ffdab9",
     	"pink":"#ffc0cb",
@@ -2278,9 +2316,9 @@ function colourNameToHex(colour) {
     	"yellow":"#ffff00"//,
     	//"yellowgreen":"#9acd32"
   	};
-    if (typeof colours[colour.toLowerCase()] != 'undefined')
+    if (typeof colours[colour.toLowerCase()] != 'undefined'){
         return colours[colour.toLowerCase()];
-
+    }
     return false;
 }
 //end code from 
@@ -2318,7 +2356,6 @@ function getRandomInt(min, max) {
 //////////////////////////////////////////////
 
 function initSaveLoadButtons() {
-
   document.getElementById('link').onclick = function() {
         this.href = 'data:text/plain;charset=utf-8,'
           + encodeURIComponent(saveLog);
@@ -2339,7 +2376,6 @@ function initSaveLoadButtons() {
     //
     uploadFile.style.visibility = 'hidden';
   });
-
 }
 
 function initConsole() {
@@ -2358,8 +2394,6 @@ function initConsole() {
     submitCommand(cli.value);
     cli.value='';
  });
-
-
 }
 function openConsole() {
   document.getElementById('submitButton').style.visibility = 'visible';
@@ -2380,7 +2414,6 @@ function submitCommandsFromFile(commands) {
     submitCommand(lines[line]);
   }
 }
-
 function submitCommand(command) {
   //notify user 
   notify(command);
@@ -2674,7 +2707,7 @@ function notify(notification) {
   setTimeout(function(){
     document.getElementById("notify").innerHTML="";
   },2500);
-  //also add command to save log so users can save their creations
+  //also add relevant commands to save log so users can save their creations
   if(notification != 'save' && notification != 'load' 
     && notification != 'pause' && notification != 'unpause'
     && notification != 'open console' && notification != 'close console') {
@@ -2683,107 +2716,8 @@ function notify(notification) {
 }
 //test method
 function testEverything() {
-/*  	  	scene.add(createSphere(parseParams('transparent true x -150 z 100 size 15')));
-  	  	scene.add(createCylinder(parseParams('transparent true x 250 z 10 size 15')));
-  	  	scene.add(createTorusKnot(parseParams('transparent true z -500 size 115')));
-  	  	scene.add(createRing(parseParams('transparent true x 150 z -100 size 15')));
-  	  	*/
-            //setDefaultGlobalParams('spin x');
-       //scene.add(createCone(parseParams('size 60 move x -350 and 350 move y 0 and 350 move z -175 and 175 y 177 color maroon ambient turquoise')));
-       scene.add(createCone(parseParams('spin x size 60 move z 350 and -350 move x 500 and -350 move y 300 and 340 color maroon ambient turquoise')));
-        scene.add(createCube(parseParams('move z 0 and 50 move x -300 and 300 move y 450 and 375')));
-        scene.add(createBubble(parseParams('y 200 x -150')));
-        //scene.add(createTorusKnot(parseParams('move z -350 and 350 move y 0 and 350 color chartreuse ambient magenta size 15 width 7')));
-
-
-  var testknots = createManyTorusKnots(
-    parseParams('spin y amount 4 size 34 and 206 move z -600 and 600 width 11 x -1350 and 1300 texture cloud'));
-        
-        for(var i = 0; i < testknots.length; i++) {
-          scene.add(testknots[i]);          
-        }
-                    setDefaultGlobalParams('transparent true');
-
-  var testspheres2 = createManyCubes(
-    parseParams('amount 5 x -450 and 350 y 150 move z -200 and 300 size 100 color magenta ambient green'));
-        
-        for(var i = 0; i < testspheres2.length; i++) {
-          scene.add(testspheres2[i]);         
-        }
-
-  var testspheres22 = createManyCubes(
-    parseParams('amount 5 x -350 and 450 z 200 size 100 color blue ambient pink'));
-        
-        for(var i = 0; i < testspheres22.length; i++) {
-          scene.add(testspheres22[i]);         
-        }
-                    setDefaultGlobalParams('transparent false');
-                    //setDefaultGlobalParams('spin y spin z');
-
-  var testspheres2 = createManyCones(
-    parseParams('amount 5 x -450 and 350 y 400 z 150 size 50 color magenta ambient chartreuse'));
-        
-        for(var i = 0; i < testspheres2.length; i++) {
-          scene.add(testspheres2[i]);         
-        }
-
-  var testspheres22 = createManyCones(
-    parseParams('amount 5 x -350 and 450 y 350 z 150 size 50 color aqua ambient pink'));
-        
-        for(var i = 0; i < testspheres22.length; i++) {
-          scene.add(testspheres22[i]);         
-        }
-
-            setDefaultGlobalParams('size 55 and 10 ');
-
-  var testspheres2 = createManyCubes(
-    parseParams('spin z color forest transparent true amount 5 x 220 and 200 y 100 and 0 z -170 and 170'));
-        
-        for(var i = 0; i < testspheres2.length; i++) {
-          scene.add(testspheres2[i]);         
-        }
-
-  var testspheres = createManyCones(
-    parseParams('color magenta transparent true amount 5 x - 220 and - 200 y 100 and 0 z -170 and 170'));
-        
-        for(var i = 0; i < testspheres.length; i++) {
-          scene.add(testspheres[i]);          
-        }
-
-        setDefaultGlobalParams('texture random transparent true size 55');
-  
-  var testrings = createManyWalls(
-    parseParams('amount 2 size 1000 and 1000 x -500 and 500'));
-        
-        for(var i = 0; i < testrings.length; i++) {
-          scene.add(testrings[i]);          
-        }
-        
-        setDefaultGlobalParams('transparent false z - 600 color chartreuse ambient red amount 6 size 150 and 15 width 11');
-
-                setDefaultGlobalParams('color forest');
-
-  var testknotsc = createManyCylinders(
-  	parseParams('spin x texture cloud z -77 and 41 x -50 and 50'));
-  	  	
-  	  	for(var i = 0; i < testknotsc.length; i++) {
-  	  		scene.add(testknotsc[i]);  	  		
-  	  	}
-                setDefaultGlobalParams('color forest');
-        setDefaultGlobalParams('size 505 and 500');
-
-
-        scene.add(createFloor({y: -500}));
-        console.log('def y: '+defaultGlobalParams['y']);
-        //TODO: figure out why y needs to be set here!
-        scene.add(createBackWall(parseParams('y 0 size 1000 texture checkers')));
-
-        
-initDefaultGlobalParams();
-        scene.add(createFloor({y: -50}));
-        scene.add(createFloor({y: 500}));
-
-
+  var testcommands = 'create back wall texture water\ncreate floor\ncreate cube texture chrome move x -500 and 500 move y 50 and 300 move z slow -250 and 250 spin z\ncreate cube texture chrome move x fast -500 and 500 move y 50 and 300 move z -250 and 0 spin x fast spin y';
+  submitCommandsFromFile(testcommands);
 }
 
 </script>
