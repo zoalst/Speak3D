@@ -1358,19 +1358,39 @@ function createGeometry(params, geometry, many) {
       }
     }
     else {
-      for(var i = 0; i < amount; i++) {
-        var mesh = new THREE.Mesh(geom, geometryMaterial ); 
-        mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-        meshs[i] = mesh;
-        if(spin == true) {
-          initSpinMesh(mesh,spinx,spiny,spinz);
+      if(material != undefined) {
+        if(material == 'bubble') {
+          bubbles = true;
+          for(var i = 0; i < amount; i++) {
+            bubbleMesh = new THREE.Mesh(geom, bubbleMaterial ); 
+            bubbleMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+            meshs[i] = bubbleMesh;
+            if(spin == true) {
+              initSpinMesh(bubbleMesh,spinx,spiny,spinz);
+            }
+            if(move == true) {
+              initMovingMesh(bubbleMesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
+            }
+            addToMeshs(bubbleMesh);
+          }          
+          return meshs;
         }
-        if(move == true) {
-          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
-        }
-        addToMeshs(mesh);
       }
-      return meshs;
+      else{
+        for(var i = 0; i < amount; i++) {
+          var mesh = new THREE.Mesh(geom, geometryMaterial ); 
+          mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+          meshs[i] = mesh;
+          if(spin == true) {
+            initSpinMesh(mesh,spinx,spiny,spinz);
+          }
+          if(move == true) {
+            initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
+          }
+          addToMeshs(mesh);
+        }
+        return meshs;
+      }
     }
   }
   //else we are creating many geometries of different sizes
