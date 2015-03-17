@@ -90,7 +90,7 @@
 <br />
   - 'create wall *parameters*'
 <br />
-  - 'create bubble *parameters*' or 'create bubble cube *parameters*' or 'create bubble knot *parameters*'
+  - 'create bubble *parameters*'
 <br />
   - 'create many cubes/spheres/rings/knots/cylinders/floors/walls *parameters*' 
 <br />
@@ -110,6 +110,8 @@
   - 'texture' followed by a texture name
 <br />
   - 'tranparent' followed by 'true' or 'false'
+<br />
+  - 'material' followed by 'bubble'
 <br />
   - 'spin' followed by 'x', 'y', or 'z'
 <br />
@@ -526,24 +528,6 @@ function init() {
   	  	scene.add(createIcosahedron(pp['x'],pp['y'],pp['z'],
   	  		pp['size'],pp['color'],pp['transparent']));
   	  },*/
-      'create bubble cube': function() {
-        notify('create bubble cube');
-        scene.add(createBubbleCube(defaultGlobalParams));
-      },
-      'create bubble cube *params': function(params) {
-        notify('create bubble cube '+params);
-        var parsedParams = parseParams(params);
-        scene.add(createBubbleCube(parsedParams));
-      },
-      'create bubble not': function() {
-        notify('create bubble knot');
-        scene.add(createBubbleKnot(defaultGlobalParams));
-      },
-      'create bubble not *params': function(params) {
-        notify('create bubble knot '+params);
-        var parsedParams = parseParams(params);
-        scene.add(createBubbleKnot(parsedParams));
-      },
       'create bubble': function() {
         notify('create bubble');
         scene.add(createBubble(defaultGlobalParams));
@@ -923,7 +907,7 @@ function render() {
     spinParams = spinningParams[i];
     spinningMeshs[i].rotation.x +=spinParams['x'];
     spinningMeshs[i].rotation.y +=spinParams['y'];
-    spinningMeshs[i].rotation.z +=spinParams['z'];;
+    spinningMeshs[i].rotation.z +=spinParams['z'];
   }
 
   //movement/oscillations
@@ -1073,16 +1057,6 @@ function createCone(params) {
 function createBubble(params) {
   bubbles = true;
   return createGeometry(params,'Bubble');
-}
-
-function createBubbleCube(params) {
-  bubbles = true;
-  return createGeometry(params,'BubbleCube');
-}
-
-function createBubbleKnot(params) {
-  bubbles = true;
-  return createGeometry(params,'BubbleKnot'); 
 }
 
 /*function createOctahedron(x,y,z,size,color,transparent) {
@@ -1237,6 +1211,7 @@ function createGeometry(params, geometry, many) {
   var movez = resolvedParams['movez'];
   var movezspeed = resolvedParams['movezspeed'];
   var endmovez = resolvedParams['endmovez'];
+  var material = resolvedParams['material'];
 
   //first check if there is a default texture
   if(texture == undefined) {
@@ -1254,7 +1229,7 @@ function createGeometry(params, geometry, many) {
         ambient = defaultGlobalParams['ambient'];
       }
     }
-    var material = new THREE.MeshPhongMaterial( { 
+    var geometryMaterial = new THREE.MeshPhongMaterial( { 
       color: color, 
       ambient: ambient,  
       transparent: btrans, 
@@ -1286,7 +1261,7 @@ function createGeometry(params, geometry, many) {
     else {
       wallTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
     }
-    var material = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide, transparent: btrans } );
+    var geometryMaterial = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide, transparent: btrans } );
   }
 
   if(many == undefined) {
@@ -1338,24 +1313,53 @@ function createGeometry(params, geometry, many) {
         var geom = new THREE.CylinderGeometry(0,width,size);          
       }
     }
+    //so user can still call 'create bubble' for a bubble sphere,
+    //otherwise use material param set to bubble
+    else if(geometry == 'Bubble') {
+      var geom = new THREE.SphereGeometry(size);
+      bubbleMesh = new THREE.Mesh(geom, bubbleMaterial);
+      bubbleMesh.position.set( x, y, z );
+      addToMeshs(bubbleMesh);
+      return bubbleMesh;
+    }
     if(!many) {
-      var mesh = new THREE.Mesh(geom, material ); 
-      mesh.position.set( x, y, z );
-      if(spin == true) {
-        initSpinMesh(mesh,spinx,spiny,spinz);
-      }
-      if(move == true) {
-        initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
-      }
-      addToMeshs(mesh);//increases numberOfMeshs by 1
+      if(material != undefined) {
+        if(material == 'bubble') {
+          bubbles = true;
+          bubbleMesh = new THREE.Mesh(geom, bubbleMaterial ); 
+          bubbleMesh.position.set( x, y, z );
+          if(spin == true) {
+            initSpinMesh(bubbleMesh,spinx,spiny,spinz);
+          }
+          if(move == true) {
+            initMovingMesh(bubbleMesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
+          }
+          addToMeshs(bubbleMesh);//increases numberOfMeshs by 1
       /*if(collidable) {//TODO
         solids.push(mesh);
       }*/
-      return mesh;
+          return bubbleMesh;
+        }
+      } 
+      else {
+        var mesh = new THREE.Mesh(geom, geometryMaterial ); 
+        mesh.position.set( x, y, z );
+        if(spin == true) {
+          initSpinMesh(mesh,spinx,spiny,spinz);
+        }
+        if(move == true) {
+          initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
+        }
+        addToMeshs(mesh);//increases numberOfMeshs by 1
+      /*if(collidable) {//TODO
+        solids.push(mesh);
+      }*/
+        return mesh;
+      }
     }
     else {
       for(var i = 0; i < amount; i++) {
-        var mesh = new THREE.Mesh(geom, material ); 
+        var mesh = new THREE.Mesh(geom, geometryMaterial ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
         meshs[i] = mesh;
         if(spin == true) {
@@ -1377,7 +1381,7 @@ function createGeometry(params, geometry, many) {
       for(var i = 0; i < amount; i++) {
         newSize = +size+i*sizeIncrement;
         var geom = new THREE.CubeGeometry(newSize,newSize,newSize);
-        var mesh = new THREE.Mesh(geom, material ); 
+        var mesh = new THREE.Mesh(geom, geometryMaterial ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
         meshs[i] = mesh;
         if(spin == true) {
@@ -1393,7 +1397,7 @@ function createGeometry(params, geometry, many) {
       for(var i = 0; i < amount; i++) {
         newSize = +size+i*sizeIncrement;
         var geom = new THREE.SphereGeometry(newSize);
-        var mesh = new THREE.Mesh(geom, material ); 
+        var mesh = new THREE.Mesh(geom, geometryMaterial ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
         meshs[i] = mesh;
         if(spin == true) {
@@ -1414,7 +1418,7 @@ function createGeometry(params, geometry, many) {
         else {
           var geom = new THREE.CylinderGeometry(width,width,newSize);          
         }
-        var mesh = new THREE.Mesh(geom, material ); 
+        var mesh = new THREE.Mesh(geom, geometryMaterial ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
         meshs[i] = mesh;
         if(spin == true) {
@@ -1435,7 +1439,7 @@ function createGeometry(params, geometry, many) {
         else {
           var geom = new THREE.RingGeometry((newSize-width),newSize);          
         }
-        var mesh = new THREE.Mesh(geom, material ); 
+        var mesh = new THREE.Mesh(geom, geometryMaterial ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
         meshs[i] = mesh;
         if(spin == true) {
@@ -1456,7 +1460,7 @@ function createGeometry(params, geometry, many) {
         else {
           var geom = new THREE.TorusKnotGeometry(newSize, width);      
         }
-        var mesh = new THREE.Mesh(geom, material ); 
+        var mesh = new THREE.Mesh(geom, geometryMaterial ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
         meshs[i] = mesh;
         if(spin == true) {
@@ -1477,7 +1481,7 @@ function createGeometry(params, geometry, many) {
         else {
           var geom = new THREE.CylinderGeometry(0,width,newSize);      
         }
-        var mesh = new THREE.Mesh(geom, material ); 
+        var mesh = new THREE.Mesh(geom, geometryMaterial ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
         meshs[i] = mesh;
         if(spin == true) {
@@ -1956,6 +1960,7 @@ function resolveParams(params) {
   var movez = params['movez'];
   var movezspeed = params['movezspeed'];
   var endmovez = params['endmovez'];
+  var material = params['material'];//bubble, mirror, etc
 
   if(x == undefined) {
     x = defaultGlobalParams['x'];
@@ -2068,6 +2073,9 @@ function resolveParams(params) {
   if(height == undefined) {
     height = defaultGlobalParams['height'];
   }
+  if(material == undefined) {
+    material = defaultGlobalParams['material'];
+  }
   resolvedParams["x"] = x;
   resolvedParams["y"] = y;
   resolvedParams["z"] = z;
@@ -2094,6 +2102,7 @@ function resolveParams(params) {
   resolvedParams["movez"] = movez;
   resolvedParams["movezspeed"] = movezspeed;
   resolvedParams["endmovez"] = endmovez;
+  resolvedParams["material"] = material;
 
   return resolvedParams;
 }
@@ -2482,28 +2491,6 @@ function submitCommand(command) {
       }    
     }
   }
-  else if(command.indexOf('create bubble cube') === 0) {
-    var len = 'create bubble cube'.length;
-    if(command.length > len) {
-      var params = command.substring(len+1);
-      var parsedParams = parseParams(params);
-      scene.add(createBubbleCube(parsedParams));    
-    }
-    else {
-      scene.add(createBubbleCube(defaultGlobalParams));
-    }
-  } 
-  else if(command.indexOf('create bubble knot') === 0) {
-    var len = 'create bubble knot'.length;
-    if(command.length > len) {
-      var params = command.substring(len+1);
-      var parsedParams = parseParams(params);
-      scene.add(createBubbleKnot(parsedParams));    
-    }
-    else {
-      scene.add(createBubbleKnot(defaultGlobalParams));
-    }
-  } 
   else if(command.indexOf('create bubble') === 0) {
     var len = 'create bubble'.length;
     if(command.length > len) {

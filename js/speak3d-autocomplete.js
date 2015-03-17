@@ -22,8 +22,6 @@ $(function(){
     'create many floors',
     'create many walls',
     'create bubble',
-    'create bubble cube',
-    'create bubble knot',
     'test',
     'gravity on',
     'gravity off'
