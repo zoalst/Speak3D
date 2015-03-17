@@ -182,6 +182,8 @@ var textureRepeatAmount = 100;
 var textures = getTextures();
 var bubbleMaterial;
 var bubbles = false;
+var mirrorMaterial;
+var mirrors = false;
 
 var spinningMeshs = [];
 var spinningParams = [];
@@ -291,6 +293,7 @@ function init() {
   initSaveLoadButtons();
 	initDefaultGlobalParams();
   initBubble();
+  initMirror();
   hidePauseScreen();
   showPauseScreen();
 
@@ -536,6 +539,15 @@ function init() {
         notify('create bubble '+params);
         var parsedParams = parseParams(params);
         scene.add(createBubble(parsedParams));
+      },
+      'create mirror': function() {
+        notify('create mirror');
+        scene.add(createMirror(defaultGlobalParams));
+      },
+      'create mirror *params': function(params) {
+        notify('create mirror '+params);
+        var parsedParams = parseParams(params);
+        scene.add(createMirror(parsedParams));
       },
  			'create floor': function() {
         notify('create floor');
@@ -901,6 +913,13 @@ function render() {
     bubbleMesh.visible = true;
   }
 
+  //mirror
+  if(mirrors) {
+    mirrorMesh.visible = false;
+    mirrorCamera.updateCubeMap( renderer, scene );
+    mirrorMesh.visible = true;
+  }
+
   //spin
   var spinParams;
   for (var i = 0; i < spinningMeshs.length; i++) {
@@ -1059,6 +1078,10 @@ function createBubble(params) {
   return createGeometry(params,'Bubble');
 }
 
+function createMirror(params) {
+  mirrors = true;
+  return createGeometry(params,'Mirror');
+}
 /*function createOctahedron(x,y,z,size,color,transparent) {
 
 }
@@ -1096,7 +1119,12 @@ function createFloorOrWall(params, floorOrWall) {
     x = 0;
   }
   if(y == undefined){
-    y = 500;
+    if(floorOrWall == 'Floor') {
+      y = 0;
+    }
+    else {
+      y = 500;
+    }
   }
   if(size == undefined){
     size = 1000;
@@ -1179,7 +1207,6 @@ function createManyCones(params) {
   return createGeometry(params, 'ConeGeometry',true);
 }
 
-//TODO bubbles
 function createGeometry(params, geometry, many) {
   var color = params['color'];
   var ambient = params['ambient'];
@@ -1322,8 +1349,16 @@ function createGeometry(params, geometry, many) {
       addToMeshs(bubbleMesh);
       return bubbleMesh;
     }
+    else if(geometry == 'Mirror') {
+      var geom = new THREE.CubeGeometry(size*2,size,size/8);
+      mirrorMesh = new THREE.Mesh(geom, mirrorMaterial);
+      mirrorMesh.position.set( x, y, z );
+      addToMeshs(mirrorMesh);
+      return mirrorMesh;
+    }
     if(!many) {
       if(material != undefined) {
+        //TODO bubble/refactcamera/position
         if(material == 'bubble') {
           bubbles = true;
           bubbleMesh = new THREE.Mesh(geom, bubbleMaterial ); 
@@ -1679,6 +1714,12 @@ function initBubble() {
     vertexShader:   fShader.vertexShader,
     fragmentShader: fShader.fragmentShader
   }   );
+}
+
+function initMirror() {
+  this.mirrorCamera = new THREE.CubeCamera( 0.1, 5000, 512 );
+  scene.add( mirrorCamera );
+  mirrorMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorCamera.renderTarget } );
 }
 
 function initSpinMesh(mesh,spinx,spiny,spinz) {
@@ -2520,6 +2561,17 @@ function submitCommand(command) {
     }
     else {
       scene.add(createBubble(defaultGlobalParams));
+    }
+  } 
+  else if(command.indexOf('create mirror') === 0) {
+    var len = 'create mirror'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      var parsedParams = parseParams(params);
+      scene.add(createMirror(parsedParams));    
+    }
+    else {
+      scene.add(createMirror(defaultGlobalParams));
     }
   } 
   else if(command.indexOf('create floor') === 0) {

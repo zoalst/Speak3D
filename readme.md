@@ -149,14 +149,15 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
 
-  - export function so users can save whatever they create
   - add dat.GUI, for default params
+  - ability to reset/clear default params
   - GUI for user uploaded textures and models
   - improve cli's auto-complete
   - improve cli w/ list of recently submitted commands
   - ability to manipulate & remove existing geometries, incl. voice command to stop all motion
   - enhance start/pause screen
-  - bubble as a texture option instead of seperate geometry
+  - mirror material
+  - export function, add option that generates three js code
   - add random as an option, ex: color random, size & coordinates also
   - esc from pointer lock when mouse is in motion can cause camera to be angled somewhere else
   - ctrl+z is buggy
