@@ -5,7 +5,7 @@ Created using [three.js](http://threejs.org) and [annyang.](https://www.talater.
 Built off of the Text3D example in Lee Stemkoski's
 [Three.js examples](http://stemkoski.github.io/Three.js/index.html)
 
-[Try the Demo on Google Drive](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (only works with Chrome)
+[Try the Demo on Google Drive](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (speech recognition only works with Chrome)
 
 ## List of Commands & Examples
 
@@ -90,6 +90,7 @@ You'll need [nodejs](http://nodejs.org/) installed
   - add dat.GUI, for default params
   - ability to reset/clear default params
   - GUI for user uploaded textures and models
+  - add parameters for dimensions, rotation, etc.
   - improve cli's auto-complete
   - improve cli w/ list of recently submitted commands
   - ability to manipulate & remove existing geometries, incl. voice command to stop all motion
@@ -103,12 +104,10 @@ You'll need [nodejs](http://nodejs.org/) installed
   - create self command, for third person view
   - when creating many geometries w/ one command, morph them into one geometry (maybe when amount >= a certian amount)
   - better controls to navigate in 3D space
-  - add parameters for dimensions, rotation, etc.
   - problems with people talking fast
   - more geometries
   - more colors and textures
   - ability to set default parameters for specific geometries 
-  - enhance spin with different speeds
   - lights, fog, skyBox, etc.
   - built-in models and user uploaded models
   - better debugging

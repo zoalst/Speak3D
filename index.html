@@ -615,6 +615,15 @@ function init() {
         //pass defaultGlobalParams as second arg to set the defaultGlobalParams
         parseParams(params, defaultGlobalParams);
   	  },
+      'reset default': function() {
+        notify('reset default');
+        //reset all default params
+        resetDefaultGlobalParams();
+      },
+      'reset default *params': function(params) {
+        notify('reset default '+params);
+        resetDefaultGlobalParams(params);
+      },
   	  'undo': function() {
         notify('undo');
   	  	undo();
@@ -1048,36 +1057,28 @@ function create3DText(text) {//,x,y,z,size) {
 	textMesh.rotation.x = -Math.PI / 4;
 	return textMesh;
 }
-
 function createSphere(params) {
 	return createGeometry(params,'SphereGeometry');
 }
-
 function createCube(params) {
 	return createGeometry(params,'CubeGeometry');
 }
-
 function createRing(params) {
 	return createGeometry(params,'RingGeometry');
 }
-
 function createTorusKnot(params) {
 	return createGeometry(params,'TorusKnotGeometry');
 }
-
 function createCylinder(params) {
 	return createGeometry(params,'CylinderGeometry');
 }
-
 function createCone(params) {
   return createGeometry(params,'ConeGeometry');
 }
-
 function createBubble(params) {
   bubbles = true;
   return createGeometry(params,'Bubble');
 }
-
 function createMirror(params) {
   mirrors = true;
   return createGeometry(params,'Mirror');
@@ -1085,27 +1086,21 @@ function createMirror(params) {
 /*function createOctahedron(x,y,z,size,color,transparent) {
 
 }
-
 function createTetrahedron(x,y,z,size,color,transparent) {
 
 }
-
 function createDodecahedron(x,y,z,size,color,transparent) {
 
 }
-
 function createIcosahedron(x,y,z,size,color,transparent) {
 
 }*/
-
 function createFloor(params) {
   return createFloorOrWall(params, 'Floor');
 }
-
 function createWall(params) {
 	return createFloorOrWall(params, 'Wall');
 }
-
 function createBackWall(params) {
   return createFloorOrWall(params, 'BackWall');
 }
@@ -1210,13 +1205,13 @@ function createManyCones(params) {
 function createGeometry(params, geometry, many) {
   var color = params['color'];
   var ambient = params['ambient'];
-  var texture = params['texture'];
-  //color/ambient/texture not yet resolved
+  //color/ambient not yet resolved
   var resolvedParams = resolveParams(params);
   var x = resolvedParams['x'];
   var y = resolvedParams['y'];
   var z = resolvedParams['z'];
   var size = resolvedParams['size'];
+  var texture = resolvedParams['texture'];
   var btrans = resolvedParams['btrans'];
   var amount = resolvedParams['amount'];
   var endx = resolvedParams['endx'];
@@ -1240,10 +1235,6 @@ function createGeometry(params, geometry, many) {
   var endmovez = resolvedParams['endmovez'];
   var material = resolvedParams['material'];
 
-  //first check if there is a default texture
-  if(texture == undefined) {
-    texture = defaultGlobalParams['texture'];
-  }
   if(texture == undefined) {
     if(color == undefined) {
       color = defaultGlobalParams['color'];
@@ -1868,6 +1859,27 @@ function parseParams(params, parsedParams) {
         else {
           parsedParams['end'+lastParamType] = paramsArray[i+1];     
         }
+        //move x -50 until 500 fast
+        var speed;
+        var moveSpeed;
+        if(paramsArray[i+2] != undefined) {
+          speed = paramsArray[i+2].toLowerCase();
+          if(speed == 'slow') {
+            moveSpeed = globalMoveSlow;
+            i++;
+          }
+          else if(speed == 'fast') {
+            moveSpeed = globalMoveFast;
+            i++;
+          } 
+          else if(speed == 'medium') {
+            moveSpeed = globalMoveMedium;
+            i++;
+          } 
+          else {
+            moveSpeed = globalMoveSlow;
+          }
+        }
       }
       lastParamType = '';
     }
@@ -1875,6 +1887,7 @@ function parseParams(params, parsedParams) {
     else if(currParam == 'move' || currParam == 'mood') {
       parsedParams['move'] = true;
       var dir = paramsArray[i+1].toLowerCase();
+      //move x fast -50 until 500
       var speed;
       var moveSpeed;
       if(paramsArray[i+2] != undefined) {
@@ -1996,6 +2009,19 @@ function initDefaultGlobalParams() {
   defaultGlobalParams['transparent'] = false;
   defaultGlobalParams['amount'] = 3;
 }
+function resetDefaultGlobalParams(params) {
+  if(params == undefined) {
+    //reset all params
+    initDefaultGlobalParams();
+  }
+  else {
+    ///TODO reset given params
+    var paramsArray = params.split(' ');
+    for(var i = 0; i < paramsArray.length; i++) {
+      //defaultGlobalParams[]
+    }
+  }
+}
 
 //resolves params except color/ambient/texture
 function resolveParams(params) {
@@ -2005,8 +2031,8 @@ function resolveParams(params) {
   var z = params['z'];
   var size = params['size'];
   /*var color = params['color'];
-  var ambient = params['ambient'];
-  var texture = params['texture'];*/
+  var ambient = params['ambient'];*/
+  var texture = params['texture'];
   var transparent = params['transparent'];
   var amount = params['amount'];
   var endx = params['endx'];
@@ -2042,6 +2068,9 @@ function resolveParams(params) {
   }
   if(size == undefined) {
     size = defaultGlobalParams['size'];
+  }
+  if(texture == undefined) {
+    texture = defaultGlobalParams['texture'];
   }
   var btrans;
   if(transparent == undefined) {
@@ -2151,6 +2180,7 @@ function resolveParams(params) {
   resolvedParams["btrans"] = btrans;
   resolvedParams["amount"] = amount;
   resolvedParams["size"] = size;
+  resolvedParams["texture"] = texture;
   resolvedParams["endx"] = endx;
   resolvedParams["endy"] = endy;
   resolvedParams["endz"] = endz;
@@ -2687,6 +2717,16 @@ function submitCommand(command) {
       var params = command.substring(len+1);
       //pass defaultGlobalParams as second arg to set the defaultGlobalParams
       parseParams(params, defaultGlobalParams);
+    }
+  }
+  else if(command.indexOf('reset default') === 0) {
+    var len = 'reset default'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      //TODO
+    }
+    else {
+      resetDefaultGlobalParams();
     }
   }
   else if(command.indexOf('test') === 0 ) {
