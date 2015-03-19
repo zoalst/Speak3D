@@ -1192,12 +1192,14 @@ function createGeometry(params, geometry, many) {
     if(wallTexture == undefined) {
           wallTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );      
     }
-    wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
-    if(size > 1000) {
-      wallTexture.repeat.set( 10, 10 );
-    }
-    else {
-      wallTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
+    if(texture != 'hearts') {
+      wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping; 
+      if(size > 1000) {
+        wallTexture.repeat.set( 10, 10 );
+      }
+      else {
+        wallTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
+      }
     }
     var geometryMaterial = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide, transparent: btrans } );
   }
@@ -1608,12 +1610,15 @@ function createFloorOrWall(params,floorOrWall,many) {
   else {
     var planeTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[texture] );    
   }
-  planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping; 
-  if(size > 1000) {
-    planeTexture.repeat.set( 10, 10 );
-  }
-  else {
-    planeTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
+  //problem with repeat hearts
+  if(texture != 'hearts') {
+    planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping; 
+    if(size > 1000) {
+      planeTexture.repeat.set( 10, 10 );
+    }
+    else {
+      planeTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
+    }
   }
   var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide, transparent: btrans } );
   if(many == undefined) {
@@ -2366,7 +2371,7 @@ function colourNameToHex(colour) {
 
 //to convert given texture name to texture file
 function getTextures() {
-  texturesLength = 16;
+  texturesLength = 23;
   return {
       "checkers":"checkerboard.jpg",
       "cloud":"cloud.png",
@@ -2383,7 +2388,14 @@ function getTextures() {
       "snow":"snow-512.jpg",
       "sand":"sand-512.jpg",
       "grass":"grass-512.jpg",
-      "water":"water512.jpg"
+      "water":"water512.jpg",
+      "brick":"4-old-brick-background-sml.jpg",
+      "paper":"5-blue-paper-background-lrg.jpg",
+      "chipped":"CLP_chipped_paint_wall.jpg",
+      "lava":"lava.jpg",
+      "wood":"wood-texture3.jpg",
+      "rope":"Rope-01.png",
+      "hearts":"transparent_red_hearts_tile_by_fantasystock-d37zzib.png"
   };
 }
 

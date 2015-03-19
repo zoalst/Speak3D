@@ -68,8 +68,10 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## List of Texture Names
   
   -alloy
+  -brick
   -carving
   -checkers
+  -chipped
   -chrome
   -cloud
   -crate
@@ -77,12 +79,17 @@ You'll need [nodejs](http://nodejs.org/) installed
   -electric
   -glow
   -grass
+  -hearts
+  -lava
   -moon
+  -paper
   -rock
   -rocky
+  -rope
   -sand
   -snow
   -water
+  -wood
 
 ## To Do
 
