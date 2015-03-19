@@ -199,7 +199,8 @@ var globalMoveFast = 5;
 var globalMoveMedium = 2;
 
 var user;
-var gravity = new THREE.Vector3(0,-4,0);//TODO user change gravity
+var gravAmount = -4;
+var gravity = new THREE.Vector3(0,gravAmount,0);//TODO user change gravity
 var solids = [];
 var gravAndColl = false;
 //var useOtherControls = true;
@@ -847,7 +848,6 @@ function update() {
   
     user.translateY( user.velocity.y );
 
-    //TODO have collision/gravity(aka real game controls) be turned on/off by user
     if(gravAndColl) {
       // collision detection!
       if ( collision( solids ) )
@@ -1283,6 +1283,19 @@ function createGeometry(params, geometry, many) {
           addToMeshs(bubbleMesh,solid);//increases numberOfMeshs by 1
           return bubbleMesh;
         }
+        else if(material == 'mirror') {
+          mirrors = true;
+          mirrorMesh = new THREE.Mesh(geom, mirrorMaterial ); 
+          mirrorMesh.position.set( x, y, z );
+          if(spin == true) {
+            initSpinMesh(mirrorMesh,spinx,spiny,spinz);
+          }
+          if(move == true) {
+            initMovingMesh(mirrorMesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
+          }
+          addToMeshs(mirrorMesh,solid);//increases numberOfMeshs by 1
+          return mirrorMesh;
+        }
       } 
       else {
         var mesh = new THREE.Mesh(geom, geometryMaterial ); 
@@ -1312,6 +1325,22 @@ function createGeometry(params, geometry, many) {
               initMovingMesh(bubbleMesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
             }
             addToMeshs(bubbleMesh,solid);
+          }          
+          return meshs;
+        }
+        if(material == 'mirror') {
+          mirrors = true;
+          for(var i = 0; i < amount; i++) {
+            mirrorMesh = new THREE.Mesh(geom, mirrorMaterial ); 
+            mirrorMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+            meshs[i] = mirrorMesh;
+            if(spin == true) {
+              initSpinMesh(mirrorMesh,spinx,spiny,spinz);
+            }
+            if(move == true) {
+              initMovingMesh(mirrorMesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
+            }
+            addToMeshs(mirrorMesh,solid);
           }          
           return meshs;
         }
@@ -1602,10 +1631,8 @@ function createFloorOrWall(params,floorOrWall,many) {
       mesh.rotation.y = Math.PI / 2;
     }
     else if(floorOrWall == 'BackWall') {
-     // mesh.position.z = -500;
     }
     addToMeshs(mesh,true);
-    ///solids.push(mesh);
     return mesh;
   }
   else{
@@ -1627,7 +1654,6 @@ function createFloorOrWall(params,floorOrWall,many) {
         }
         meshs[i] = mesh;
         addToMeshs(mesh,true);
-        //solids.push(mesh);
       }
     }
     else {
@@ -1646,7 +1672,6 @@ function createFloorOrWall(params,floorOrWall,many) {
         }
         meshs[i] = mesh;
         addToMeshs(mesh,true);
-        //solids.push(mesh);
       }
     }
     return meshs;
