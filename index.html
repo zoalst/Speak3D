@@ -1095,87 +1095,6 @@ function createDodecahedron(x,y,z,size,color,transparent) {
 function createIcosahedron(x,y,z,size,color,transparent) {
 
 }*/
-function createFloor(params) {
-  return createFloorOrWall(params, 'Floor');
-}
-function createWall(params) {
-	return createFloorOrWall(params, 'Wall');
-}
-function createBackWall(params) {
-  return createFloorOrWall(params, 'BackWall');
-}
-function createFloorOrWall(params, floorOrWall) {
-  var x = params['x'];
-  var y = params['y'];
-  var size = params['size'];
-  var transparent = params['transparent'];
-  var texture = params['texture'];
-  if(x == undefined){
-    x = 0;
-  }
-  if(y == undefined){
-    if(floorOrWall == 'Floor') {
-      y = 0;
-    }
-    else {
-      y = 500;
-    }
-  }
-  if(size == undefined){
-    size = 1000;
-  }
-  var btrans;
-  if(transparent == undefined) {
-    btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
-  }
-  else {
-    btrans = convertWordToBoolean(transparent);
-  }
-  if(texture == undefined) {
-    texture = defaultGlobalParams['texture'];
-  }
-  if(texture == undefined) {
-    var planeTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
-  }
-  else if(texture == 'random') {
-      var rand = getRandomInt(0,texturesLength-1);
-      var i = 0;
-      for(var t in textures) {
-        if(rand == i) {
-          var planeTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[t] );
-        }
-        i++;
-      }    
-  }
-  else {
-    var planeTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[texture] );    
-  }
-  planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping; 
-  if(size > 1000) {
-    planeTexture.repeat.set( 10, 10 );
-  }
-  else {
-    planeTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
-  }
-  var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide, transparent: btrans } );
-  var geometry = new THREE.PlaneGeometry(size, size, 10, 10);
-  var mesh = new THREE.Mesh(geometry, material);
-  mesh.position.x = x;
-  mesh.position.y = y;
-  if(floorOrWall == 'Floor') {
-    mesh.rotation.x = Math.PI / 2;
-  }
-  else if(floorOrWall == 'Wall') {
-    mesh.rotation.y = Math.PI / 2;
-  }
-  //TODO z param for backwall
-  else if(floorOrWall == 'BackWall') {
-    mesh.position.z = -500;
-  }
-  addToMeshs(mesh);
-  solids.push(mesh);
-  return mesh;
-}
 
 //functions for creating mulitple geometries of the same type with a single command
 function createManySpheres(params) {
@@ -1234,6 +1153,7 @@ function createGeometry(params, geometry, many) {
   var movezspeed = resolvedParams['movezspeed'];
   var endmovez = resolvedParams['endmovez'];
   var material = resolvedParams['material'];
+  var solid = resolvedParams['solid'];
 
   if(texture == undefined) {
     if(color == undefined) {
@@ -1337,14 +1257,14 @@ function createGeometry(params, geometry, many) {
       var geom = new THREE.SphereGeometry(size);
       bubbleMesh = new THREE.Mesh(geom, bubbleMaterial);
       bubbleMesh.position.set( x, y, z );
-      addToMeshs(bubbleMesh);
+      addToMeshs(bubbleMesh,solid);
       return bubbleMesh;
     }
     else if(geometry == 'Mirror') {
       var geom = new THREE.CubeGeometry(size*2,size,size/8);
       mirrorMesh = new THREE.Mesh(geom, mirrorMaterial);
       mirrorMesh.position.set( x, y, z );
-      addToMeshs(mirrorMesh);
+      addToMeshs(mirrorMesh,solid);
       return mirrorMesh;
     }
     if(!many) {
@@ -1360,10 +1280,7 @@ function createGeometry(params, geometry, many) {
           if(move == true) {
             initMovingMesh(bubbleMesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
           }
-          addToMeshs(bubbleMesh);//increases numberOfMeshs by 1
-      /*if(collidable) {//TODO
-        solids.push(mesh);
-      }*/
+          addToMeshs(bubbleMesh,solid);//increases numberOfMeshs by 1
           return bubbleMesh;
         }
       } 
@@ -1376,10 +1293,7 @@ function createGeometry(params, geometry, many) {
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-        addToMeshs(mesh);//increases numberOfMeshs by 1
-      /*if(collidable) {//TODO
-        solids.push(mesh);
-      }*/
+        addToMeshs(mesh,solid);//increases numberOfMeshs by 1
         return mesh;
       }
     }
@@ -1397,7 +1311,7 @@ function createGeometry(params, geometry, many) {
             if(move == true) {
               initMovingMesh(bubbleMesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
             }
-            addToMeshs(bubbleMesh);
+            addToMeshs(bubbleMesh,solid);
           }          
           return meshs;
         }
@@ -1413,7 +1327,7 @@ function createGeometry(params, geometry, many) {
           if(move == true) {
             initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
           }
-          addToMeshs(mesh);
+          addToMeshs(mesh,solid);
         }
         return meshs;
       }
@@ -1436,7 +1350,7 @@ function createGeometry(params, geometry, many) {
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-        addToMeshs(mesh);
+        addToMeshs(mesh,solid);
       }
     }
     else if(geometry == 'SphereGeometry'){
@@ -1452,7 +1366,7 @@ function createGeometry(params, geometry, many) {
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-        addToMeshs(mesh);
+        addToMeshs(mesh,solid);
       }
     }
     else if(geometry == 'CylinderGeometry'){
@@ -1473,7 +1387,7 @@ function createGeometry(params, geometry, many) {
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-        addToMeshs(mesh);
+        addToMeshs(mesh,solid);
       }
     }
     else if(geometry == 'RingGeometry'){
@@ -1494,7 +1408,7 @@ function createGeometry(params, geometry, many) {
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-        addToMeshs(mesh);
+        addToMeshs(mesh,solid);
       }
     }
     else if(geometry == 'TorusKnotGeometry'){
@@ -1515,7 +1429,7 @@ function createGeometry(params, geometry, many) {
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-        addToMeshs(mesh);
+        addToMeshs(mesh,solid);
       }
     }
     else if(geometry == 'ConeGeometry') {
@@ -1536,19 +1450,33 @@ function createGeometry(params, geometry, many) {
         if(move == true) {
           initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed);
         }
-        addToMeshs(mesh);
+        addToMeshs(mesh,solid);
       }
     }
     return meshs; 
   }
 }
+function createFloor(params) {
+  return createFloorOrWall(params, 'Floor');
+}
+function createWall(params) {
+  return createFloorOrWall(params, 'Wall');
+}
+function createBackWall(params) {
+  return createFloorOrWall(params, 'BackWall');
+}
 function createManyFloors(params) {
-  return createManyFloorsOrWalls(params,'Floor');
+  return createFloorOrWall(params,'Floor',true);
 }
 function createManyWalls(params) {
-  return createManyFloorsOrWalls(params,'Wall');
+  return createFloorOrWall(params,'Wall',true);
 }
-function createManyFloorsOrWalls(params,floorOrWall) {
+function createManyBackWalls(params) {
+  return createFloorOrWall(params,'BackWall',true);
+}
+function createFloorOrWall(params,floorOrWall,many) {
+  //don't use resolve method because default are different
+  //TODO actually maybe use resolve but check xyz size first and set them before
   var texture = params['texture'];
   var x = params['x'];
   var y = params['y'];
@@ -1563,17 +1491,34 @@ function createManyFloorsOrWalls(params,floorOrWall) {
   var width = params['width'];
   if(x == undefined){
     x = defaultGlobalParams['x'];
-    //x = -150;
+    if(x == undefined) {
+      x = 0;
+    }
   }
   if(y == undefined){
-    //y = defaultGlobalParams['y'];
-    y = 0;
+    y = defaultGlobalParams['y'];
+    if(y == undefined) {
+      if(floorOrWall == 'Floor') {
+        y = 0;
+      }
+      else {
+        y = 500;
+      }
+    }
   }
   if(z == undefined){
     z = defaultGlobalParams['z'];
-    //z = 0;
+    if(z == undefined) {
+      if(floorOrWall == 'BackWall') {
+        z = -500;
+      }
+      else {
+        z = 0;
+      }
+    }
   }
   if(size == undefined){
+    //TODO default floor/wall size
     size = 1000;
   }
   var btrans;
@@ -1642,45 +1587,70 @@ function createManyFloorsOrWalls(params,floorOrWall) {
     planeTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
   }
   var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide, transparent: btrans } );
-  var meshs = [];
-  var divisor = amount - 1;
-  var xIncrement = +(endx-x)/divisor;
-  var yIncrement = +(endy-y)/divisor;
-  var zIncrement = +(endz-z)/divisor;
-  if(endsize == undefined) {
-    var geom = new THREE.PlaneGeometry(size, size, 10, 10);
-    for(var i = 0; i < amount; i++) {
-      var mesh = new THREE.Mesh(geom, material ); 
-      mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-      if(floorOrWall == 'Wall') {
-        mesh.rotation.y = Math.PI / 2;
-      }
-      else if (floorOrWall == 'Floor') {
-        mesh.rotation.x = Math.PI / 2;
-      }
-      meshs[i] = mesh;
-      addToMeshs(mesh);
-    }
+  if(many == undefined) {
+    many = false;
   }
-  else {
-    var sizeIncrement = (endsize-size)/divisor;
-    var newSize;
-    for(var i = 0; i < amount; i++) {
-      newSize = +size+i*sizeIncrement;
-      var geom = new THREE.PlaneGeometry(newSize,newSize,10,10);
-      var mesh = new THREE.Mesh(geom, material ); 
-      mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
-      if(floorOrWall == 'Wall') {
-        mesh.rotation.y = Math.PI / 2;
-      }
-      else if (floorOrWall == 'Floor') {
-        mesh.rotation.x = Math.PI / 2;
-      }
-      meshs[i] = mesh;
-      addToMeshs(mesh);
+  if(!many) {
+    var geometry = new THREE.PlaneGeometry(size, size, 10, 10);    
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.position.x = x;
+    mesh.position.y = y;
+    if(floorOrWall == 'Floor') {
+      mesh.rotation.x = Math.PI / 2;
     }
+    else if(floorOrWall == 'Wall') {
+      mesh.rotation.y = Math.PI / 2;
+    }
+    else if(floorOrWall == 'BackWall') {
+     // mesh.position.z = -500;
+    }
+    addToMeshs(mesh,true);
+    ///solids.push(mesh);
+    return mesh;
   }
-  return meshs;
+  else{
+    var meshs = [];
+    var divisor = amount - 1;
+    var xIncrement = +(endx-x)/divisor;
+    var yIncrement = +(endy-y)/divisor;
+    var zIncrement = +(endz-z)/divisor;
+    if(endsize == undefined) {
+      var geom = new THREE.PlaneGeometry(size, size, 10, 10);
+      for(var i = 0; i < amount; i++) {
+        var mesh = new THREE.Mesh(geom, material ); 
+        mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+        if(floorOrWall == 'Wall') {
+          mesh.rotation.y = Math.PI / 2;
+        }
+        else if (floorOrWall == 'Floor') {
+          mesh.rotation.x = Math.PI / 2;
+        }
+        meshs[i] = mesh;
+        addToMeshs(mesh,true);
+        //solids.push(mesh);
+      }
+    }
+    else {
+      var sizeIncrement = (endsize-size)/divisor;
+      var newSize;
+      for(var i = 0; i < amount; i++) {
+        newSize = +size+i*sizeIncrement;
+        var geom = new THREE.PlaneGeometry(newSize,newSize,10,10);
+        var mesh = new THREE.Mesh(geom, material ); 
+        mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
+        if(floorOrWall == 'Wall') {
+          mesh.rotation.y = Math.PI / 2;
+        }
+        else if (floorOrWall == 'Floor') {
+          mesh.rotation.x = Math.PI / 2;
+        }
+        meshs[i] = mesh;
+        addToMeshs(mesh,true);
+        //solids.push(mesh);
+      }
+    }
+    return meshs;
+  }
 }
 
 function initBubble() {
@@ -1765,9 +1735,12 @@ function initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexs
 //--user can describe geometry (green transparent cube)
 //--user can right click on geometry
 
-function addToMeshs(mesh) {
+function addToMeshs(mesh,solid) {
 	meshs[numberOfMeshs] = mesh;
 	numberOfMeshs++;
+  if(solid) {
+    solids.push(mesh);
+  }
 }
 //remove last geometry that was created
 //TODO, undo other things like set default params
@@ -2056,6 +2029,7 @@ function resolveParams(params) {
   var movezspeed = params['movezspeed'];
   var endmovez = params['endmovez'];
   var material = params['material'];//bubble, mirror, etc
+  var solid = params['solid'];
 
   if(x == undefined) {
     x = defaultGlobalParams['x'];
@@ -2174,6 +2148,16 @@ function resolveParams(params) {
   if(material == undefined) {
     material = defaultGlobalParams['material'];
   }
+  var bsolid;
+  if(solid == undefined) {
+    bsolid = convertWordToBoolean(defaultGlobalParams['solid']);
+    if(defaultGlobalParams['solid'] == undefined) {
+      bsolid = false;
+    }
+  }
+  else {
+    bsolid = convertWordToBoolean(solid);
+  }
   resolvedParams["x"] = x;
   resolvedParams["y"] = y;
   resolvedParams["z"] = z;
@@ -2202,6 +2186,7 @@ function resolveParams(params) {
   resolvedParams["movezspeed"] = movezspeed;
   resolvedParams["endmovez"] = endmovez;
   resolvedParams["material"] = material;
+  resolvedParams["solid"] = bsolid;
 
   return resolvedParams;
 }
@@ -2704,6 +2689,23 @@ function submitCommand(command) {
       scene.add(createBackWall({x:0,y:500,size:1000}));
     }
   }
+  else if(command.indexOf('create many back walls') === 0) {
+    var len = 'create many back walls'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      var parsedParams = parseParams(params);
+      var geom = createManyBackWalls(parsedParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }    
+    }
+    else {
+      var geoms = createManyBackWalls(defaultGlobalParams);
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      } 
+    }
+  }
   else if(command.indexOf('create text') === 0) {
     var len = 'create text'.length;
     if(command.length > len) {
@@ -2728,6 +2730,12 @@ function submitCommand(command) {
     else {
       resetDefaultGlobalParams();
     }
+  }
+  else if(command.indexOf('undo') === 0) {
+    undo();
+  }
+  else if(command.indexOf('upload') === 0) {
+    document.getElementById('uploadFile').style.visibility = 'visible';
   }
   else if(command.indexOf('test') === 0 ) {
     testEverything();
