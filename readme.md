@@ -102,12 +102,12 @@ You'll need [nodejs](http://nodejs.org/) installed
   - improve cli w/ list of recently submitted commands
   - ability to manipulate & remove existing geometries, incl. voice command to stop all motion
   - enhance start/pause screen
-  - mirror material
   - export function, add option that generates three js code
   - add random as an option, ex: color random, size & coordinates also
   - esc from pointer lock when mouse is in motion can cause camera to be angled somewhere else
   - ctrl+z is buggy
   - use updated version of three.js
+  - bug when loading more than one mirror from file
   - bug with create many w/ mirror material (cameras)
   - create self command, for third person view
   - when creating many geometries w/ one command, morph them into one geometry (maybe when amount >= a certian amount)
