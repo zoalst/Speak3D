@@ -2481,9 +2481,18 @@ function submitCommandsFromFile(commands) {
     submitCommand(lines[line]);
   }
 }
+function cleanupSpaces(command) {
+  var split = command.split(/\s+/);
+  var result = '';
+  for(var s in split) {
+    result += split[s] + ' ';
+  }
+  return result.substring(0,result.length-1);
+}
 function submitCommand(command) {
   //notify user 
   notify(command);
+  command = cleanupSpaces(command);
   if(command.indexOf('create sphere') === 0) {
     var len = 'create sphere'.length;
     if(command.length > len) {
