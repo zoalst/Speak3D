@@ -1190,17 +1190,22 @@ function createGeometry(params, geometry, many) {
   //if we only create one geometry or many of the same size
   if(endsize == undefined || !many) {
     if(geometry == 'CubeGeometry'){
-      var geom = new THREE.CubeGeometry(size,size,size);
+      if(width == undefined) {
+        width = size;
+      }
+      else{
+        var geom = new THREE.CubeGeometry(width,height,depth);
+      }
     }
     else if(geometry == 'SphereGeometry'){
       var geom = new THREE.SphereGeometry(size);
     }
     else if(geometry == 'CylinderGeometry'){
       if(width == undefined) {
-        var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,size);
+        var geom = new THREE.CylinderGeometry(size*2/5,size*2/5,height);
       }
       else {
-        var geom = new THREE.CylinderGeometry(width,width,size);          
+        var geom = new THREE.CylinderGeometry(width,width,height);          
       }
     }
     else if(geometry == 'RingGeometry'){
@@ -1221,10 +1226,10 @@ function createGeometry(params, geometry, many) {
     }
     else if(geometry == 'ConeGeometry') {
       if(width == undefined) {
-        var geom = new THREE.CylinderGeometry(0,size*2/5,size);
+        var geom = new THREE.CylinderGeometry(0,size*2/5,height);
       }
       else {
-        var geom = new THREE.CylinderGeometry(0,width,size);          
+        var geom = new THREE.CylinderGeometry(0,width,height);          
       }
     }
     //so user can still call 'create bubble' for a bubble sphere,
@@ -1237,7 +1242,10 @@ function createGeometry(params, geometry, many) {
       return bubbleMesh;
     }
     else if(geometry == 'Mirror') {
-      var geom = new THREE.CubeGeometry(size*2,size,size/8);
+      if(width == undefined) {
+        width = size;
+      }
+      var geom = new THREE.CubeGeometry(width,height,depth);
       mapMirrorCameraToMirrorMaterial( x, y, z );
       mirrorMesh = new THREE.Mesh(geom, mirrorMaterial);
       mirrorMesh.position.set( x, y, z );
@@ -2033,6 +2041,7 @@ function resetDefaultGlobalParams(params) {
 }
 
 //resolves params except color/ambient
+//height and depth are set to size by default
 function resolveParams(params) {
   var resolvedParams = {};
   var x = params['x'];
@@ -2181,10 +2190,16 @@ function resolveParams(params) {
   }
   if(height == undefined) {
     height = defaultGlobalParams['height'];
+    if(height == undefined) {
+      height = size
+    }
   }
   //dimension in z direction
   if(depth == undefined) {
     depth = defaultGlobalParams['depth'];
+    if(depth == undefined) {
+      depth = size
+    }
   }
   if(material == undefined) {
     material = defaultGlobalParams['material'];
