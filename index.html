@@ -164,7 +164,7 @@ var mirrors = false;
 
 var spinningMeshs = [];
 var spinningParams = [];
-var globalSpinSlow = 0.002;
+var globalSpinSlow = 0.001;
 var globalSpinFast = 0.05;
 var globalSpinMedium = 0.01;
 
@@ -1193,9 +1193,7 @@ function createGeometry(params, geometry, many) {
       if(width == undefined) {
         width = size;
       }
-      else{
-        var geom = new THREE.CubeGeometry(width,height,depth);
-      }
+      var geom = new THREE.CubeGeometry(width,height,depth);
     }
     else if(geometry == 'SphereGeometry'){
       var geom = new THREE.SphereGeometry(size);
@@ -1506,31 +1504,22 @@ function createFloorOrWall(params,floorOrWall,many) {
   var endsize = params['endsize'];
   var width = params['width'];
   if(x == undefined){
-    x = defaultGlobalParams['x'];
-    if(x == undefined) {
-      x = 0;
-    }
+    x = 0;
   }
   if(y == undefined){
-    y = defaultGlobalParams['y'];
-    if(y == undefined) {
-      if(floorOrWall == 'Floor') {
-        y = 0;
-      }
-      else {
-        y = 500;
-      }
+    if(floorOrWall == 'Floor') {
+      y = 0;
+    }
+    else {
+      y = 500;
     }
   }
   if(z == undefined){
-    z = defaultGlobalParams['z'];
-    if(z == undefined) {
-      if(floorOrWall == 'BackWall') {
-        z = -500;
-      }
-      else {
-        z = 0;
-      }
+    if(floorOrWall == 'BackWall') {
+      z = -500;
+    }
+    else {
+      z = 0;
     }
   }
   if(size == undefined){
@@ -2088,6 +2077,9 @@ function resolveParams(params) {
   }
   if(size == undefined) {
     size = defaultGlobalParams['size'];
+    if(size == undefined) {
+      size = 50;
+    }
   }
   if(texture == undefined) {
     texture = defaultGlobalParams['texture'];
