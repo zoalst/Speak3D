@@ -183,6 +183,7 @@ var textures = getTextures();
 var bubbleMaterial;
 var bubbles = false;
 var mirrorMaterial;
+var mirrorCamera;
 var mirrors = false;
 
 var spinningMeshs = [];
@@ -201,6 +202,7 @@ var globalMoveMedium = 2;
 var user;
 var gravAmount = -4;
 var gravity = new THREE.Vector3(0,gravAmount,0);//TODO user change gravity
+var jumpVelocity = 5;
 var solids = [];
 var gravAndColl = false;
 //var useOtherControls = true;
@@ -862,7 +864,7 @@ function update() {
         }
       }
       if ( keyboard.pressed("space") && (user.velocity.y <= 0 )) {
-        user.velocity = new THREE.Vector3(0,7,0);
+        user.velocity = new THREE.Vector3(0,jumpVelocity,0);
       }
       //dont speed up forever when falling
       if(user.velocity.y < 14){
@@ -1264,6 +1266,7 @@ function createGeometry(params, geometry, many) {
     }
     else if(geometry == 'Mirror') {
       var geom = new THREE.CubeGeometry(size*2,size,size/8);
+      mapMirrorCameraToMirrorMaterial( x, y, z );
       mirrorMesh = new THREE.Mesh(geom, mirrorMaterial);
       mirrorMesh.position.set( x, y, z );
       addToMeshs(mirrorMesh,solid);
@@ -1287,6 +1290,7 @@ function createGeometry(params, geometry, many) {
         }
         else if(material == 'mirror') {
           mirrors = true;
+          mapMirrorCameraToMirrorMaterial( x, y, z );
           mirrorMesh = new THREE.Mesh(geom, mirrorMaterial ); 
           mirrorMesh.position.set( x, y, z );
           if(spin == true) {
@@ -1332,6 +1336,7 @@ function createGeometry(params, geometry, many) {
         }
         if(material == 'mirror') {
           mirrors = true;
+            mapMirrorCameraToMirrorMaterial( +x, +y, +z  );
           for(var i = 0; i < amount; i++) {
             mirrorMesh = new THREE.Mesh(geom, mirrorMaterial ); 
             mirrorMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
@@ -1629,6 +1634,7 @@ function createFloorOrWall(params,floorOrWall,many) {
     var mesh = new THREE.Mesh(geometry, material);
     mesh.position.x = x;
     mesh.position.y = y;
+    mesh.position.z = z;
     if(floorOrWall == 'Floor') {
       mesh.rotation.x = Math.PI / 2;
     }
@@ -1701,18 +1707,27 @@ function initBubble() {
   // create custom material for the shader
   bubbleMaterial = new THREE.ShaderMaterial( 
   {
-      uniforms:     fresnelUniforms,
+    uniforms:     fresnelUniforms,
     vertexShader:   fShader.vertexShader,
-    fragmentShader: fShader.fragmentShader
+    fragmentShader: fShader.fragmentShader,
+    side: THREE.DoubleSide
   }   );
 }
 
 function initMirror() {
-  this.mirrorCamera = new THREE.CubeCamera( 0.1, 5000, 512 );
+  this.mirrorCamera = new THREE.CubeCamera( 0.5, 10000, 512 );
   scene.add( mirrorCamera );
   mirrorMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorCamera.renderTarget } );
 }
 
+function mapMirrorCameraToMirrorMaterial(x,y,z) {
+  mirrorCamera = new THREE.CubeCamera( 0.5, 10000, 512 );
+  mirrorCamera.position.x = x;
+  mirrorCamera.position.y = y;
+  mirrorCamera.position.z = z;
+  scene.add( mirrorCamera );
+  mirrorMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorCamera.renderTarget } );
+}
 function initSpinMesh(mesh,spinx,spiny,spinz) {
     spinningMeshs.push(mesh);
     spinningParams.push({'x':spinx, 'y':spiny, 'z':spinz});

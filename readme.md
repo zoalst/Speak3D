@@ -5,7 +5,7 @@ Created using [three.js](http://threejs.org) and [annyang.](https://www.talater.
 Built off of the Text3D example in Lee Stemkoski's
 [Three.js examples](http://stemkoski.github.io/Three.js/index.html)
 
-[Try the Demo on Google Drive](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (speech recognition only works with Chrome)
+[Try the Demo on Google Drive](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (works with Chrome)
 
 ## List of Commands & Examples
 
@@ -108,6 +108,7 @@ You'll need [nodejs](http://nodejs.org/) installed
   - esc from pointer lock when mouse is in motion can cause camera to be angled somewhere else
   - ctrl+z is buggy
   - use updated version of three.js
+  - bug with create many w/ mirror material (cameras)
   - create self command, for third person view
   - when creating many geometries w/ one command, morph them into one geometry (maybe when amount >= a certian amount)
   - better controls to navigate in 3D space
