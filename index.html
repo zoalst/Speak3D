@@ -196,8 +196,8 @@ var paused = false;
 var blocker = document.getElementById( 'blocker' );
 var instructions = document.getElementById( 'instructions' );
 
-var gui, guiDefaultParams;
-
+var gui, guiDefaultParams, guiApperance, guiPosition;
+ 
 var saveLog = '';
 
 init();
@@ -296,8 +296,9 @@ function init() {
   customContainer.appendChild(gui.domElement);*/
   //for default params
   //var guiDefault = gui.addFolder('Default Params');
-  var guiApperance = gui.addFolder('Appearance');
-  var guiPosition = gui.addFolder('Positioning/Motion');
+  guiApperance = gui.addFolder('Appearance');//folder names need to match code in updateGUI method
+  guiPosition = gui.addFolder('Position');//folder names need to match code in updateGUI method
+  //get list of teture names
   var textureNames = [];
   textureNames.push('none');
   for(var key in textures) {
@@ -328,9 +329,9 @@ function init() {
     endx: 0,//TODO make sure these always equal xyz unless explicitly changed (or default already set to someething else)
     endy: 50,
     endz: 0,
-    movex: 'none',
-    movey: 'none',
-    movez: 'none',
+    movexspeed: 'none',
+    moveyspeed: 'none',
+    movezspeed: 'none',
     spinx: 'none',
     spiny: 'none',
     spinz: 'none',
@@ -346,7 +347,6 @@ function init() {
   {   
     defaultGlobalParams['ambient'] = value;
   });
-  //TODO texture list
   var guiDefaultTexture = guiApperance.add( guiDefaultParams, 'texture', textureNames );
   guiDefaultTexture.onChange(function(value)
   {   
@@ -370,7 +370,7 @@ function init() {
   var guiDefaultTransparent = guiApperance.add( guiDefaultParams, 'transparent' );
   guiDefaultTransparent.onChange(function(value)
   {   
-    //TODO decide to store as boolean or string(bool needs changes in parseParams)
+    //TODO string rn?, decide to store as boolean or string(bool needs changes in parseParams)
     defaultGlobalParams['transparent'] = value+'';
   });
   var guiDefaultSize = guiApperance.add( guiDefaultParams, 'size' ).min(0);
@@ -433,7 +433,7 @@ function init() {
   {   
     defaultGlobalParams['endz'] = value;
   }); 
-  var guiDefaultMoveX = guiPosition.add( guiDefaultParams, 'movex', [ 'none', 'slow', 'medium', 'fast' ] ).name('move x');
+  var guiDefaultMoveX = guiPosition.add( guiDefaultParams, 'movexspeed', [ 'none', 'slow', 'medium', 'fast' ] ).name('move x');
   guiDefaultMoveX.onChange(function(value)
   {   
     if(value != 'none') {
@@ -443,7 +443,7 @@ function init() {
       defaultGlobalParams['movexspeed'] = undefined;
     }     
   });
-  var guiDefaultMoveY = guiPosition.add( guiDefaultParams, 'movey', [ 'none', 'slow', 'medium', 'fast' ] ).name('move y');
+  var guiDefaultMoveY = guiPosition.add( guiDefaultParams, 'moveyspeed', [ 'none', 'slow', 'medium', 'fast' ] ).name('move y');
   guiDefaultMoveY.onChange(function(value)
   {   
     if(value != 'none') {
@@ -453,7 +453,7 @@ function init() {
       defaultGlobalParams['moveyspeed'] = undefined;
     }     
   });
-  var guiDefaultMoveZ = guiPosition.add( guiDefaultParams, 'movez', [ 'none', 'slow', 'medium', 'fast' ] ).name('move z');
+  var guiDefaultMoveZ = guiPosition.add( guiDefaultParams, 'movezspeed', [ 'none', 'slow', 'medium', 'fast' ] ).name('move z');
   guiDefaultMoveZ.onChange(function(value)
   {   
     if(value != 'none') {
@@ -817,6 +817,7 @@ function init() {
         notify('set default '+params);
         //pass defaultGlobalParams as second arg to set the defaultGlobalParams
         parseParams(params, defaultGlobalParams);
+        updateGUI(defaultGlobalParams);
   	  },
       'reset default': function() {
         notify('reset default');
@@ -2016,7 +2017,6 @@ function parseParams(params, parsedParams) {
   var currParam = '';
   for(var i = 0; i < paramsArray.length-1; i+=2) {
     currParam = paramsArray[i].toLowerCase();
-    //console.log('startdforcurrparam: '+currParam);
     if(currParam == 'color' || currParam == 'colour') {
       //check if color starts w/ dark, medium, light, or pale
       var next = paramsArray[i+1];
@@ -2426,6 +2426,20 @@ function getSpinSpeedAsNumber(speed) {
   return spinSpeed;
 }
 
+function getSpinSpeedAsWord(speed) {
+  var spinSpeedWord;
+  if(speed == globalSpinSlow) {
+    spinSpeedWord = 'slow';
+  }
+  else if(speed == globalSpinFast) {
+    spinSpeedWord = 'fast';
+  } 
+  else if(speed == globalSpinMedium) {
+    spinSpeedWord = 'medium';
+  } 
+  return spinSpeedWord;
+}
+
 function getMoveSpeedAsNumber(speed) {
   //TODO 1st line
   defaultGlobalParams['move'] = true;
@@ -2442,6 +2456,20 @@ function getMoveSpeedAsNumber(speed) {
   return moveSpeed;
 }
 
+function getMoveSpeedAsWord(speed) {
+  var moveSpeedWord;
+  if(speed == globalMoveSlow) {
+    moveSpeedWord = 'slow';
+  }
+  else if(speed == globalMoveFast) {
+    moveSpeedWord = 'fast';
+  } 
+  else if(speed == globalMoveMedium) {
+    moveSpeedWord = 'medium';
+  } 
+  return moveSpeedWord;
+}
+
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -2449,6 +2477,39 @@ function getRandomInt(min, max) {
   //////////////////////////////////////////////
  //END OF METHODS FOR DEALING WITH PARAMETERS//
 //////////////////////////////////////////////
+
+//TODO get checkboxes working
+//TODO error handling
+function updateGUI(params) {
+  for(var param in params) {
+    //TODO ??? not this & have defaultGlobalParams be all strings? convert later?
+    //checkboxes
+    if(param == 'transparent' || param == 'solid') {
+      guiDefaultParams[param] = convertWordToBoolean(params[param]);      
+    }
+    //TODO something smarter
+    //move/spin dropdowns
+    else if(param == 'movexspeed' || param == 'moveyspeed' || param == 'movezspeed') {
+      guiDefaultParams[param] = getMoveSpeedAsWord(params[param]);      
+    }
+    else if(param == 'spinx' || param == 'spiny' || param == 'spinz') {
+      guiDefaultParams[param] = getSpinSpeedAsWord(params[param]);      
+    }
+    else {
+      guiDefaultParams[param] = params[param];
+    }
+    // Iterate over all controllers
+/*  for (var i in gui.__controllers) {
+    gui.__controllers[i].updateDisplay();
+  }*/
+    for (var i = 0; i < this.gui.__folders.Appearance.__controllers.length; i++) {
+      this.gui.__folders.Appearance.__controllers[i].updateDisplay();
+    }
+    for (var i = 0; i < this.gui.__folders.Position.__controllers.length; i++) {
+      this.gui.__folders.Position.__controllers[i].updateDisplay();
+    }
+  }
+}
 
 function initSaveLoadButtons() {
   document.getElementById('link').onclick = function() {
@@ -2808,6 +2869,7 @@ function submitCommand(command) {
       var params = command.substring(len+1);
       //pass defaultGlobalParams as second arg to set the defaultGlobalParams
       parseParams(params, defaultGlobalParams);
+      updateGUI(defaultGlobalParams);
     }
   }
   else if(command.indexOf('reset default') === 0) {

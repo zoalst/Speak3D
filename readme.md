@@ -93,8 +93,8 @@ You'll need [nodejs](http://nodejs.org/) installed
 
 ## To Do
 
-
-  - enhance dat.GUI, for default params
+  - bug in dat.GUI, when default checkbox set outside of gui, updates display correctly but not value(have to double click)
+  - enhance dat.GUI
   - ability to reset/clear default params
   - GUI for user uploaded textures and models
   - add parameters for dimensions, rotation, etc.
