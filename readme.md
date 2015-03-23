@@ -94,7 +94,7 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
 
-  - add dat.GUI, for default params
+  - enhance dat.GUI, for default params
   - ability to reset/clear default params
   - GUI for user uploaded textures and models
   - add parameters for dimensions, rotation, etc.
