@@ -298,7 +298,7 @@ function init() {
   //var guiDefault = gui.addFolder('Default Params');
   guiApperance = gui.addFolder('Appearance');//folder names need to match code in updateGUI method
   guiPosition = gui.addFolder('Position');//folder names need to match code in updateGUI method
-  //get list of teture names
+  //get list of texture names
   var textureNames = [];
   textureNames.push('none');
   for(var key in textures) {
@@ -306,10 +306,7 @@ function init() {
       textureNames.push(key);
     }
   }
-  //TODO save input when controls are closed
   //TODO log these changes so save/uplload works
-  //TODO  always consistent with what default params is set to
-  //TODO sub folders?
   guiDefaultParams = 
   {
     color: "#ffb6c1", 
@@ -335,8 +332,13 @@ function init() {
     spinx: 'none',
     spiny: 'none',
     spinz: 'none',
-    solid: false
+    solid: false,
+    reset: function() {resetDefaultGlobalParams();}
   };
+  //reset button
+  gui.add( guiDefaultParams, 'reset').name('reset all');
+
+  //apperance gui
   var guiDefaultColor = guiApperance.addColor( guiDefaultParams, 'color' );
   guiDefaultColor.onChange(function(value)
   {   
@@ -403,6 +405,8 @@ function init() {
   {   
     defaultGlobalParams['amount'] = value;
   });
+
+  //position gui
   var guiDefaultX = guiPosition.add( guiDefaultParams, 'x' );
   guiDefaultX.onChange(function(value)
   {   
@@ -2187,6 +2191,7 @@ function initDefaultGlobalParams() {
   defaultGlobalParams['transparent'] = false;
   defaultGlobalParams['amount'] = 3;
 }
+//resets default params and updates GUI
 function resetDefaultGlobalParams(params) {
   if(params == undefined) {
     //reset all params
@@ -2218,6 +2223,8 @@ function resetDefaultGlobalParams(params) {
       }
     }
   }
+  //update gui
+  updateGUI(defaultGlobalParams);
 }
 
 //resolves params except color/ambient
