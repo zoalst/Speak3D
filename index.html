@@ -1390,6 +1390,9 @@ function createGeometry(params, geometry, many) {
         wallTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
       }
     }
+    else {//texture image size not a power of 2
+      wallTexture.minFilter = THREE.NearestFilter;
+    }
     var geometryMaterial = new THREE.MeshBasicMaterial( { map: wallTexture, side: THREE.DoubleSide, transparent: btrans } );
   }
 
@@ -1809,12 +1812,15 @@ function createFloorOrWall(params,floorOrWall,many) {
       planeTexture.repeat.set( size/textureRepeatAmount, size/textureRepeatAmount );
     }
   }
+  else {//texture image size not a power of 2
+    planeTexture.minFilter = THREE.NearestFilter;
+  }
   var material = new THREE.MeshBasicMaterial( { map: planeTexture, side: THREE.DoubleSide, transparent: btrans } );
   if(many == undefined) {
     many = false;
   }
   if(!many) {
-    var geometry = new THREE.PlaneGeometry(size, size, 10, 10);    
+    var geometry = new THREE.PlaneBufferGeometry(size, size, 10, 10);    
     var mesh = new THREE.Mesh(geometry, material);
     mesh.position.x = x;
     mesh.position.y = y;
@@ -1837,7 +1843,7 @@ function createFloorOrWall(params,floorOrWall,many) {
     var yIncrement = +(endy-y)/divisor;
     var zIncrement = +(endz-z)/divisor;
     if(endsize == undefined) {
-      var geom = new THREE.PlaneGeometry(size, size, 10, 10);
+      var geom = new THREE.PlaneBufferGeometry(size, size, 10, 10);
       for(var i = 0; i < amount; i++) {
         var mesh = new THREE.Mesh(geom, material ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
@@ -1856,7 +1862,7 @@ function createFloorOrWall(params,floorOrWall,many) {
       var newSize;
       for(var i = 0; i < amount; i++) {
         newSize = +size+i*sizeIncrement;
-        var geom = new THREE.PlaneGeometry(newSize,newSize,10,10);
+        var geom = new THREE.PlaneBufferGeometry(newSize,newSize,10,10);
         var mesh = new THREE.Mesh(geom, material ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
         if(floorOrWall == 'Wall') {
