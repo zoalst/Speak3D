@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<script src="js/Three.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.min.js"></script>
 <script src="js/Detector.js"></script>
 <script src="js/Stats.js"></script>
 <script src="js/OrbitControls.js"></script>
@@ -241,7 +241,7 @@ function init() {
 	scene.add(ambientLight);
 
 	// SKYBOX/FOG
-	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+	var skyBoxGeometry = new THREE.BoxGeometry( 10000, 10000, 10000 );
   var skyBoxTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures['cloud'] );    
 
 	var skyBoxMaterial = new THREE.MeshBasicMaterial( { texture: skyBoxTexture, side: THREE.DoubleSide } );
@@ -256,7 +256,7 @@ function init() {
   user.position.set(0,100,500);
   //user.rotation.y = -Math.PI / 2.0;
 
-  boundingG = new THREE.CubeGeometry(40,40,40);
+  boundingG = new THREE.BoxGeometry(40,40,40);
   // radiusAtTop, radiusAtBottom, height, segmentsAroundRadius, segmentsAlongHeight,
   // boundingG = new THREE.CylinderGeometry(20,20,80,8,2);
   // better collision but FPS drops too much
@@ -1254,7 +1254,7 @@ function createSphere(params) {
 	return createGeometry(params,'SphereGeometry');
 }
 function createCube(params) {
-	return createGeometry(params,'CubeGeometry');
+	return createGeometry(params,'BoxGeometry');
 }
 function createRing(params) {
 	return createGeometry(params,'RingGeometry');
@@ -1294,7 +1294,7 @@ function createManySpheres(params) {
 	return createGeometry(params, 'SphereGeometry',true);
 }
 function createManyCubes(params) {
-	return createGeometry(params, 'CubeGeometry',true);
+	return createGeometry(params, 'BoxGeometry',true);
 }
 function createManyRings(params) {
 	return createGeometry(params, 'RingGeometry',true);
@@ -1404,11 +1404,11 @@ function createGeometry(params, geometry, many) {
   var zIncrement = +(endz-z)/divisor;
   //if we only create one geometry or many of the same size
   if(endsize == undefined || !many) {
-    if(geometry == 'CubeGeometry'){
+    if(geometry == 'BoxGeometry'){
       if(width == undefined) {
         width = size;
       }
-      var geom = new THREE.CubeGeometry(width,height,depth);
+      var geom = new THREE.BoxGeometry(width,height,depth);
     }
     else if(geometry == 'SphereGeometry'){
       var geom = new THREE.SphereGeometry(size);
@@ -1458,7 +1458,7 @@ function createGeometry(params, geometry, many) {
       if(width == undefined) {
         width = size;
       }
-      var geom = new THREE.CubeGeometry(width,height,depth);
+      var geom = new THREE.BoxGeometry(width,height,depth);
       mapMirrorCameraToMirrorMaterial( x, y, z );
       mirrorMesh = new THREE.Mesh(geom, mirrorMaterial);
       mirrorMesh.position.set( x, y, z );
@@ -1566,10 +1566,10 @@ function createGeometry(params, geometry, many) {
   else {
     var sizeIncrement = (endsize-size)/divisor;
     var newSize;
-    if(geometry == 'CubeGeometry'){
+    if(geometry == 'BoxGeometry'){
       for(var i = 0; i < amount; i++) {
         newSize = +size+i*sizeIncrement;
-        var geom = new THREE.CubeGeometry(newSize,newSize,newSize);
+        var geom = new THREE.BoxGeometry(newSize,newSize,newSize);
         var mesh = new THREE.Mesh(geom, geometryMaterial ); 
         mesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
         meshs[i] = mesh;
