@@ -94,7 +94,7 @@
 <br />
   - 'spin' followed by 'x', 'y', or 'z'
 <br />
-  - 'move' followed by a range of 'x', 'y', or 'z', ex: move x 0 and 250
+  - 'move' followed by 'x', 'y', or 'z', will only work if a range has been set for that axis
 <br />
   - you can set a parameter range by using the keyword until, ex: create many cubes x 0 until 100
 <br />
@@ -295,7 +295,16 @@ function init() {
   var customContainer = document.getElementById('guiLoc');
   customContainer.appendChild(gui.domElement);*/
   //for default params
-  var guiDefault = gui.addFolder('Default Params');
+  //var guiDefault = gui.addFolder('Default Params');
+  var guiApperance = gui.addFolder('Appearance');
+  var guiPosition = gui.addFolder('Positioning/Motion');
+  var textureNames = [];
+  textureNames.push('none');
+  for(var key in textures) {
+    if (textures.hasOwnProperty(key)) {
+      textureNames.push(key);
+    }
+  }
   //TODO save input when controls are closed
   //TODO log these changes so save/uplload works
   //TODO  always consistent with what default params is set to
@@ -307,11 +316,12 @@ function init() {
     texture: 'none', 
     material: 'none', 
     transparent: false, 
-    amount: 3,
     size: 50,
+    endsize: 50,
     width: 50,
     height: 50,
     depth: 50,
+    amount: 3,
     x: 0,
     y: 50,
     z: 0,
@@ -326,18 +336,18 @@ function init() {
     spinz: 'none',
     solid: false
   };
-  var guiDefaultColor = guiDefault.addColor( guiDefaultParams, 'color' );
+  var guiDefaultColor = guiApperance.addColor( guiDefaultParams, 'color' );
   guiDefaultColor.onChange(function(value)
   {   
     defaultGlobalParams['color'] = value;
   });
-  var guiDefaultAmbient = guiDefault.addColor( guiDefaultParams, 'ambient' );
+  var guiDefaultAmbient = guiApperance.addColor( guiDefaultParams, 'ambient' );
   guiDefaultAmbient.onChange(function(value)
   {   
     defaultGlobalParams['ambient'] = value;
   });
   //TODO texture list
-  var guiDefaultTexture = guiDefault.add( guiDefaultParams, 'texture', [ 'none', 'grass', 'chrome' ] );
+  var guiDefaultTexture = guiApperance.add( guiDefaultParams, 'texture', textureNames );
   guiDefaultTexture.onChange(function(value)
   {   
     if(value != 'none') {
@@ -347,7 +357,7 @@ function init() {
       defaultGlobalParams['texture'] = undefined; 
     }
   });
-  var guiDefaultMaterial = guiDefault.add( guiDefaultParams, 'material', [ 'none', 'bubble', 'mirror' ] );
+  var guiDefaultMaterial = guiApperance.add( guiDefaultParams, 'material', [ 'none', 'bubble', 'mirror' ] );
   guiDefaultMaterial.onChange(function(value)
   {   
     if(value != 'none') {
@@ -357,68 +367,73 @@ function init() {
       defaultGlobalParams['material'] = undefined; 
     }
   });
-  var guiDefaultTransparent = guiDefault.add( guiDefaultParams, 'transparent' );
+  var guiDefaultTransparent = guiApperance.add( guiDefaultParams, 'transparent' );
   guiDefaultTransparent.onChange(function(value)
   {   
     //TODO decide to store as boolean or string(bool needs changes in parseParams)
     defaultGlobalParams['transparent'] = value+'';
   });
-  var guiDefaultAmount = guiDefault.add( guiDefaultParams, 'amount' ).min(0).step(1.0);
-  guiDefaultAmount.onChange(function(value)
-  {   
-    defaultGlobalParams['amount'] = value;
-  });
-  var guiDefaultSize = guiDefault.add( guiDefaultParams, 'size' ).min(0);
+  var guiDefaultSize = guiApperance.add( guiDefaultParams, 'size' ).min(0);
   guiDefaultSize.onChange(function(value)
   {   
     defaultGlobalParams['size'] = value;
   });
-  var guiDefaultWidth = guiDefault.add( guiDefaultParams, 'width' ).min(0);
+  var guiDefaultSize = guiApperance.add( guiDefaultParams, 'endsize' ).min(0).name('end size');
+  guiDefaultSize.onChange(function(value)
+  {   
+    defaultGlobalParams['endsize'] = value;
+  });
+  var guiDefaultWidth = guiApperance.add( guiDefaultParams, 'width' ).min(0);
   guiDefaultWidth.onChange(function(value)
   {   
     defaultGlobalParams['width'] = value;
   });
-  var guiDefaultHeight = guiDefault.add( guiDefaultParams, 'height' ).min(0);
+  var guiDefaultHeight = guiApperance.add( guiDefaultParams, 'height' ).min(0);
   guiDefaultHeight.onChange(function(value)
   {   
     defaultGlobalParams['height'] = value;
   });
-  var guiDefaultDepth = guiDefault.add( guiDefaultParams, 'depth' ).min(0);
+  var guiDefaultDepth = guiApperance.add( guiDefaultParams, 'depth' ).min(0);
   guiDefaultDepth.onChange(function(value)
   {   
     defaultGlobalParams['depth'] = value;
   });
-  var guiDefaultX = guiDefault.add( guiDefaultParams, 'x' );
+  var guiDefaultAmount = guiApperance.add( guiDefaultParams, 'amount' ).min(0).step(1.0);
+  guiDefaultAmount.onChange(function(value)
+  {   
+    defaultGlobalParams['amount'] = value;
+  });
+  var guiDefaultX = guiPosition.add( guiDefaultParams, 'x' );
   guiDefaultX.onChange(function(value)
   {   
     defaultGlobalParams['x'] = value;
   });
-  var guiDefaultY = guiDefault.add( guiDefaultParams, 'y' );
+  var guiDefaultY = guiPosition.add( guiDefaultParams, 'y' );
   guiDefaultY.onChange(function(value)
   {   
     defaultGlobalParams['y'] = value;
   });
-  var guiDefaultZ = guiDefault.add( guiDefaultParams, 'z' );
+  var guiDefaultZ = guiPosition.add( guiDefaultParams, 'z' );
   guiDefaultZ.onChange(function(value) 
   {   
     defaultGlobalParams['z'] = value;
   }); 
-  var guiDefaultEndX = guiDefault.add( guiDefaultParams, 'endx' );
+  var guiDefaultEndX = guiPosition.add( guiDefaultParams, 'endx' );
   guiDefaultEndX.onChange(function(value)
   {   
     defaultGlobalParams['endx'] = value;
   });
-  var guiDefaultEndY = guiDefault.add( guiDefaultParams, 'endy' );
+  var guiDefaultEndY = guiPosition.add( guiDefaultParams, 'endy' );
   guiDefaultEndY.onChange(function(value)
   {   
     defaultGlobalParams['endy'] = value;
   });
-  var guiDefaultEndZ = guiDefault.add( guiDefaultParams, 'endz' );
+  var guiDefaultEndZ = guiPosition.add( guiDefaultParams, 'endz' );
   guiDefaultEndZ.onChange(function(value) 
   {   
     defaultGlobalParams['endz'] = value;
   }); 
-  var guiDefaultMoveX = guiDefault.add( guiDefaultParams, 'movex', [ 'none', 'slow', 'medium', 'fast' ] ).name('move x');
+  var guiDefaultMoveX = guiPosition.add( guiDefaultParams, 'movex', [ 'none', 'slow', 'medium', 'fast' ] ).name('move x');
   guiDefaultMoveX.onChange(function(value)
   {   
     if(value != 'none') {
@@ -428,7 +443,7 @@ function init() {
       defaultGlobalParams['movexspeed'] = undefined;
     }     
   });
-  var guiDefaultMoveY = guiDefault.add( guiDefaultParams, 'movey', [ 'none', 'slow', 'medium', 'fast' ] ).name('move y');
+  var guiDefaultMoveY = guiPosition.add( guiDefaultParams, 'movey', [ 'none', 'slow', 'medium', 'fast' ] ).name('move y');
   guiDefaultMoveY.onChange(function(value)
   {   
     if(value != 'none') {
@@ -438,7 +453,7 @@ function init() {
       defaultGlobalParams['moveyspeed'] = undefined;
     }     
   });
-  var guiDefaultMoveZ = guiDefault.add( guiDefaultParams, 'movez', [ 'none', 'slow', 'medium', 'fast' ] ).name('move z');
+  var guiDefaultMoveZ = guiPosition.add( guiDefaultParams, 'movez', [ 'none', 'slow', 'medium', 'fast' ] ).name('move z');
   guiDefaultMoveZ.onChange(function(value)
   {   
     if(value != 'none') {
@@ -448,7 +463,7 @@ function init() {
       defaultGlobalParams['movezspeed'] = undefined;
     }     
   });
-  var guiDefaultSpinX = guiDefault.add( guiDefaultParams, 'spinx', [ 'none', 'slow', 'medium', 'fast' ] ).name('spin x');
+  var guiDefaultSpinX = guiPosition.add( guiDefaultParams, 'spinx', [ 'none', 'slow', 'medium', 'fast' ] ).name('spin x');
   guiDefaultSpinX.onChange(function(value)
   {   
     if(value != 'none') {
@@ -458,7 +473,7 @@ function init() {
       defaultGlobalParams['spinx'] = undefined;
     }     
   });
-  var guiDefaultSpinY = guiDefault.add( guiDefaultParams, 'spiny', [ 'none', 'slow', 'medium', 'fast' ] ).name('spin y');
+  var guiDefaultSpinY = guiPosition.add( guiDefaultParams, 'spiny', [ 'none', 'slow', 'medium', 'fast' ] ).name('spin y');
   guiDefaultSpinY.onChange(function(value)
   {   
     if(value != 'none') {
@@ -468,7 +483,7 @@ function init() {
       defaultGlobalParams['spiny'] = undefined;
     }     
   });
-  var guiDefaultSpinZ = guiDefault.add( guiDefaultParams, 'spinz', [ 'none', 'slow', 'medium', 'fast' ] ).name('spin z');
+  var guiDefaultSpinZ = guiPosition.add( guiDefaultParams, 'spinz', [ 'none', 'slow', 'medium', 'fast' ] ).name('spin z');
   guiDefaultSpinZ.onChange(function(value)
   {   
     if(value != 'none') {
@@ -479,7 +494,7 @@ function init() {
     }     
   });
   //TODO use diff name, solid sounds like it's related to transparent, but its actually collidable
-  var guiDefaultSolid = guiDefault.add( guiDefaultParams, 'solid' );
+  var guiDefaultSolid = guiApperance.add( guiDefaultParams, 'solid' );
   guiDefaultSolid.onChange(function(value)
   {   
     //TODO decide to store as boolean or string(bool needs changes in parseParams)

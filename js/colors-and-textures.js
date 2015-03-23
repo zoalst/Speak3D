@@ -140,29 +140,29 @@ function colourNameToHex(colour) {
 //to convert given texture name to texture file
 function getTextures() {
   var textures =  {
+      "alloy":"alien-alloy.png",
+      "brick":"4-old-brick-background-sml.jpg",
+      "carving":"alien-carving.png",
       "checkers":"checkerboard.jpg",
       "cloud":"cloud.png",
+      "chipped":"CLP_chipped_paint_wall.jpg",
       "chrome":"Chrome.png",
       "crate":"x-crate.png",
       "electric":"electric-blue-light.jpg",//maybe change name to water?
-      "alloy":"alien-alloy.png",
-      "carving":"alien-carving.png",
-      "rocky":"rocky-ground.jpg",
-      "glow":"blue-glowy.jpg",
       "dirt":"dirt-512.jpg",
-      "rock":"rock-512.jpg",
-      "moon":"moon.jpg",
-      "snow":"snow-512.jpg",
-      "sand":"sand-512.jpg",
+      "glow":"blue-glowy.jpg",
       "grass":"grass-512.jpg",
-      "water":"water512.jpg",
-      "brick":"4-old-brick-background-sml.jpg",
-      "paper":"5-blue-paper-background-lrg.jpg",
-      "chipped":"CLP_chipped_paint_wall.jpg",
+      "hearts":"transparent_red_hearts_tile_by_fantasystock-d37zzib.png",
       "lava":"lava.jpg",
-      "wood":"wood-texture3.jpg",
+      "moon":"moon.jpg",
+      "paper":"5-blue-paper-background-lrg.jpg",
+      "rock":"rock-512.jpg",
+      "rocky":"rocky-ground.jpg",
       "rope":"Rope-01.png",
-      "hearts":"transparent_red_hearts_tile_by_fantasystock-d37zzib.png"
+      "sand":"sand-512.jpg",
+      "snow":"snow-512.jpg",
+      "water":"water512.jpg",
+      "wood":"wood-texture3.jpg"
   };
   return textures;
 }
