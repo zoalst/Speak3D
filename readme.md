@@ -3,7 +3,7 @@
 Web app that creates 3D stuff when you speak to your browser. 
 Created using [three.js](http://threejs.org) and [annyang](https://www.talater.com/annyang/), along with some [jQuery](http://jquery.com/) and [dat.GUI](https://code.google.com/p/dat-gui/).  
 
-[Try the Demo on Google Drive](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (Only works with Chrome)
+[**Try the Demo on Google Drive**](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (Only works with Chrome)
 
 Built off of examples in Lee Stemkoski's [Three.js examples](http://stemkoski.github.io/Three.js/index.html) and [3JSFPS](http://stemkoski.github.io/7DFPS/index.html)
 
