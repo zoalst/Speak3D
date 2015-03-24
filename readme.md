@@ -1,8 +1,8 @@
 ## Speak3D
 
 Web app that creates 3D stuff when you speak to your browser. 
-Created using [three.js](http://threejs.org) and [annyang](https://www.talater.com/annyang/), along with some [jQuery](http://jquery.com/) and [dat.GUI](https://code.google.com/p/dat-gui/) 
-Built off of the examples in Lee Stemkoski's
+Created using [three.js](http://threejs.org) and [annyang](https://www.talater.com/annyang/), along with some [jQuery](http://jquery.com/) and [dat.GUI](https://code.google.com/p/dat-gui/).  
+Built off of examples in Lee Stemkoski's
 [Three.js examples](http://stemkoski.github.io/Three.js/index.html)
 
 [Try the Demo on Google Drive](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (Only works with Chrome)
@@ -61,18 +61,6 @@ Built off of the examples in Lee Stemkoski's
   - to use negative numbers you can say 'negative' or 'minus' followed a number, do not pause between these words
   - example (.. represents a slight pause): say 'create cube .. size .. one hundred fifty .. x .. minus twenty five'
 
-## Preset Defaults
-  - default size is 50 for all non-floor/wall geometries
-  - default (x,y,z) is (0,50,0) for all non-floor/wall geometries
-  - default color is light pink (0xffb6c1) for all non-floor/wall geometries
-  - default size is 1000 for all floor/wall
-  - default (x,y,z) is (0,0,0) for floor
-  - default (x,y,z) is (0,500,0) for wall, so it spans y 0 to 1000
-  - default (x,y,z) is (0,500,-500) for back wall 
-  - default texture is checkers for all floor/wall
-  - default transparent is false
-  - default amount is 3
-
 ## If you want to run on your server 
 
 You'll need [nodejs](http://nodejs.org/) installed
@@ -110,6 +98,18 @@ You'll need [nodejs](http://nodejs.org/) installed
   -snow
   -water
   -wood
+
+## Preset Defaults
+  - default size is 50 for all non-floor/wall geometries
+  - default (x,y,z) is (0,50,0) for all non-floor/wall geometries
+  - default color is light pink (0xffb6c1) for all non-floor/wall geometries
+  - default size is 1000 for all floor/wall
+  - default (x,y,z) is (0,0,0) for floor
+  - default (x,y,z) is (0,500,0) for wall, so it spans y 0 to 1000
+  - default (x,y,z) is (0,500,-500) for back wall 
+  - default texture is checkers for all floor/wall
+  - default transparent is false
+  - default amount is 3
 
 ## To Do
 
