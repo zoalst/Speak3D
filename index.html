@@ -1177,7 +1177,7 @@ function hidePauseScreen() {
 ///////////////////////////////////
 
 function create3DText(text) {//,x,y,z,size) {
-	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0f90 } );
+/*	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0f90 } );
 	var materialSide = new THREE.MeshBasicMaterial( { color: 0x009988 } );
 	var materialArray = [ materialFront, materialSide ];
 
@@ -1199,7 +1199,8 @@ function create3DText(text) {//,x,y,z,size) {
 	
 	textMesh.position.set( -0.5 * textWidth, 50, 100 );
 	textMesh.rotation.x = -Math.PI / 4;
-	return textMesh;
+	return textMesh;*/
+  return createGeometry(text,'TextGeometry');
 }
 function createSphere(params) {
 	return createGeometry(params,'SphereGeometry');
@@ -1392,6 +1393,17 @@ function createGeometry(params, geometry, many) {
       else {
         var geom = new THREE.CylinderGeometry(0,width,height);          
       }
+    }
+    else if(geometry == 'TextGeometry') {
+      //TODO, this will cause issues if text has Speak3D keywords/params in it(not here tho)
+      text = params;
+      var geom = new THREE.TextGeometry( text, 
+      {
+        size: 30, height: 4, curveSegments: 3,
+        font: "helvetiker", weight: "bold", style: "normal",
+        bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+        material: 0, extrudeMaterial: 1
+      });
     }
     //so user can still call 'create bubble' for a bubble sphere,
     //otherwise use material param set to bubble

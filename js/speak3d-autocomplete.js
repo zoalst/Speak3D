@@ -22,6 +22,7 @@ $(function(){
     'create many floors',
     'create many walls',
     'create bubble',
+    'create text',
     'test',
     'gravity on',
     'gravity off'
