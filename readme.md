@@ -2,10 +2,10 @@
 
 Web app that creates 3D stuff when you speak to your browser. 
 Created using [three.js](http://threejs.org) and [annyang](https://www.talater.com/annyang/), along with some [jQuery](http://jquery.com/) and [dat.GUI](https://code.google.com/p/dat-gui/).  
-Built off of examples in Lee Stemkoski's
-[Three.js examples](http://stemkoski.github.io/Three.js/index.html)
 
 [Try the Demo on Google Drive](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (Only works with Chrome)
+
+Built off of examples in Lee Stemkoski's [Three.js examples](http://stemkoski.github.io/Three.js/index.html) and [3JSFPS](http://stemkoski.github.io/7DFPS/index.html)
 
 ## Voice Command Examples
 
@@ -110,6 +110,8 @@ You'll need [nodejs](http://nodejs.org/) installed
   - default texture is checkers for all floor/wall
   - default transparent is false
   - default amount is 3
+  - default cone and cylinder width is size*2/5
+  - default ring width is size*4/5
 
 ## To Do
 
@@ -140,6 +142,9 @@ You'll need [nodejs](http://nodejs.org/) installed
   - better debugging
   - display message when browser does not support speech recognition
   - refactor
+
+## Sources
+  - Built off of examples in Lee Stemkoski's [Three.js examples](http://stemkoski.github.io/Three.js/index.html) and [3JSFPS](http://stemkoski.github.io/7DFPS/index.html)
 
 ## Authors
 
