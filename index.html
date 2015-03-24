@@ -2425,34 +2425,55 @@ function getRandomInt(min, max) {
 //TODO get checkboxes working
 //TODO error handling
 function updateGUI(params) {
+  //should already have base default params, so just add others for GUI
+  params["texture"] = 'none';
+  params["endx"] = 0;
+  params["endy"] = 50;
+  params["endz"] = 0;
+  params["endsize"] = 50;
+  params["width"] = 50;
+  params["height"] = 50;
+  params["depth"] = 50;
+  params["spinx"] = 'none';
+  params["spiny"] = 'none';
+  params["spinz"] = 'none';
+  params["movexspeed"] = 'none';
+  params["moveyspeed"] = 'none';
+  params["movezspeed"] = 'none';
+  params["material"] = 'none';
+  params["solid"] = 'false';
   for(var param in params) {
-    //TODO ??? not this & have defaultGlobalParams be all strings? convert later?
+    console.log('_________---');
+    console.log('guiDefaultParams[param]: '+guiDefaultParams[param]);
+    console.log('param: '+param);
+    console.log('params[param]: '+params[param]);
     //checkboxes
     if(param == 'transparent' || param == 'solid') {
       guiDefaultParams[param] = convertWordToBoolean(params[param]);      
     }
     //TODO something smarter
     //move/spin dropdowns
-    else if(param == 'movexspeed' || param == 'moveyspeed' || param == 'movezspeed') {
+    if((param == 'movexspeed' || param == 'moveyspeed' || param == 'movezspeed') && params[param] != 'none') {
       guiDefaultParams[param] = getMoveSpeedAsWord(params[param]);      
     }
-    else if(param == 'spinx' || param == 'spiny' || param == 'spinz') {
+    else if((param == 'spinx' || param == 'spiny' || param == 'spinz') && params[param] != 'none') {
       guiDefaultParams[param] = getSpinSpeedAsWord(params[param]);      
     }
     else {
       guiDefaultParams[param] = params[param];
     }
+  }
     // Iterate over all controllers
-/*  for (var i in gui.__controllers) {
-    gui.__controllers[i].updateDisplay();
-  }*/
+    for (var i in gui.__controllers) {
+      gui.__controllers[i].updateDisplay();
+    }
     for (var i = 0; i < this.gui.__folders.Appearance.__controllers.length; i++) {
-      this.gui.__folders.Appearance.__controllers[i].updateDisplay();
+      gui.__folders.Appearance.__controllers[i].updateDisplay();
     }
     for (var i = 0; i < this.gui.__folders.Position.__controllers.length; i++) {
-      this.gui.__folders.Position.__controllers[i].updateDisplay();
+      gui.__folders.Position.__controllers[i].updateDisplay();
     }
-  }
+  //}
 }
 
 function initSaveLoadButtons() {
