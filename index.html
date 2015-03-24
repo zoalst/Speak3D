@@ -51,72 +51,7 @@
 <!-- pause/start screen -->
 <div id="blocker">
 <div id="instructions">
-<span style="font-size:10px">Click Anywhere To Unpause (or press u)</span>
-<br />
-<span style="font-size:40px">List of Commands</span>
-<br />
-  - 'create cube *parameters*'
-<br />
-  - 'create sphere *parameters*'
-<br />
-  - 'create ring *parameters*'
-<br />
-  - 'create knot *parameters*'
-<br />
-  - 'create cylinder *parameters*' or 'create cone *parameters*'
-<br />
-  - 'create floor *parameters*'
-<br />
-  - 'create wall *parameters*'
-<br />
-  - 'create bubble *parameters*'
-<br />
-  - 'create many cubes/spheres/rings/knots/cylinders/floors/walls *parameters*' 
-<br />
-  - 'set default *parameters*'
-<br />
-<br />
-<span style="font-size:40px">*Parameters*</span>
-<br />
-  - 'x', 'y', or 'z' followed by a number
-<br />
-  - 'size' or 'width' followed by a number
-<br />
-  - 'amount' followed by a number
-<br />
-  - 'color' or 'ambient' followed by a color name
-<br />
-  - 'texture' followed by a texture name
-<br />
-  - 'tranparent' followed by 'true' or 'false'
-<br />
-  - 'material' followed by 'bubble' or 'mirror'
-<br />
-  - 'spin' followed by 'x', 'y', or 'z'
-<br />
-  - 'move' followed by 'x', 'y', or 'z', will only work if a range has been set for that axis
-<br />
-  - you can set a parameter range by using the keyword until, ex: create many cubes x 0 until 100
-<br />
-  ranges currently only function for x,y,z, and size
-<br />
-<br />
-<span style="font-size:40px">Examples</span>
-<br />
-  - say 'create sphere color magenta'
-<br />
-  - say 'create knot width 9 texture cloud'
-<br />
-  - say 'set default amount 5 transparent true', then 'create many cubes size 10 until 150'
-<br />
-  - say 'set default texture random', then 'create floor', then 'create many walls x -500 until 500'
-<br />
-<br />
-<span style="font-size:40px">Controls</span>
-<br />
-(W, A, S, D, R, F = Move, MOUSE = Look around)
-<br />
-(O = Display command line, ctrl+0 = Close command line, P = Pause, U = Unpause)
+<!-- instrcutions get loaded with jQuery in init() -->
 </div>
 </div>
 
@@ -284,7 +219,9 @@ function init() {
 	initDefaultGlobalParams();
   initBubble();
   initMirror();
-  hidePauseScreen();
+  //use jQuery to load instructions html
+  $('#instructions').load('instructions.html');
+  //hidePauseScreen();
   showPauseScreen();
 
 //testEverything();//TODO remove

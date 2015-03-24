@@ -94,6 +94,7 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - bug in dat.GUI, when default checkbox set outside of gui, updates display correctly but not value(have to double click)
+  - add callback to gui so it logs stuff for save/load
   - enhance dat.GUI
   - ability to reset/clear default params
   - GUI for user uploaded textures and models

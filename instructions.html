@@ -1,0 +1,78 @@
+<span style="font-size:10px">Click Anywhere To Unpause (or press u)</span>
+<br />
+<span style="font-size:25px">Examples</span>
+<br />
+  - say 'create cube x 75 y 100 color magenta'
+<br />
+  - say 'create floor', then 'create knot material mirror spin y slow' 
+<br />
+  - say 'set default amount 5 transparent true', then 'create many cubes size 10 until 150'
+<br />
+  - say 'set default texture random', then 'create floor', then 'create many walls x -500 until 500'
+<br />
+  - say 'set default x -50 until 50 y 0 until 100', then 'create many cones move x spin z'
+<br />
+<br />
+<span style="font-size:25px">List of Commands</span>
+<br />
+  - create geometry, followed by optional parameters
+<br />
+  - create many geometries, followed by optional parameters
+<br />
+  - set default, followed by parameters
+<br />
+  - reset default, open/close console, gravity on/off, undo, save, upload, test 
+<br />
+<br />
+<span style="font-size:25px">Geometry Names</span>
+<br />
+  cube
+  - sphere
+  - cylinder
+  - cone
+  - ring
+  - knot
+  - floor
+  - wall 
+  - back wall
+  - text
+<br />
+<br />
+<span style="font-size:25px">Parameters</span>
+<br />
+<span style="font-size:15px">everything in 'single quotes' represents the exact words you say</span>
+<br />
+<span style="font-size:15px">everything in (parentheses) represents your input</span>
+<br />
+<span style="font-size:15px">everything in [square brackets] is optional</span>
+<br />
+<span style="font-size:15px">the symbol -> represents followed by</span>
+<br />
+  - 'x', 'y', or 'z' -> (number) [ -> 'until' -> (number) ]
+<br />
+  - 'size', 'width', 'height', or 'depth' -> (number)
+<br />
+  - 'color' or 'ambient' -> (color name)
+<br />
+  - 'texture' -> (texture name)
+<br />
+  - 'material' -> (material name), right now the only options are 'bubble' or 'mirror'
+<br />
+  - 'tranparent' -> 'true' or 'false'
+<br />
+  - 'amount' -> (number), this parameter is used when creating many geometries
+<br />
+  - 'spin' -> 'x', 'y', or 'z' [ -> 'slow', 'medium', or 'fast' ]
+<br />
+  - 'move' -> 'x', 'y', or 'z' [ -> 'slow', 'medium', or 'fast' ]
+<br />
+  - **move will only work if a range has been set for that axis using the 'until' keyword
+<br />
+  - 'solid' -> 'true' or 'false', this makes a geometry collidable(when gravity is on)
+<br />
+<br />
+<span style="font-size:25px">Controls</span>
+<br />
+(W, A, S, D, R, F = Move, MOUSE = Look around)
+<br />
+(O = Open console, ctrl+0 = Close console, H = Hide/show gui, P = Pause, U = Unpause)
