@@ -1290,7 +1290,7 @@ function createGeometry(params, geometry, many) {
   var material = resolvedParams['material'];
   var solid = resolvedParams['solid'];
 
-  if(texture == undefined) {
+  if(texture == undefined || texture == 'none') {
     if(color == undefined) {
       color = defaultGlobalParams['color'];
     }
@@ -1426,7 +1426,7 @@ function createGeometry(params, geometry, many) {
       return mirrorMesh;
     }
     if(!many) {
-      if(material != undefined) {
+      if(material != undefined && material != 'none') {
         //TODO bubble/refactcamera/position
         if(material == 'bubble') {
           bubbles = true;
@@ -1470,7 +1470,7 @@ function createGeometry(params, geometry, many) {
       }
     }
     else {
-      if(material != undefined) {
+      if(material != undefined && material != 'none') {
         if(material == 'bubble') {
           bubbles = true;
           for(var i = 0; i < amount; i++) {
@@ -2023,6 +2023,37 @@ function parseParams(params, parsedParams) {
       else if(lastParamType == 'color') {
         parsedParams['endcolor'] = paramsArray[i+1];
       }
+      else if(lastParamType == 'movex' || lastParamType == 'movey' || lastParamType == 'movez') {
+        if(paramsArray[i+1] == '-') {
+          //strip off move to set to endx,endy,endz
+          parsedParams['end'+lastParamType.substring(4)] = paramsArray[i+1] + paramsArray[i+2];
+          i++;
+        }
+        else {
+          parsedParams['end'+lastParamType.substring(4)] = paramsArray[i+1];
+        }
+        //move x -50 until 500 fast
+        var speed;
+        var moveSpeed;
+        if(paramsArray[i+2] != undefined) {
+          speed = paramsArray[i+2].toLowerCase();
+          if(speed == 'slow') {
+            moveSpeed = globalMoveSlow;
+            i++;
+          }
+          else if(speed == 'fast') {
+            moveSpeed = globalMoveFast;
+            i++;
+          }
+          else if(speed == 'medium') {
+            moveSpeed = globalMoveMedium;
+            i++;
+          }
+          else {
+            moveSpeed = globalMoveSlow;
+          }
+        }
+      }
       lastParamType = '';
     }
     //move/oscillate
@@ -2052,18 +2083,43 @@ function parseParams(params, parsedParams) {
       else {
         moveSpeed = globalMoveSlow;
       }      
-
+      var coor = paramsArray[i+2];
+      if(coor == '-' && isNumber(paramsArray[i+3])) {
+        coor = paramsArray[i+2] + paramsArray[i+3];
+        i++;
+      }
       if(dir == 'x') {
+        if(isNumber(coor)) {
+          parsedParams['movex'] = coor;
+          lastParamType = 'movex'; 
+          i++;
+        }
+        else {
+          lastParamType = 'movexspeed';           
+        }
         parsedParams['movexspeed'] = +moveSpeed;
-        lastParamType = 'movex'; 
       }
       else if(dir == 'y' || dir == 'why') {
+        if(isNumber(coor)) {
+          parsedParams['movey'] = coor;
+          lastParamType = 'movey'; 
+          i++;
+        }
+        else {
+          lastParamType = 'moveyspeed';           
+        }
         parsedParams['moveyspeed'] = +moveSpeed;
-        lastParamType = 'movey'; 
       }
       else if(dir == 'z') {
+        if(isNumber(coor)) {
+          parsedParams['movez'] = coor;
+          lastParamType = 'movez'; 
+          i++;
+        }
+        else {
+          lastParamType = 'movezspeed';           
+        }
         parsedParams['movezspeed'] = +moveSpeed;
-        lastParamType = 'movez'; 
       }
     }
     //spin
@@ -2145,6 +2201,8 @@ function resetDefaultGlobalParams(params) {
   if(params == undefined) {
     //reset all params
     initDefaultGlobalParams();
+    //update gui, pass in nothing to reset
+    updateGUI();
   }
   else {
     //reset given params
@@ -2171,9 +2229,9 @@ function resetDefaultGlobalParams(params) {
         defaultGlobalParams[currParam] = undefined;
       }
     }
+    //update gui
+    updateGUI(defaultGlobalParams);
   }
-  //update gui
-  updateGUI(defaultGlobalParams);
 }
 
 //resolves params except color/ambient
@@ -2357,6 +2415,10 @@ function resolveParams(params) {
   return resolvedParams;
 }
 
+function isNumber(potentialNumber) {
+  return !isNaN(potentialNumber);
+}
+
 function convertWordToBoolean(word) {
 	if(word == 'true') {
 		return true;
@@ -2437,28 +2499,28 @@ function getRandomInt(min, max) {
 //TODO get checkboxes working
 //TODO error handling
 function updateGUI(params) {
-  //should already have base default params, so just add others for GUI
-  params["texture"] = 'none';
-  params["endx"] = 0;
-  params["endy"] = 50;
-  params["endz"] = 0;
-  params["endsize"] = 50;
-  params["width"] = 50;
-  params["height"] = 50;
-  params["depth"] = 50;
-  params["spinx"] = 'none';
-  params["spiny"] = 'none';
-  params["spinz"] = 'none';
-  params["movexspeed"] = 'none';
-  params["moveyspeed"] = 'none';
-  params["movezspeed"] = 'none';
-  params["material"] = 'none';
-  params["solid"] = 'false';
+  //if resetting gui & params
+  if(params == undefined) {
+    params = {};
+    //should already have base default params, so just add others for GUI
+    params["texture"] = 'none';
+    params["endx"] = 0;
+    params["endy"] = 50;
+    params["endz"] = 0;
+    params["endsize"] = 50;
+    params["width"] = 50;//TODO set these to nothing actually
+    params["height"] = 50;//
+    params["depth"] = 50;//
+    params["spinx"] = 'none';
+    params["spiny"] = 'none';
+    params["spinz"] = 'none';
+    params["movexspeed"] = 'none';
+    params["moveyspeed"] = 'none';
+    params["movezspeed"] = 'none';
+    params["material"] = 'none';
+    params["solid"] = 'false';
+  }
   for(var param in params) {
-    console.log('_________---');
-    console.log('guiDefaultParams[param]: '+guiDefaultParams[param]);
-    console.log('param: '+param);
-    console.log('params[param]: '+params[param]);
     //checkboxes
     if(param == 'transparent' || param == 'solid') {
       guiDefaultParams[param] = convertWordToBoolean(params[param]);      
@@ -2846,7 +2908,7 @@ function submitCommand(command) {
       var params = command.substring(len+1);
       //pass defaultGlobalParams as second arg to set the defaultGlobalParams
       parseParams(params, defaultGlobalParams);
-      updateGUI(defaultGlobalParams);
+      updateGUI(defaultGlobalParams);//TODO doesnt work
     }
   }
   else if(command.indexOf('reset default') === 0) {
