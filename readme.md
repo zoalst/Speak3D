@@ -23,7 +23,7 @@ Built off of examples in Lee Stemkoski's [Three.js examples](http://stemkoski.gi
   - 'set default' w/ parameters
   - say 'undo' or press ctrl+z
   - say 'save' to save what you generate as a text file that can later be uploaded with 'upload'
-  - say 'open console' or press 'o' to submit typed out commands in the top right corner(submit with enter); say 'close console' to close it
+  - say 'open console' or press 'o' to submit typed out commands in the bottom left corner(submit with enter); say 'close console' to close it
   - say 'gravity on' to have gravity and collision affect the user, say 'gravity off' to turn it off
   - say 'test' or 'test everything' to see a bunch of stuff at once
 

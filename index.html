@@ -56,8 +56,8 @@
 </div>
 
 <!-- cli -->
-<button id = "submitButton" type="button" style="position: absolute; right:0px; top:10px; visibility:hidden">!!</button> 
-<input id="consoleBox" type="text" command="command" size="66" style="position: absolute; right:20px; top:10px; visibility:hidden"/>
+<button id = "submitButton" type="button" style="position: absolute; left:0px; bottom:0px; visibility:hidden">!!</button> 
+<input id="consoleBox" type="text" command="command" size="66" style="position: absolute; left:20px; bottom:0px; visibility:hidden"/>
 
 <!-- TODO unique filenames (timestamp) -->
 <a href="" id="link" download="Speak3D.txt"> </a>
@@ -165,7 +165,7 @@ function init() {
 	// STATS
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.bottom = '0px';
+	stats.domElement.style.bottom = '25px';
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 	// LIGHT
