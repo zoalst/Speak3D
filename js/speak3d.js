@@ -400,7 +400,7 @@ function init() {
   	  },
    	  'create cube': function() {
         notify('create cube');
-  	  	scene.add(createCube(defaultGlobalParams));
+  	  	scene.add(createCube(''));
   	  },
   	  'create cube *params': function(params) {
         notify('create cube '+params);
@@ -1216,11 +1216,19 @@ function createGeometry(params, geometry, many) {
   var solid = resolvedParams['solid'];
 
   var defaultTexture = defaultGlobalParams['texture'];
+  //for deciding when to use default material vs explicit color or texture
+  var useColorOrTextureInstead = false;
+  if((texture != undefined && texture != 'none') 
+      || (defaultTexture != undefined && defaultTexture != 'none') 
+      || (color != undefined && color != "16758465")) {
+    useColorOrTextureInstead = true;
+  }
+  //TODO ambient
   //color given in command, no texture given
   if((texture == undefined || texture == 'none') && color != undefined) {
     if(ambient == undefined) {
       //TODO might cause some kinda light pink bug
-      if(defaultGlobalParams['ambient'] == undefined || ambient == "#ffb6c1") {
+      if(defaultGlobalParams['ambient'] == undefined || ambient == '#ffb6c1') {
         ambient = color;
       }
       else {
@@ -1375,7 +1383,7 @@ function createGeometry(params, geometry, many) {
       return mirrorMesh;
     }
     if(!many) {
-      if(material != undefined && material != 'none') {
+      if(material != undefined && material != 'none' && !useColorOrTextureInstead) {
         //TODO bubble/refactcamera/position
         if(material == 'bubble') {
           bubbles = true;
@@ -1419,7 +1427,7 @@ function createGeometry(params, geometry, many) {
       }
     }
     else {
-      if(material != undefined && material != 'none') {
+      if(material != undefined && material != 'none' && !useColorOrTextureInstead) {
         if(material == 'bubble') {
           bubbles = true;
           for(var i = 0; i < amount; i++) {
