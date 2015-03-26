@@ -117,6 +117,7 @@ You'll need [nodejs](http://nodejs.org/) installed
 
   - bug in dat.GUI, when default checkbox set outside of gui, updates display correctly but not value(have to double click)
   - just say 'set' instead of 'set default'
+  - reset default w/ params, sets given params and resets everything else
   - add callback to gui so it logs stuff for save/load
   - enhance dat.GUI
   - bug when loading more than one mirror from file
