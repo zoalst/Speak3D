@@ -1187,13 +1187,14 @@ function createManyCones(params) {
 function createGeometry(params, geometry, many) {
   var color = params['color'];
   var ambient = params['ambient'];
+  var texture = params['texture'];
   //color/ambient not yet resolved
   var resolvedParams = resolveParams(params);
   var x = resolvedParams['x'];
   var y = resolvedParams['y'];
   var z = resolvedParams['z'];
   var size = resolvedParams['size'];
-  var texture = resolvedParams['texture'];
+  //var texture = resolvedParams['texture'];
   var btrans = resolvedParams['btrans'];
   var amount = resolvedParams['amount'];
   var endx = resolvedParams['endx'];
@@ -1214,10 +1215,30 @@ function createGeometry(params, geometry, many) {
   var material = resolvedParams['material'];
   var solid = resolvedParams['solid'];
 
-  if(texture == undefined || texture == 'none') {
-    if(color == undefined) {
-      color = defaultGlobalParams['color'];
+  var defaultTexture = defaultGlobalParams['texture'];
+  //color given in command, no texture given
+  if((texture == undefined || texture == 'none') && color != undefined) {
+    if(ambient == undefined) {
+      //TODO might cause some kinda light pink bug
+      if(defaultGlobalParams['ambient'] == undefined || ambient == "#ffb6c1") {
+        ambient = color;
+      }
+      else {
+        ambient = defaultGlobalParams['ambient'];
+      }
     }
+    var geometryMaterial = new THREE.MeshPhongMaterial( { 
+      color: color, 
+      ambient: ambient,  
+      transparent: btrans, 
+      blending: THREE.AdditiveBlending 
+    } );
+  }
+  //no color or texture given, no default texture so use default color
+  else if((texture == undefined || texture == 'none') 
+      && (defaultTexture == undefined || defaultTexture == 'none') 
+      && color == undefined) {
+    color = defaultGlobalParams['color'];
     if(ambient == undefined) {
       if(defaultGlobalParams['ambient'] == undefined) {
         ambient = color;
@@ -1233,7 +1254,11 @@ function createGeometry(params, geometry, many) {
       blending: THREE.AdditiveBlending 
     } );
   }
+  //has either texture or default texture
   else {
+    if(texture == undefined || texture == 'none')  {
+      texture = defaultTexture;
+    }
     var wallTexture;
     if(texture != 'random') {
       wallTexture = new THREE.ImageUtils.loadTexture( 'images/' + textures[texture] );
@@ -1905,6 +1930,18 @@ function parseParams(params, parsedParams) {
         parsedParams['color'] = colourNameToHex(next);
       }
       lastParamType = 'color';
+    }
+    else if(currParam == 'ambient') {
+      //check if color starts w/ dark, medium, light, or pale
+      var next = paramsArray[i+1];
+      if(next == 'dark' || next == 'medium' || next == 'light' || next == 'pale') {
+        parsedParams['ambient'] = colourNameToHex(next+paramsArray[i+2]);
+        i++;
+      }
+      else{
+        parsedParams['ambient'] = colourNameToHex(next);
+      }
+      lastParamType = 'ambient';
     }
     else if(currParam == 'x' || currParam == 'y' || currParam == 'z' ) {
       //negative numbers sometimes come in with a space, ex: - 100
