@@ -5,6 +5,8 @@ Created using [three.js](http://threejs.org) and [annyang](https://www.talater.c
 
 [**Try the Demo on Google Drive**](http://googledrive.com/host/0B5KjNubMIcDvSnNtVnhNemsxd2M/index.html) (Only works with Chrome)
 
+There is [**this demo video**](http://youtu.be/1AGmanBZOM0) and [**this demo video**](https://youtu.be/nnfOzQ7Quno) 
+
 Built off of examples in Lee Stemkoski's [Three.js examples](http://stemkoski.github.io/Three.js/index.html) and [3JSFPS](http://stemkoski.github.io/7DFPS/index.html)
 
 ## Voice Command Examples
@@ -21,7 +23,7 @@ Built off of examples in Lee Stemkoski's [Three.js examples](http://stemkoski.gi
 
   - 'create' geometry or 'create many' geometries w/ optional parameters
   - 'set default' w/ parameters
-  - say 'undo' or press ctrl+z
+  - say 'undo'
   - say 'save' to save what you generate as a text file that can later be uploaded with 'upload'
   - say 'open console' or press 'o' to submit typed out commands in the bottom left corner(submit with enter); say 'close console' to close it
   - say 'gravity on' to have gravity and collision affect the user, say 'gravity off' to turn it off
@@ -115,32 +117,27 @@ You'll need [nodejs](http://nodejs.org/) installed
 
 ## To Do
 
-  - bug in dat.GUI, when default checkbox set outside of gui, updates display correctly but not value(have to double click)
+  - ability to manipulate & remove existing geometries, incl. voice command to stop all motion
   - just say 'set' instead of 'set default'
   - reset default w/ params, sets given params and resets everything else
-  - add callback to gui so it logs stuff for save/load
-  - enhance dat.GUI
-  - bug when loading more than one mirror from file
-  - bug with create many w/ mirror material (cameras)
-  - GUI for user uploaded textures and models
-  - add parameters for dimensions, rotation, etc.
-  - improve cli's auto-complete
-  - improve cli w/ list of recently submitted commands
-  - ability to manipulate & remove existing geometries, incl. voice command to stop all motion
+  - enhance dat.GUI usability and so it logs stuff for save/load
+  - built-in models, GUI for user uploaded textures and models
+  - bug with create many w/ mirror material (cameras) and loading more than one mirror from file
+  - add parameters for rotation, geometry specific options, etc.
+  - improve cli's auto-complete, list of recently submitted commands
   - enhance start/pause screen
   - export function, add option that generates three js code
   - add random as an option, ex: color random, size & coordinates also
   - esc from pointer lock when mouse is in motion can cause camera to be angled somewhere else
   - ctrl+z is buggy
   - create self command, for third person view
+  - bug in dat.GUI, when default checkbox set outside of gui, updates display correctly but not value(have to double click)
   - when creating many geometries w/ one command, morph them into one geometry (maybe when amount >= a certian amount)
   - better controls to navigate in 3D space
   - problems with people talking fast
-  - more geometries
-  - more colors and textures
+  - more geometries, colors and textures
   - ability to set default parameters for specific geometries 
   - lights, fog, skyBox, etc.
-  - built-in models and user uploaded models
   - better debugging
   - display message when browser does not support speech recognition
   - refactor

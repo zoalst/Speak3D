@@ -828,7 +828,7 @@ function update() {
 	//TODO, it's really bugged due to hold down
 	if ( keyboard.pressed("ctrl+z") && !undoing) { 
 		undoing = true;
-		undo()
+		undo();
 		setInterval(function() {undoing=false;}, 1000);
 	}
 
@@ -926,7 +926,8 @@ function update() {
         user.translateZ( -move.zDist );
         user.updateMatrix();
         if ( collision( solids ) ) {
-            console.log( "Something's wrong with collision..." );
+            //TODO
+            //console.log( "Something's wrong with collision..." );
         }
       }
       if ( keyboard.pressed("space") && (user.velocity.y <= 0 )) {
@@ -1218,9 +1219,10 @@ function createGeometry(params, geometry, many) {
   var defaultTexture = defaultGlobalParams['texture'];
   //for deciding when to use default material vs explicit color or texture
   var useColorOrTextureInstead = false;
-  if((texture != undefined && texture != 'none') 
+  if(((texture != undefined && texture != 'none') 
       || (defaultTexture != undefined && defaultTexture != 'none') 
-      || (color != undefined && color != "16758465")) {
+      || (color != undefined && color != "16758465"))
+      && (material == undefined || material == 'none')) {
     useColorOrTextureInstead = true;
   }
   //TODO ambient
@@ -2877,7 +2879,7 @@ function submitCommand(command) {
       var params = command.substring(len+1);
       //pass defaultGlobalParams as second arg to set the defaultGlobalParams
       parseParams(params, defaultGlobalParams);
-      updateGUI(defaultGlobalParams);//TODO doesnt work
+      updateGUI(defaultGlobalParams);
     }
   }
   else if(command.indexOf('reset default') === 0) {
