@@ -1,7 +1,7 @@
 /*
 	Speak3D
 	Author: Zachary Stenger
-	Date: Feb. & Mar. 2015
+	Date: Feb. - Apr. 2015
   uses annyang for speech recognition
 	built off of the Text3D example in
 	Three.js "tutorials by example" by Lee Stemkoski
@@ -1917,7 +1917,7 @@ function undo() {
  //METHODS FOR DEALING WITH PARAMETERS//
 ///////////////////////////////////////
 
-//--params- string of parameters & their values
+//NEW PARSEPARAMS METHOD!!! use state-diagram
 //--parsedParams, assoc array to store param->value (use defaultGlobalParams to setDefaultParams)
 function parseParams(params, parsedParams) {
   //TODO, if user speaks too fast comes in with no space (ex: z75)
@@ -1925,238 +1925,266 @@ function parseParams(params, parsedParams) {
   if(parsedParams == undefined) {
     parsedParams = {};
   }
-  var lastParamType = '';
+  //state variable
+  /*states: s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
+    s0: idling state -> s1,s4,s5,s6,s7,s10
+    s1: xyz,size,height,width,depth -> s2
+    s2: check range for s1 stuff -> s3
+    s3: complete range -> s0
+    s4: transparent,solid (booleans) -> s0
+    s5: color/ambient/texture/material -> s0
+    s6: spin xyz -> s0
+    s7: move xyz -> s8
+    s8: check if move cooridates given -> s9
+    s9: check move range for s8 stuff -> s3
+    s10: amount
+  */
+  var currState = 's0';
+  var lastState = '';
+  var tempState = '';
   var currParam = '';
-  for(var i = 0; i < paramsArray.length-1; i+=2) {
+  var word = '';
+  for(var i = 0; i < paramsArray.length; i++) {
     currParam = paramsArray[i].toLowerCase();
-    if(currParam == 'color' || currParam == 'colour') {
-      //check if color starts w/ dark, medium, light, or pale
-      var next = paramsArray[i+1];
-      if(next == 'dark' || next == 'medium' || next == 'light' || next == 'pale') {
-        parsedParams['color'] = colourNameToHex(next+paramsArray[i+2]);
+    console.log('currState: '+currState);
+    console.log('lastState: '+lastState);
+    console.log('currParam: '+currParam);
+    console.log('word: '+word);
+    console.log(' -------------- ');
+    //first deal ith special cases
+    //check for why/by/y
+    if(currParam === 'why' || currParam === 'by') {
+      currParam = 'y';
+    }
+    //check for minus sign w/ a space
+    else if(currParam === '-') {
+      if(paramsArray[i+1] != undefined && isNumber(paramsArray[i+1])){
+        currParam = currParam + paramsArray[i+1];
         i++;
       }
-      else{
-        parsedParams['color'] = colourNameToHex(next);
-      }
-      lastParamType = 'color';
     }
-    else if(currParam == 'ambient') {
-      //check if color starts w/ dark, medium, light, or pale
-      var next = paramsArray[i+1];
-      if(next == 'dark' || next == 'medium' || next == 'light' || next == 'pale') {
-        parsedParams['ambient'] = colourNameToHex(next+paramsArray[i+2]);
-        i++;
-      }
-      else{
-        parsedParams['ambient'] = colourNameToHex(next);
-      }
-      lastParamType = 'ambient';
+    //check for zero coming in as word
+    else if(currParam === 'zero') {
+      currParam = 0;
     }
-    else if(currParam == 'x' || currParam == 'y' || currParam == 'z' ) {
-      //negative numbers sometimes come in with a space, ex: - 100
-      if(paramsArray[i+1] == '-') {
-        parsedParams[currParam] = paramsArray[i+1] + paramsArray[i+2];
-        lastParamType = currParam;
-        i++;  
+    else if(['and','end','&'].indexOf(currParam) != -1 ) {
+      currParam = 'until';
+    }
+    else if(currParam === 'with') {
+      currParam = 'width';
+    }
+    else if(currParam === 'death') {
+      currParam = 'depth';
+    }
+    else if(currParam === 'sized') {
+      currParam = 'size';
+    }
+    tempState = currState;
+    //state0, idling
+    if(currState === 's0') {
+      if(['x','y','z','size','width','height','depth'].indexOf(currParam) != -1 ) {
+        currState = 's1';
+        word = currParam;
+      }
+      else if(['transparent','solid'].indexOf(currParam) != -1) {
+        currState = 's4';
+        word = currParam;
+      }
+      else if(['color','texture','material','ambient'].indexOf(currParam) != -1) {
+        currState = 's5';
+        word = currParam;
+      }
+      else if(currParam === 'spin') {
+        currState = 's6';
+        word = currParam;
+      }
+      else if(currParam === 'move' || currParam === 'mood') {
+        currState = 's7';
+        word = 'move';
+      }
+      else if(currParam === 'amount' || currParam === 'announced') {
+        currState = 's10';
+        word = 'amount';
+      }
+    }
+    else if(currState === 's1') {
+      if(isNumber(currParam)) {
+        currState = 's2';
+        parsedParams[word] = currParam;
       }
       else {
-        parsedParams[currParam] = paramsArray[i+1];
-        lastParamType = currParam;
-      }     
+        currState = 's0';//err, todo
+      }
     }
-    //annyang sometimes thinks you are saying 'why' or 'by' instead of 'y'
-    //mainly happens when y is your first or only coordinate input
-    else if(currParam == 'why' || currParam == 'by' ) {
-      if(paramsArray[i+1] == '-') {
-        parsedParams['y'] = paramsArray[i+1] + paramsArray[i+2];
-        i++;  
+    else if(currState === 's2') {
+      if(currParam == 'until') {
+        currState = 's3';
       }
       else {
-        parsedParams['y'] = paramsArray[i+1];
-      }     
-      lastParamType = 'y';
-    }
-    //change terminology to 'until' because when you say x -200 and 50 it thinks you say -250
-    else if(currParam == 'until' || currParam == 'and' || currParam == 'end' || paramsArray[i] == '&') {
-      if(lastParamType == 'x' || lastParamType == 'y' || lastParamType == 'z') {
-        if(paramsArray[i+1] == '-') {
-          parsedParams['end'+lastParamType] = paramsArray[i+1] + paramsArray[i+2]; 
-          i++;    
-        }
-        else {
-          parsedParams['end'+lastParamType] = paramsArray[i+1];     
-        }
+        currState = 's0';
+        i--;//go back because we looked ahead
       }
-      else if(lastParamType == 'size') {
-        parsedParams['endsize'] = paramsArray[i+1];
-      }
-      else if(lastParamType == 'color') {
-        parsedParams['endcolor'] = paramsArray[i+1];
-      }
-      else if(lastParamType == 'movex' || lastParamType == 'movey' || lastParamType == 'movez') {
-        if(paramsArray[i+1] == '-') {
-          //strip off move to set to endx,endy,endz
-          parsedParams['end'+lastParamType.substring(4)] = paramsArray[i+1] + paramsArray[i+2];
-          i++;
-        }
-        else {
-          parsedParams['end'+lastParamType.substring(4)] = paramsArray[i+1];
-        }
-        //move x -50 until 500 fast
-        var speed;
-        var moveSpeed;
-        if(paramsArray[i+2] != undefined) {
-          speed = paramsArray[i+2].toLowerCase();
-          if(speed == 'slow') {
-            moveSpeed = globalMoveSlow;
+    }   
+    else if(currState === 's3') {
+      if(isNumber(currParam)) {
+        currState = 's0';
+        parsedParams['end'+word] = currParam;
+        //came from move state, check for speed
+        if( lastState === 's9' && i < paramsArray.length-1 ) {
+          var moveSpeed = checkForMoveSpeed(paramsArray[i+1].toLowerCase());
+          if(moveSpeed != undefined) {
+            parsedParams['move'+word+'speed'] = moveSpeed;
             i++;
           }
-          else if(speed == 'fast') {
-            moveSpeed = globalMoveFast;
-            i++;
-          }
-          else if(speed == 'medium') {
-            moveSpeed = globalMoveMedium;
-            i++;
-          }
-          else {
-            moveSpeed = globalMoveSlow;
-          }
-        }
-      }
-      lastParamType = '';
-    }
-    //move/oscillate
-    else if(currParam == 'move' || currParam == 'mood') {
-      parsedParams['move'] = true;
-      var dir = paramsArray[i+1].toLowerCase();
-      var speed;
-      var moveSpeed;
-      if(paramsArray[i+2] != undefined) {
-        speed = paramsArray[i+2].toLowerCase();
-        if(speed == 'slow') {
-          moveSpeed = globalMoveSlow;
-          i++;
-        }
-        else if(speed == 'fast') {
-          moveSpeed = globalMoveFast;
-          i++;
-        } 
-        else if(speed == 'medium') {
-          moveSpeed = globalMoveMedium;
-          i++;
-        } 
-        else {
-          moveSpeed = globalMoveSlow;
         }
       }
       else {
-        moveSpeed = globalMoveSlow;
-      }      
-      var coor = paramsArray[i+2];
-      if(coor == '-' && isNumber(paramsArray[i+3])) {
-        coor = paramsArray[i+2] + paramsArray[i+3];
-        i++;
+        currState = 's0';//err, todo
       }
-      if(dir == 'x') {
-        if(isNumber(coor)) {
-          parsedParams['x'] = coor;
-          lastParamType = 'movex'; 
-          i++;
-        }
-        else {
-          lastParamType = 'movexspeed';           
-        }
-        parsedParams['movexspeed'] = +moveSpeed;
+    }
+    //transparent/solid
+    else if(currState === 's4') {
+      if(currParam == 'true' || currParam == 'false') {
+        currState = 's0';
+        parsedParams[word] = currParam;
       }
-      else if(dir == 'y' || dir == 'why') {
-        if(isNumber(coor)) {
-          parsedParams['y'] = coor;
-          lastParamType = 'movey'; 
-          i++;
-        }
-        else {
-          lastParamType = 'moveyspeed';           
-        }
-        parsedParams['moveyspeed'] = +moveSpeed;
+      else {
+        currState = 's0';//err, todo
       }
-      else if(dir == 'z') {
-        if(isNumber(coor)) {
-          parsedParams['z'] = coor;
-          lastParamType = 'movez'; 
-          i++;
+    }
+    //color/ambient/texture/material
+    //TODO error checking, names
+    else if(currState == 's5') {
+      if(['color','ambient'].indexOf(word) != -1) {
+        if(['dark','medium','light','pale'].indexOf(currParam) != -1) {
+          if(i < paramsArray.length-1) {
+            var colorName = currParam+paramsArray[i+1].toLowerCase();
+            parsedParams[word] = colourNameToHex(colorName);
+            i++;
+          }
         }
-        else {
-          lastParamType = 'movezspeed';           
-        }
-        parsedParams['movezspeed'] = +moveSpeed;
+        parsedParams[word] = currParam;        
       }
+      else {
+        parsedParams[word] = currParam;
+      }
+      currState = 's0';
     }
     //spin
-    else if(currParam == 'spin') {
-      parsedParams['spin'] = true;
-      var dir = paramsArray[i+1].toLowerCase();
-      var speed;
-      var spinSpeed;
-      if(paramsArray[i+2] != undefined) {
-        speed = paramsArray[i+2].toLowerCase();
-        if(speed == 'slow') {
-          spinSpeed = globalSpinSlow;
-          i++;
-        }
-        else if(speed == 'fast') {
-          spinSpeed = globalSpinFast;
-          i++;
-        } 
-        else if(speed == 'medium') {
+    else if(currState == 's6') {
+      var spinSpeed = globalSpinMedium;        
+      if(i < paramsArray.length-1) {
+        spinSpeed = checkForSpinSpeed(paramsArray[i+1].toLowerCase());
+        if(spinSpeed === undefined) {
           spinSpeed = globalSpinMedium;
-          i++;
-        } 
-        else {
-          spinSpeed = globalSpinMedium;        
         }
+        else {
+          i++;
+        }
+      }
+      if(['x','y','z'].indexOf(currParam) != -1) {
+        currState = 's0';
+        parsedParams['spin'+currParam] = spinSpeed;
+        parsedParams['spin'] = true;
       }
       else {
-        spinSpeed = globalSpinMedium;        
+        currState = 's0';//err, todo
       }
-      if(dir == 'x') {
-        parsedParams['spinx'] = spinSpeed;
+    }
+    //move
+    else if(currState == 's7') {
+      var moveSpeed = globalMoveSlow
+      if(i < paramsArray.length-1) {
+        moveSpeed = checkForMoveSpeed(paramsArray[i+1].toLowerCase());
+        if(moveSpeed === undefined) {
+          moveSpeed = globalMoveSlow;
+        }
+        else {
+          i++;
+        }
       }
-      else if(dir == 'y' || dir == 'why') {
-        parsedParams['spiny'] = spinSpeed;
+      if(['x','y','z'].indexOf(currParam) != -1) {
+        currState = 's8';
+        parsedParams['move'+currParam+'speed'] = moveSpeed;
+        parsedParams['move'] = true;
+        //need to pass along currParam as word incase range is given. (until)
+        word = currParam;
       }
-      else if(dir == 'z') {
-        parsedParams['spinz'] = spinSpeed;        
+      else {
+        currState = 's0';//err, todo
       }
-      lastParamType = 'spin'; 
     }
-    else if(currParam == 'texture') {
-      parsedParams['texture'] = paramsArray[i+1].toLowerCase();      
-      lastParamType = 'texture'; 
+    else if(currState == 's8') {
+      if(isNumber(currParam)) {
+        currState = 's9';
+        parsedParams[word] = currParam;
+      }
+      else {
+        currState = 's0';
+        i--;//go back because we looked ahead
+      }
     }
-    //sometimes annyang hears announced instead of amount
-    else if(currParam == 'announced') {
-      parsedParams['amount'] = paramsArray[i+1];      
-      lastParamType = 'amount'; 
+    else if(currState === 's9') {
+      if(currParam == 'until') {
+        currState = 's3';
+      }
+      else {
+        currState = 's0';
+        i--;//go back because we looked ahead
+      }
+    } 
+    else if(currState === 's10') {
+      if(isNumber(currParam)) {
+        currState = 's0';
+        parsedParams[word] = currParam;
+      }
+      else {
+        currState = 's0';//err, todo
+      }
     }
-    //sometimes annyang hears sized instead of size
-    else if(currParam == 'sized') {
-      parsedParams['size'] = paramsArray[i+1];      
-      lastParamType = 'size'; 
-    }
-    //annyang hears with instead of width
-    else if(currParam == 'with') {
-      parsedParams['width'] = paramsArray[i+1];      
-      lastParamType = 'width'; 
-    }
-    else {
-      parsedParams[currParam] = paramsArray[i+1];     
-      lastParamType = currParam;
-    }
+    lastState = tempState;      
   }
   return parsedParams;
 }
+function checkForMoveSpeed(speed) {
+  if(speed === undefined) {
+    return undefined;
+  }
+  else {
+    if(speed == 'slow') {
+      return globalMoveSlow;
+    }
+    else if(speed == 'fast') {
+      return globalMoveFast;
+    } 
+    else if(speed == 'medium') {
+      return globalMoveMedium;
+    }
+    else {
+      return undefined;
+    }
+  }
+}
+function checkForSpinSpeed(speed) {
+  if(speed === undefined) {
+    return undefined;
+  }
+  else {
+    if(speed === 'slow') {
+      return globalSpinSlow;
+    }
+    else if(speed === 'fast') {
+      return globalSpinFast;
+    } 
+    else if(speed === 'medium') {
+      return globalSpinMedium;
+    }
+    else {
+      return undefined;
+    }
+  }
+}
+
 function initDefaultGlobalParams() {
   defaultGlobalParams = {};
 	defaultGlobalParams['x'] = 0;
@@ -2442,7 +2470,7 @@ function getMoveSpeedAsNumber(speed) {
   else if(speed == 'medium') {
     moveSpeed = globalMoveMedium;
   } 
-  return moveSpeed;
+  return globalMoveSlow;
 }
 
 function getMoveSpeedAsWord(speed) {
