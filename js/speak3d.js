@@ -36,6 +36,12 @@ var globalSpinSlow = 0.001;
 var globalSpinFast = 0.05;
 var globalSpinMedium = 0.01;
 
+var orbittingMeshs = [];
+var orbittingParams = [];
+var globalOrbitSlow = 1;
+var globalOrbitFast = 5;
+var globalOrbitMedium = 2.5;
+var defaultOrbitRadius = 120;
 
 var movingMeshs = [];
 var movingParams = [];
@@ -58,6 +64,8 @@ var instructions = document.getElementById( 'instructions' );
 var gui, guiDefaultParams, guiApperance, guiPosition;
  
 var saveLog = '';
+
+var t = 0;
 
 init();
 animate();
@@ -982,7 +990,6 @@ function collision( wallArray )
   }
   return false;
 }
-
 function render() {
   //bubble
   if(bubbles) {
@@ -1080,6 +1087,34 @@ function render() {
           }
           moveParams['zdir'] = -1*zdir;
         }
+      }
+    }
+  }
+  //orbit
+  if(orbittingMeshs.length > 0) {
+    t += 0.01;
+    var orbitParams;
+    var radius;
+    var xpos, ypos, zpos;
+    for (var i = 0; i < orbittingMeshs.length; i++) {
+      orbitParams = orbittingParams[i];
+      xpos = +orbitParams['xpos'];
+      ypos = +orbitParams['ypos'];
+      zpos = +orbitParams['zpos'];
+      if(orbitParams['x'] != 0) {
+        radius = orbitParams['xradius'];
+        orbittingMeshs[i].position.y = ypos+Math.cos(t*orbitParams['x'])*radius;
+        orbittingMeshs[i].position.z = zpos+Math.sin(t*orbitParams['x'])*radius;
+      }
+      if(orbitParams['y'] != 0) {
+        radius = orbitParams['yradius'];
+        orbittingMeshs[i].position.x = xpos+Math.cos(t*orbitParams['y'])*radius;
+        orbittingMeshs[i].position.z = zpos+Math.sin(t*orbitParams['y'])*radius;
+      }
+      if(orbitParams['z'] != 0) {
+        radius = orbitParams['zradius'];
+        orbittingMeshs[i].position.x = xpos+Math.cos(t*orbitParams['z'])*radius;
+        orbittingMeshs[i].position.y = ypos+Math.sin(t*orbitParams['z'])*radius;
       }
     }
   }
@@ -1215,6 +1250,13 @@ function createGeometry(params, geometry, many) {
   var movezspeed = resolvedParams['movezspeed'];
   var material = resolvedParams['material'];
   var solid = resolvedParams['solid'];
+  var orbit = resolvedParams['orbit'];
+  var orbitx = resolvedParams['orbitx'];
+  var orbity = resolvedParams['orbity'];
+  var orbitz = resolvedParams['orbitz'];
+  var orbitxradius = resolvedParams['orbitxradius'];
+  var orbityradius = resolvedParams['orbityradius'];
+  var orbitzradius = resolvedParams['orbitzradius'];
 
   var defaultTexture = defaultGlobalParams['texture'];
   //for deciding when to use default material vs explicit color or texture
@@ -1397,6 +1439,9 @@ function createGeometry(params, geometry, many) {
           if(move == true) {           
             initMovingMesh(bubbleMesh,x,y,z,endx,endy,endz,movexspeed,moveyspeed,movezspeed);
           }
+          if(orbit == true) {
+            initOrbitMesh(bubbleMesh,orbitx,orbity,orbitz,orbitxradius,orbityradius,orbitzradius);
+          }
           addToMeshs(bubbleMesh,solid);//increases numberOfMeshs by 1
           return bubbleMesh;
         }
@@ -1411,6 +1456,9 @@ function createGeometry(params, geometry, many) {
           if(move == true) {
             initMovingMesh(mirrorMesh,x,y,z,endx,endy,endz,movexspeed,moveyspeed,movezspeed);
           }
+          if(orbit == true) {
+            initOrbitMesh(mirrorMesh,orbitx,orbity,orbitz,orbitxradius,orbityradius,orbitzradius);
+          }
           addToMeshs(mirrorMesh,solid);//increases numberOfMeshs by 1
           return mirrorMesh;
         }
@@ -1423,6 +1471,9 @@ function createGeometry(params, geometry, many) {
         }
         if(move == true) {
           initMovingMesh(mesh,x,y,z,endx,endy,endz,movexspeed,moveyspeed,movezspeed);
+        }
+        if(orbit == true) {
+          initOrbitMesh(mesh,orbitx,orbity,orbitz,orbitxradius,orbityradius,orbitzradius);
         }
         addToMeshs(mesh,solid);//increases numberOfMeshs by 1
         return mesh;
@@ -1442,6 +1493,9 @@ function createGeometry(params, geometry, many) {
             if(move == true) {
               initMovingMesh(bubbleMesh,x,y,z,endx,endy,endz,movexspeed,moveyspeed,movezspeed);
             }
+            if(orbit == true) {
+              initOrbitMesh(bubbleMesh,orbitx,orbity,orbitz,orbitxradius,orbityradius,orbitzradius);
+            }
             addToMeshs(bubbleMesh,solid);
           }          
           return meshs;
@@ -1459,6 +1513,9 @@ function createGeometry(params, geometry, many) {
             if(move == true) {
               initMovingMesh(mirrorMesh,x,y,z,endx,endy,endz,movexspeed,moveyspeed,movezspeed);
             }
+            if(orbit == true) {
+              initOrbitMesh(mirrorMesh,orbitx,orbity,orbitz,orbitxradius,orbityradius,orbitzradius);
+            }
             addToMeshs(mirrorMesh,solid);
           }          
           return meshs;
@@ -1474,6 +1531,9 @@ function createGeometry(params, geometry, many) {
           }
           if(move == true) {
             initMovingMesh(mesh,x,y,z,endx,endy,endz,movexspeed,moveyspeed,movezspeed);
+          }
+          if(orbit == true) {
+            initOrbitMesh(mesh,orbitx,orbity,orbitz,orbitxradius,orbityradius,orbitzradius);
           }
           addToMeshs(mesh,solid);
         }
@@ -1838,7 +1898,12 @@ function initSpinMesh(mesh,spinx,spiny,spinz) {
     spinningMeshs.push(mesh);
     spinningParams.push({'x':spinx, 'y':spiny, 'z':spinz});
 }
-
+function initOrbitMesh(mesh,orbitx,orbity,orbitz,xradius,yradius,zradius) {
+    orbittingMeshs.push(mesh);
+    orbittingParams.push({'x':orbitx, 'y':orbity, 'z':orbitz,
+        'xradius':xradius, 'yradius':yradius, 'zradius':zradius,
+        'xpos':mesh.position.x, 'ypos':mesh.position.y, 'zpos':mesh.position.z, });
+}
 //sets up motion along axes that have a defined movespeed var
 function initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexspeed,moveyspeed,movezspeed) {
         movingMeshs.push(mesh);
@@ -1933,7 +1998,7 @@ function parseParams(params, parsedParams) {
     s3: complete range -> s0
     s4: transparent,solid (booleans) -> s0
     s5: color/ambient/texture/material -> s0
-    s6: spin xyz -> s0
+    s6: spin/orbit xyz -> s0
     s7: move xyz -> s8
     s8: check if move cooridates given -> s9
     s9: check move range for s8 stuff -> s3
@@ -1946,11 +2011,11 @@ function parseParams(params, parsedParams) {
   var word = '';
   for(var i = 0; i < paramsArray.length; i++) {
     currParam = paramsArray[i].toLowerCase();
-    console.log('currState: '+currState);
+    /*console.log('currState: '+currState);
     console.log('lastState: '+lastState);
     console.log('currParam: '+currParam);
     console.log('word: '+word);
-    console.log(' -------------- ');
+    console.log(' -------------- ');*/
     //first deal ith special cases
     //check for why/by/y
     if(currParam === 'why' || currParam === 'by') {
@@ -1994,7 +2059,7 @@ function parseParams(params, parsedParams) {
         currState = 's5';
         word = currParam;
       }
-      else if(currParam === 'spin') {
+      else if(currParam === 'spin' || currParam === 'orbit') {
         currState = 's6';
         word = currParam;
       }
@@ -2070,22 +2135,21 @@ function parseParams(params, parsedParams) {
       }
       currState = 's0';
     }
-    //spin
+    //spin/orbit
     else if(currState == 's6') {
-      var spinSpeed = globalSpinMedium;        
-      if(i < paramsArray.length-1) {
-        spinSpeed = checkForSpinSpeed(paramsArray[i+1].toLowerCase());
-        if(spinSpeed === undefined) {
-          spinSpeed = globalSpinMedium;
+      if(['x','y','z'].indexOf(currParam) != -1) {
+        if(i === paramsArray.length-1) {
+          //no more input so assign speed
+          var speed = (word.startsWith('spin') ? globalSpinMedium : globalOrbitSlow);
+          parsedParams[word+currParam] = speed;
+          currState = 's0';
         }
         else {
-          i++;
+          //more input, check if it's speed or radius
+          currState = 's11';
         }
-      }
-      if(['x','y','z'].indexOf(currParam) != -1) {
-        currState = 's0';
-        parsedParams['spin'+currParam] = spinSpeed;
-        parsedParams['spin'] = true;
+        parsedParams[word] = true;
+        word = word+currParam;
       }
       else {
         currState = 's0';//err, todo
@@ -2142,6 +2206,39 @@ function parseParams(params, parsedParams) {
         currState = 's0';//err, todo
       }
     }
+    //word can be spinx,spiny,spinx,orbitx,orbity,orbitz
+    else if(currState === 's11') {
+      if(['slow','medium','fast'].indexOf(currParam) != -1) {
+        currState = 's11';
+        parsedParams[word] = getSpeed(word.substring(0,word.length-1),currParam);
+      }
+      else if(currParam === 'radius' && word.substring(0,5) === 'orbit') {
+        currState = 's12';
+      }
+      else {
+        if(parsedParams[word] === undefined) {
+          parsedParams[word] = (word.startsWith('spin') ? globalSpinMedium : globalOrbitSlow);
+        }
+        currState = 's0';
+        i--;
+      }
+    }
+    //orbit radius
+    else if(currState === 's12') {
+      if(isNumber(currParam)) {
+        currState = 's11';
+        parsedParams[word+'radius'] = currParam;
+      }
+      else {
+        currState = 's0';//err, todo
+      }
+      if(i === paramsArray.length-1 && parsedParams[word] === undefined) {
+          //no more input & no speed, so assign speed
+          var speed = (word.startsWith('spin') ? globalSpinMedium : globalOrbitSlow);
+          parsedParams[word] = speed;
+          currState = 's0';
+        }
+    }
     lastState = tempState;      
   }
   return parsedParams;
@@ -2181,6 +2278,62 @@ function checkForSpinSpeed(speed) {
     }
     else {
       return undefined;
+    }
+  }
+}
+function getSpeed(type, speed) {
+    if(type === 'spin') {
+      if(speed === 'slow') {
+        return globalSpinSlow;
+      }
+      else if(speed === 'fast') {
+        return globalSpinFast;
+      } 
+      else if(speed === 'medium') {
+        return globalSpinMedium;
+      }
+    }
+    else if(type === 'orbit') {
+      if(speed === 'slow') {
+        return globalOrbitSlow;
+      }
+      else if(speed === 'fast') {
+        return globalOrbitFast;
+      } 
+      else if(speed === 'medium') {
+        return globalOrbitMedium;
+      }
+    }
+}
+function checkForSpeed(type, speed) {
+  if(speed === undefined) {
+    return (type === 'spin' ? globalSpinMedium : globalOrbitSlow);
+  }
+  else if(['slow','medium','fast'].indexOf(speed) === -1) {
+    return undefined;
+  }
+  else {
+    if(type === 'spin') {
+      if(speed === 'slow') {
+        return globalSpinSlow;
+      }
+      else if(speed === 'fast') {
+        return globalSpinFast;
+      } 
+      else if(speed === 'medium') {
+        return globalSpinMedium;
+      }
+    }
+    else if(type === 'orbit') {
+      if(speed === 'slow') {
+        return globalOrbitSlow;
+      }
+      else if(speed === 'fast') {
+        return globalOrbitFast;
+      } 
+      else if(speed === 'medium') {
+        return globalOrbitMedium;
+      }
     }
   }
 }
@@ -2263,6 +2416,13 @@ function resolveParams(params) {
   var movezspeed = params['movezspeed'];
   var material = params['material'];//bubble, mirror, etc
   var solid = params['solid'];
+  var orbit = params['orbit'];
+  var orbitx = params['orbitx'];
+  var orbity = params['orbity'];
+  var orbitz = params['orbitz'];
+  var orbitxradius = params['orbitxradius'];
+  var orbityradius = params['orbityradius'];
+  var orbitzradius = params['orbitzradius'];
 
   if(x == undefined) {
     x = defaultGlobalParams['x'];
@@ -2386,6 +2546,48 @@ function resolveParams(params) {
   else {
     bsolid = convertWordToBoolean(solid);
   }
+  if(orbit == undefined) {
+    orbit = defaultGlobalParams['orbit'];
+    if(orbit == undefined) {
+      orbit = false;
+    }
+  }
+  if(orbitx == undefined) {
+    orbitx = defaultGlobalParams['orbitx'];
+    if(orbitx == undefined) {
+      orbitx = 0;
+    }
+  }
+  if(orbity == undefined) {
+    orbity = defaultGlobalParams['orbity'];
+    if(orbity == undefined) {
+      orbity = 0;
+    }
+  }
+  if(orbitz == undefined) {
+    orbitz = defaultGlobalParams['orbitz'];
+    if(orbitz == undefined) {
+      orbitz = 0;
+    }
+  }
+  if(orbitxradius === undefined) {
+    orbitxradius = defaultGlobalParams['orbitxradius'];
+    if(orbitxradius === undefined) {
+      orbitxradius = defaultOrbitRadius;
+    }
+  }
+  if(orbityradius === undefined) {
+    orbitYradius = defaultGlobalParams['orbityradius'];
+    if(orbityradius === undefined) {
+      orbityradius = defaultOrbitRadius;
+    }
+  }
+  if(orbitzradius === undefined) {
+    orbitzradius = defaultGlobalParams['orbitzradius'];
+    if(orbitzradius === undefined) {
+      orbitzradius = defaultOrbitRadius;
+    }
+  }
   resolvedParams["x"] = x;
   resolvedParams["y"] = y;
   resolvedParams["z"] = z;
@@ -2410,6 +2612,13 @@ function resolveParams(params) {
   resolvedParams["movezspeed"] = movezspeed;
   resolvedParams["material"] = material;
   resolvedParams["solid"] = bsolid;
+  resolvedParams["orbit"] = orbit;
+  resolvedParams["orbitx"] = orbitx;
+  resolvedParams["orbity"] = orbity;
+  resolvedParams["orbitz"] = orbitz;
+  resolvedParams["orbitxradius"] = orbitxradius;
+  resolvedParams["orbityradius"] = orbityradius;
+  resolvedParams["orbitzradius"] = orbitzradius;
 
   return resolvedParams;
 }
@@ -2524,7 +2733,6 @@ function updateGUI(params) {
     if(param == 'transparent' || param == 'solid') {
       guiDefaultParams[param] = convertWordToBoolean(params[param]);      
     }
-    //TODO something smarter
     //move/spin dropdowns
     if((param == 'movexspeed' || param == 'moveyspeed' || param == 'movezspeed') && params[param] != 'none') {
       guiDefaultParams[param] = getMoveSpeedAsWord(params[param]);      
@@ -2944,7 +3152,7 @@ function notify(notification) {
   setTimeout(function(){
     document.getElementById("notify").innerHTML="";
   },2500);
-  //also add relevant commands to save log so users can save their creations
+  //also add relevant commands to save log
   if(notification != 'save' && notification != 'load' 
     && notification != 'pause' && notification != 'unpause'
     && notification != 'open console' && notification != 'close console') {
@@ -2953,6 +3161,7 @@ function notify(notification) {
 }
 //test method
 function testEverything() {
-  var testcommands = 'create back wall texture water\ncreate floor\ncreate cube texture chrome move x -500 and 500 move y 50 and 300 move z slow -250 and 250 spin z\ncreate cube texture chrome move x fast -500 and 500 move y 50 and 300 move z -250 and 0 spin x fast spin y';
+  //var testcommands = 'create back wall texture water\ncreate floor\ncreate cube texture chrome move x -500 and 500 move y 50 and 300 move z slow -250 and 250 spin z\ncreate cube texture chrome move x fast -500 and 500 move y 50 and 300 move z -250 and 0 spin x fast spin y';
+  var testcommands = 'create floor\ncreate cone height 200 color green\ncreate many cubes color green x 500 until -500 orbit y slow radius 500\ncreate many cubes y 100 until 300 orbit y medium radius 500';
   submitCommandsFromFile(testcommands);
 }
