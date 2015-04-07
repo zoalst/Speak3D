@@ -201,6 +201,12 @@ function init() {
     spinx: 'none',
     spiny: 'none',
     spinz: 'none',
+    orbitx: 'none',
+    orbitxradius: defaultOrbitRadius,
+    orbity: 'none',
+    orbityradius: defaultOrbitRadius,
+    orbitz: 'none',
+    orbitzradius: defaultOrbitRadius,
     solid: false,
     reset: function() {resetDefaultGlobalParams();}
   };
@@ -365,6 +371,51 @@ function init() {
     else {
       defaultGlobalParams['spinz'] = undefined;
     }     
+  });
+  var guiDefaultOrbitX = guiPosition.add( guiDefaultParams, 'orbitx', [ 'none', 'slow', 'medium', 'fast' ] ).name('orbit x');
+  guiDefaultOrbitX.onChange(function(value)
+  {   
+    if(value != 'none') {
+      defaultGlobalParams['orbitx'] = getOrbitSpeedAsNumber(value); 
+    }
+    else {
+      defaultGlobalParams['orbitx'] = undefined;
+    }     
+  });
+  var guiDefaultOrbitXRadius = guiPosition.add( guiDefaultParams, 'orbitxradius' ).name('orbit x radius');
+  guiDefaultOrbitXRadius.onChange(function(value)
+  {   
+      defaultGlobalParams['orbitxradius'] = value; 
+  });
+  var guiDefaultOrbitY = guiPosition.add( guiDefaultParams, 'orbity', [ 'none', 'slow', 'medium', 'fast' ] ).name('orbit y');
+  guiDefaultOrbitY.onChange(function(value)
+  {   
+    if(value != 'none') {
+      defaultGlobalParams['orbity'] = getOrbitSpeedAsNumber(value); 
+    }
+    else {
+      defaultGlobalParams['orbity'] = undefined;
+    }     
+  });
+  var guiDefaultOrbitYRadius = guiPosition.add( guiDefaultParams, 'orbityradius' ).name('orbit y radius');
+  guiDefaultOrbitYRadius.onChange(function(value)
+  {   
+      defaultGlobalParams['orbityradius'] = value;      
+  });
+  var guiDefaultOrbitZ = guiPosition.add( guiDefaultParams, 'orbitz', [ 'none', 'slow', 'medium', 'fast' ] ).name('orbit z');
+  guiDefaultOrbitZ.onChange(function(value)
+  {   
+    if(value != 'none') {
+      defaultGlobalParams['orbitz'] = getOrbitSpeedAsNumber(value); 
+    }
+    else {
+      defaultGlobalParams['orbitz'] = undefined;
+    }     
+  });
+  var guiDefaultOrbitZRadius = guiPosition.add( guiDefaultParams, 'orbitzradius' ).name('orbit z radius');
+  guiDefaultOrbitZRadius.onChange(function(value)
+  {   
+      defaultGlobalParams['orbitzradius'] = value;      
   });
   //TODO use diff name, solid sounds like it's related to transparent, but its actually collidable
   var guiDefaultSolid = guiApperance.add( guiDefaultParams, 'solid' );
@@ -616,6 +667,21 @@ function init() {
         var parsedParams = parseParams(params);
         scene.add(createBubble(parsedParams));
       },
+      'create many bubbles': function() {
+        notify('create many bubbles');
+        var geoms = createManyBubbles(defaultGlobalParams);   
+        for(var i = 0; i < geoms.length; i++) {
+          scene.add(geoms[i]);          
+        }       
+      },
+      'create many bubbles *params': function(params) {
+        notify('create many bubbles '+params);
+        var parsedParams = parseParams(params);
+        var geoms = createManyBubbles(parsedParams);   
+        for(var i = 0; i < geoms.length; i++) {
+          scene.add(geoms[i]);          
+        }
+      },
       'create mirror': function() {
         notify('create mirror');
         scene.add(createMirror(defaultGlobalParams));
@@ -624,6 +690,21 @@ function init() {
         notify('create mirror '+params);
         var parsedParams = parseParams(params);
         scene.add(createMirror(parsedParams));
+      },
+      'create many mirrors': function() {
+        notify('create many mirrors');
+        var geoms = createManyMirrors(defaultGlobalParams);   
+        for(var i = 0; i < geoms.length; i++) {
+          scene.add(geoms[i]);          
+        }
+      },
+      'create many mirrors *params': function(params) {
+        notify('create many mirrors '+params);
+        var parsedParams = parseParams(params);
+        var geoms = createManyMirrors(parsedParams);   
+        for(var i = 0; i < geoms.length; i++) {
+          scene.add(geoms[i]);          
+        }
       },
  			'create floor': function() {
         notify('create floor');
@@ -1136,30 +1217,7 @@ function hidePauseScreen() {
  //METHODS FOR CREATING GEOMETRIES//
 ///////////////////////////////////
 
-function create3DText(text) {//,x,y,z,size) {
-/*	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0f90 } );
-	var materialSide = new THREE.MeshBasicMaterial( { color: 0x009988 } );
-	var materialArray = [ materialFront, materialSide ];
-
-	var textGeom = new THREE.TextGeometry( text, 
-	{
-		size: 30, height: 4, curveSegments: 3,
-		font: "helvetiker", weight: "bold", style: "normal",
-		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
-		material: 0, extrudeMaterial: 1
-	});
-	// font: helvetiker, gentilis, droid sans, droid serif, optimer
-	// weight: normal, bold
-	
-	var textMaterial = new THREE.MeshFaceMaterial(materialArray);
-	var textMesh = new THREE.Mesh(textGeom, textMaterial );
-	
-	textGeom.computeBoundingBox();
-	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-	
-	textMesh.position.set( -0.5 * textWidth, 50, 100 );
-	textMesh.rotation.x = -Math.PI / 4;
-	return textMesh;*/
+function create3DText(text) {
   return createGeometry(text,'TextGeometry');
 }
 function createSphere(params) {
@@ -1181,12 +1239,16 @@ function createCone(params) {
   return createGeometry(params,'ConeGeometry');
 }
 function createBubble(params) {
-  bubbles = true;
   return createGeometry(params,'Bubble');
 }
+function createManyBubbles(params) {
+  return createGeometry(params,'Bubble',true);
+}
 function createMirror(params) {
-  mirrors = true;
   return createGeometry(params,'Mirror');
+}
+function createManyMirrors(params) {
+  return createGeometry(params,'Mirror',true);
 }
 /*function createOctahedron(x,y,z,size,color,transparent) {
 
@@ -1360,7 +1422,7 @@ function createGeometry(params, geometry, many) {
       }
       var geom = new THREE.BoxGeometry(width,height,depth);
     }
-    else if(geometry == 'SphereGeometry'){
+    else if(geometry == 'SphereGeometry' || geometry == 'Bubble'){
       var geom = new THREE.SphereGeometry(size);
     }
     else if(geometry == 'CylinderGeometry'){
@@ -1406,30 +1468,17 @@ function createGeometry(params, geometry, many) {
         material: 0, extrudeMaterial: 1
       });
     }
-    //so user can still call 'create bubble' for a bubble sphere,
-    //otherwise use material param set to bubble
-    else if(geometry == 'Bubble') {
-      var geom = new THREE.SphereGeometry(size);
-      bubbleMesh = new THREE.Mesh(geom, bubbleMaterial);
-      bubbleMesh.position.set( x, y, z );
-      addToMeshs(bubbleMesh,solid);
-      return bubbleMesh;
-    }
     else if(geometry == 'Mirror') {
       if(width == undefined) {
         width = size;
       }
       var geom = new THREE.BoxGeometry(width,height,depth);
-      mapMirrorCameraToMirrorMaterial( x, y, z );
-      mirrorMesh = new THREE.Mesh(geom, mirrorMaterial);
-      mirrorMesh.position.set( x, y, z );
-      addToMeshs(mirrorMesh,solid);
-      return mirrorMesh;
     }
     if(!many) {
-      if(material != undefined && material != 'none' && !useColorOrTextureInstead) {
+      if((material != undefined && material != 'none' && !useColorOrTextureInstead)
+        || geometry == 'Bubble' || geometry == 'Mirror') {
         //TODO bubble/refactcamera/position
-        if(material == 'bubble') {
+        if(material == 'bubble' || geometry == 'Bubble') {
           bubbles = true;
           bubbleMesh = new THREE.Mesh(geom, bubbleMaterial ); 
           bubbleMesh.position.set( x, y, z );
@@ -1445,7 +1494,7 @@ function createGeometry(params, geometry, many) {
           addToMeshs(bubbleMesh,solid);//increases numberOfMeshs by 1
           return bubbleMesh;
         }
-        else if(material == 'mirror') {
+        else if(material == 'mirror' || geometry == 'Mirror') {
           mirrors = true;
           mapMirrorCameraToMirrorMaterial( x, y, z );
           mirrorMesh = new THREE.Mesh(geom, mirrorMaterial ); 
@@ -1480,8 +1529,9 @@ function createGeometry(params, geometry, many) {
       }
     }
     else {
-      if(material != undefined && material != 'none' && !useColorOrTextureInstead) {
-        if(material == 'bubble') {
+      if((material != undefined && material != 'none' && !useColorOrTextureInstead) 
+        || geometry == 'Bubble' || geometry == 'Mirror') {
+        if(material == 'bubble' || geometry == 'Bubble') {
           bubbles = true;
           for(var i = 0; i < amount; i++) {
             bubbleMesh = new THREE.Mesh(geom, bubbleMaterial ); 
@@ -1500,9 +1550,9 @@ function createGeometry(params, geometry, many) {
           }          
           return meshs;
         }
-        if(material == 'mirror') {
+        if(material == 'mirror' || geometry == 'Mirror') {
           mirrors = true;
-            mapMirrorCameraToMirrorMaterial( +x, +y, +z  );
+          mapMirrorCameraToMirrorMaterial( +x, +y, +z  );
           for(var i = 0; i < amount; i++) {
             mirrorMesh = new THREE.Mesh(geom, mirrorMaterial ); 
             mirrorMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
@@ -2636,6 +2686,22 @@ function convertWordToBoolean(word) {
 	}
 }
 
+function getOrbitSpeedAsNumber(speed) {
+  //TODO 1st line
+  defaultGlobalParams['orbit'] = true;
+  var orbitSpeed;
+  if(speed == 'slow') {
+    orbitSpeed = globalOrbitSlow;
+  }
+  else if(speed == 'fast') {
+    orbitSpeed = globalOrbitFast;
+  } 
+  else if(speed == 'medium') {
+    orbitSpeed = globalOrbitMedium;
+  } 
+  return orbitSpeed;
+}
+
 function getSpinSpeedAsNumber(speed) {
   //TODO 1st line
   defaultGlobalParams['spin'] = true;
@@ -2727,6 +2793,13 @@ function updateGUI(params) {
     params["movezspeed"] = 'none';
     params["material"] = 'none';
     params["solid"] = 'false';
+    params["orbitx"] = 'none';
+    params["orbitxradius"] = defaultOrbitRadius;
+    params["orbity"] = 'none';
+    params["orbityradius"] = defaultOrbitRadius;
+    params["orbitz"] = 'none';
+    params["orbitzradius"] = defaultOrbitRadius;
+
   }
   for(var param in params) {
     //checkboxes
@@ -3007,6 +3080,23 @@ function submitCommand(command) {
       scene.add(createBubble(defaultGlobalParams));
     }
   } 
+  else if(command.indexOf('create many bubbles') === 0) {
+    var len = 'create many bubbles'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      var parsedParams = parseParams(params);
+      var geoms = createManyBubbles(parsedParams);   
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }  
+    }
+    else {
+      var geoms = createManyBubbles(defaultGlobalParams);   
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      } 
+    }
+  } 
   else if(command.indexOf('create mirror') === 0) {
     var len = 'create mirror'.length;
     if(command.length > len) {
@@ -3016,6 +3106,23 @@ function submitCommand(command) {
     }
     else {
       scene.add(createMirror(defaultGlobalParams));
+    }
+  }
+  else if(command.indexOf('create many mirrors') === 0) {
+    var len = 'create many mirrors'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      var parsedParams = parseParams(params);
+      var geoms = createManyMirrors(parsedParams);   
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }
+    }
+    else {
+      var geoms = createManyMirrors(defaultGlobalParams);   
+      for(var i = 0; i < geoms.length; i++) {
+        scene.add(geoms[i]);          
+      }
     }
   } 
   else if(command.indexOf('create floor') === 0) {
