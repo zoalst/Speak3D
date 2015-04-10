@@ -65,6 +65,10 @@ var gui, guiDefaultParams, guiApperance, guiPosition;
  
 var saveLog = '';
 
+var raycaster;
+var mouse = new THREE.Vector2(), INTERSECTED;
+var manipulateMode = true; //TODO M key toggles?
+
 var t = 0;
 
 init();
@@ -81,12 +85,35 @@ function init() {
 	scene.add(camera);
 	camera.position.set(0,200,500);
 	camera.lookAt(scene.position);	
+
+
+        var geometry = new THREE.BoxGeometry( 20, 20, 20 );
+        for ( var i = 0; i < 20; i ++ ) {
+          var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+          object.position.x = Math.random() * 800 - 400;
+          object.position.y = Math.random() * 800 - 400;
+          object.position.z = Math.random() * 800 - 400;
+          object.rotation.x = Math.random() * 2 * Math.PI;
+          object.rotation.y = Math.random() * 2 * Math.PI;
+          object.rotation.z = Math.random() * 2 * Math.PI;
+          object.scale.x = Math.random() + 0.5;
+          object.scale.y = Math.random() + 0.5;
+          object.scale.z = Math.random() + 0.5;
+          scene.add( object );
+        }
+
+  raycaster = new THREE.Raycaster();
+
 	// RENDERER
 	if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
 	else
 		renderer = new THREE.CanvasRenderer(); 
-	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+        renderer.setClearColor( 0xf0f0f0 );
+        renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+        //renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.sortObjects = false;
 	container = document.getElementById( 'ThreeJS' );
 	container.appendChild( renderer.domElement );
 	// EVENTS
@@ -100,6 +127,8 @@ function init() {
 	stats.domElement.style.bottom = '25px';
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
+
+  
 	// LIGHT
 	var light = new THREE.PointLight(0xffffff);
 	light.position.set(0,250,0);
@@ -142,7 +171,10 @@ function init() {
   {
     return new THREE.Vector3(50*x, 50*y, 50*z);
   }
+        document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
+  //document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+  //document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 	////////////
 	// CUSTOM //
 	////////////
@@ -846,7 +878,7 @@ function init() {
   //want pointer lock only on the ThreeJS div, not the overlaying UI
   container.addEventListener( 'click', function ( event ) 
   {
-    if(!consoleOpen){
+    if(!consoleOpen && !manipulateMode){
       var havePointerLock = 'pointerLockElement' in document ||
       'mozPointerLockElement' in document ||
       'webkitPointerLockElement' in document;
@@ -1199,9 +1231,30 @@ function render() {
       }
     }
   }
+  // find intersections
+        raycaster.setFromCamera( mouse, camera );
+        var intersects = raycaster.intersectObjects( scene.children );
+        if ( intersects.length > 0 ) {
+          if ( INTERSECTED != intersects[ 0 ].object ) {
+            console.log('INTERSECTED: '+INTERSECTED);
+            if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+            INTERSECTED = intersects[ 0 ].object;
+            INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+            INTERSECTED.material.color.setHex( 0xff0000 );
+          }
+        } else {
+          if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+          INTERSECTED = null;
+        }
+
 	renderer.render( scene, camera );
 }
 
+      function onDocumentMouseMove( event ) {
+        event.preventDefault();
+        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+      }
 function showPauseScreen() {
   blocker.style.display = '-webkit-box';
   blocker.style.display = '-moz-box';
@@ -2008,6 +2061,38 @@ function initMovingMesh(mesh,movex,movey,movez,endmovex,endmovey,endmovez,movexs
 //--user can describe geometry (green transparent cube)
 //--user can right click on geometry
 
+//method from http://mrdoob.github.io/three.js/examples/canvas_interactive_cubes.html
+function onDocumentTouchStart( event ) {
+  
+  event.preventDefault();
+  
+  event.clientX = event.touches[0].clientX;
+  event.clientY = event.touches[0].clientY;
+  onDocumentMouseDown( event );
+} 
+//original from http://mrdoob.github.io/three.js/examples/canvas_interactive_cubes.html
+function onDocumentMouseDown( event ) {
+  console.log('docmousedown');
+  event.preventDefault();
+  mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+  mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+  raycaster.setFromCamera( mouse, camera );
+  //var intersects = raycaster.intersectObjects( meshs );
+  var intersects = raycaster.intersectObjects( scene.children );
+  if ( intersects.length > 0 ) {
+    //the object we want to manipulate
+    intersects[ 0 ].object;
+    //create three js menu thing?? instead of right click
+    console.log('yup: '+intersects[ 0 ].object.color);
+  }
+  /*
+  // Parse all the faces
+  for ( var i in intersects ) {
+    intersects[ i ].face.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
+  }
+  */
+}
+
 function addToMeshs(mesh,solid) {
 	meshs[numberOfMeshs] = mesh;
 	numberOfMeshs++;
@@ -2022,6 +2107,14 @@ function undo() {
   if(spinningMeshs.lastIndexOf(meshs[numberOfMeshs]) >= 0) {
     spinningMeshs.pop();
     spinningParams.pop();
+  }
+  if(movingMeshs.lastIndexOf(meshs[numberOfMeshs]) >= 0) {
+    movingMeshs.pop();
+    movingParams.pop();
+  }
+  if(orbittingMeshs.lastIndexOf(meshs[numberOfMeshs]) >= 0) {
+    orbittingMeshs.pop();
+    orbittingParams.pop();
   }
 	numberOfMeshs--;
   scene.remove(meshs[numberOfMeshs]);
