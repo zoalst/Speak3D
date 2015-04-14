@@ -156,7 +156,7 @@ function init() {
   //hidePauseScreen();
   showPauseScreen();
 
-//testEverything();//TODO remove
+testEverything();//TODO remove
 
   //gui 
   gui = new dat.GUI();
@@ -3268,7 +3268,114 @@ function notify(notification) {
 }
 //test method
 function testEverything() {
+  saveAsJavaScript();
   //var testcommands = 'create back wall texture water\ncreate floor\ncreate cube texture chrome move x -500 and 500 move y 50 and 300 move z slow -250 and 250 spin z\ncreate cube texture chrome move x fast -500 and 500 move y 50 and 300 move z -250 and 0 spin x fast spin y';
-  var testcommands = 'create floor\ncreate cone height 200 color green\ncreate many cubes color green x 500 until -500 orbit y slow radius 500\ncreate many cubes y 100 until 300 orbit y medium radius 500';
-  submitCommandsFromFile(testcommands);
+  //var testcommands = 'create floor\ncreate cone height 200 color green\ncreate many cubes color green x 500 until -500 orbit y slow radius 500\ncreate many cubes y 100 until 300 orbit y medium radius 500';
+  //submitCommandsFromFile(testcommands);
+}
+
+//output javascript
+function saveAsJavaScript() {
+  var completeFile;
+  var first = getBaseJSFirstPart();
+  var middle = getBaseJSMiddlePart();
+  var last = getBaseJSLastPart();
+  completeFile = first;
+  var lines = saveLog.split('\n');
+  for(var line = 0; line < lines.length; line++){
+    completeFile += generateCode(lines[line]);
+  }
+}
+
+function generateCode(line) {
+  var result;
+
+  return result;
+}
+
+function getBaseJSFirstPart() {
+  return '/*\n'
+  +'This file was auto-generated from Speak3D\n'
+  +'Author: Zachary Stenger\n'
+  +'https://github.com/zacharystenger/Speak3D\n'
+  +'*/\n'
+  +'\n'
+  +'var container, scene, camera, renderer, controls, stats;\n'
+  +'var keyboard = new THREEx.KeyboardState();\n'
+  +'var clock = new THREE.Clock();\n'
+  +'var meshs = [];\n'
+  +'var numberOfMeshs = 0;\n'
+  +'\n'
+  +'init();\n'
+  +'animate();\n'
+  +'\n'
+  +'function init() {\n'
+  +'// SCENE\n'
+  +'scene = new THREE.Scene();\n'
+  +'// CAMERA\n'
+  +'var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;\n'
+  +'var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;\n'
+  +'camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);\n'
+  +'scene.add(camera);\n'
+  +'camera.position.set(0,200,500);\n'
+  +'camera.lookAt(scene.position);  \n'
+  +'// RENDERER\n'
+  +'if ( Detector.webgl )\n'
+  +'  renderer = new THREE.WebGLRenderer( {antialias:true} );\n'
+  +'else\n'
+  +'  renderer = new THREE.CanvasRenderer(); \n'
+  +'renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);\n'
+  +'container = document.getElementById( \'ThreeJS\' );\n'
+  +'container.appendChild( renderer.domElement );\n'
+  +'// EVENTS\n'
+  +'THREEx.WindowResize(renderer, camera);\n'
+  +'THREEx.FullScreen.bindKey({ charCode : \'/\'.charCodeAt(0) });\n'
+  +'// CONTROLS\n'
+  +'controls = new THREE.OrbitControls( camera, renderer.domElement );//TODO\n'
+  +'// STATS\n'
+  +'stats = new Stats();\n'
+  +'stats.domElement.style.position = \'absolute\';\n'
+  +'stats.domElement.style.bottom = \'25px\';\n'
+  +'stats.domElement.style.zIndex = 100;\n'
+  +'container.appendChild( stats.domElement );\n'
+  +'// LIGHT\n'
+  +'var light = new THREE.PointLight(0xffffff);\n'
+  +'light.position.set(0,250,0);\n'
+  +'scene.add(light);\n'
+  +'var ambientLight = new THREE.AmbientLight(0x999999);\n'
+  +'scene.add(ambientLight);\n'
+  +'\n'
+  +'// SKYBOX/FOG\n'
+  +'var skyBoxGeometry = new THREE.BoxGeometry( 10000, 10000, 10000 );\n'
+  +'var skyBoxTexture = new THREE.ImageUtils.loadTexture( \'images/cloud.png\' );\n'
+  +'\n'
+  +'var skyBoxMaterial = new THREE.MeshBasicMaterial( { texture: skyBoxTexture, side: THREE.DoubleSide } );\n'
+  +'var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );\n'
+  +'scene.add(skyBox);\n'
+  +'scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );\n'
+  +'\n'
+  +'//USER CREATED CONTENT STARTS HERE\n'
+  ;
+}
+
+function getBaseJSMiddlePart() {
+  return '  //END USER CREATED CONTENT\n'
+  +'\n'
+  +'}\n'
+  +'function animate() {\n'
+  +'  requestAnimationFrame( animate );\n'
+  +'  render();\n'
+  +'  update();\n'
+  +'}\n'
+  +'\n'
+  +'function update() {\n'
+  +'  stats.update();\n'
+  +'}\n'
+  +'function render() {\n'
+  ;
+}
+
+function getBaseJSLastPart() {
+  return '  renderer.render( scene, camera );\n'
+  +'}'
 }
