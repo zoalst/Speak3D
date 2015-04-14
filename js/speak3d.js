@@ -1207,10 +1207,14 @@ function showPauseScreen() {
   blocker.style.display = '-moz-box';
   blocker.style.display = 'box';
   instructions.style.display = '';
+  saveButton.style.visibility = 'visible';
+  uploadFile.style.visibility = 'visible';
   paused = true;
 }
 function hidePauseScreen() {
   blocker.style.display = 'none';    
+  saveButton.style.visibility = 'hidden';
+  uploadFile.style.visibility = 'hidden';
   paused = false;
 }
   ///////////////////////////////////
@@ -2849,7 +2853,7 @@ function initSaveLoadButtons() {
     };
     reader.readAsText(uploadFile.files[0], 'utf-8');
     //
-    uploadFile.style.visibility = 'hidden';
+    //uploadFile.style.visibility = 'hidden';
   });
 }
 
