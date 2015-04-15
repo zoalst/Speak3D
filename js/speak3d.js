@@ -19,7 +19,7 @@ var meshs = [];
 var numberOfMeshs = 0;
 var undoing = false;
 //default parameters
-var defaultGlobalParams = {};
+var globalParams = {};
 //divisor var, texture repeats for size/textureRepeatAmount
 var textureRepeatAmount = 100;
 var textures = getTextures();
@@ -32,22 +32,28 @@ var mirrors = false;
 
 var spinningMeshs = [];
 var spinningParams = [];
-var globalSpinSlow = 0.001;
-var globalSpinFast = 0.05;
-var globalSpinMedium = 0.01;
+var spinSpeeds = {
+  'slow': 0.005,
+  'medium': 0.01,
+  'fast': 0.05
+};
 
 var orbittingMeshs = [];
 var orbittingParams = [];
-var globalOrbitSlow = 1;
-var globalOrbitFast = 5;
-var globalOrbitMedium = 2.5;
 var defaultOrbitRadius = 120;
+var orbitSpeeds = {
+  'slow': 1,
+  'medium': 2.5,
+  'fast': 5
+};
 
 var movingMeshs = [];
 var movingParams = [];
-var globalMoveSlow = 1;
-var globalMoveFast = 5;
-var globalMoveMedium = 2;
+var moveSpeeds = {
+  'slow': 1,
+  'medium': 2,
+  'fast': 5
+};
 
 var user;
 var gravAmount = -4;
@@ -148,7 +154,7 @@ function init() {
 	////////////
   initConsole();
   initSaveLoadButtons();
-	initDefaultGlobalParams();
+	initGlobalParams();
   initBubble();
   initMirror();
   //use jQuery to load instructions html
@@ -208,7 +214,7 @@ function init() {
     orbitz: 'none',
     orbitzradius: defaultOrbitRadius,
     solid: false,
-    reset: function() {resetDefaultGlobalParams();}
+    reset: function() {resetGlobalParams();}
   };
   //reset button
   gui.add( guiDefaultParams, 'reset').name('reset all');
@@ -217,212 +223,156 @@ function init() {
   var guiDefaultColor = guiApperance.addColor( guiDefaultParams, 'color' );
   guiDefaultColor.onChange(function(value)
   {   
-    defaultGlobalParams['color'] = value;
+    globalParams['color'] = value;
   });
   var guiDefaultAmbient = guiApperance.addColor( guiDefaultParams, 'ambient' );
   guiDefaultAmbient.onChange(function(value)
   {   
-    defaultGlobalParams['ambient'] = value;
+    globalParams['ambient'] = value;
   });
   var guiDefaultTexture = guiApperance.add( guiDefaultParams, 'texture', textureNames );
   guiDefaultTexture.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['texture'] = value;
-    }
-    else {
-      defaultGlobalParams['texture'] = undefined; 
-    }
+    globalParams['texture'] = (value !== 'none') ? value : undefined;
   });
   var guiDefaultMaterial = guiApperance.add( guiDefaultParams, 'material', [ 'none', 'bubble', 'mirror' ] );
   guiDefaultMaterial.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['material'] = value;
-    }
-    else {
-      defaultGlobalParams['material'] = undefined; 
-    }
+    globalParams['material'] = (value !== 'none') ? value : undefined;
   });
   var guiDefaultTransparent = guiApperance.add( guiDefaultParams, 'transparent' );
   guiDefaultTransparent.onChange(function(value)
   {   
     //TODO string rn?, decide to store as boolean or string(bool needs changes in parseParams)
-    defaultGlobalParams['transparent'] = value+'';
+    globalParams['transparent'] = value+'';
   });
   var guiDefaultSize = guiApperance.add( guiDefaultParams, 'size' ).min(0);
   guiDefaultSize.onChange(function(value)
   {   
-    defaultGlobalParams['size'] = value;
+    globalParams['size'] = value;
   });
   var guiDefaultSize = guiApperance.add( guiDefaultParams, 'endsize' ).min(0).name('end size');
   guiDefaultSize.onChange(function(value)
   {   
-    defaultGlobalParams['endsize'] = value;
+    globalParams['endsize'] = value;
   });
   var guiDefaultWidth = guiApperance.add( guiDefaultParams, 'width' ).min(0);
   guiDefaultWidth.onChange(function(value)
   {   
-    defaultGlobalParams['width'] = value;
+    globalParams['width'] = value;
   });
   var guiDefaultHeight = guiApperance.add( guiDefaultParams, 'height' ).min(0);
   guiDefaultHeight.onChange(function(value)
   {   
-    defaultGlobalParams['height'] = value;
+    globalParams['height'] = value;
   });
   var guiDefaultDepth = guiApperance.add( guiDefaultParams, 'depth' ).min(0);
   guiDefaultDepth.onChange(function(value)
   {   
-    defaultGlobalParams['depth'] = value;
+    globalParams['depth'] = value;
   });
   var guiDefaultAmount = guiApperance.add( guiDefaultParams, 'amount' ).min(0).step(1.0);
   guiDefaultAmount.onChange(function(value)
   {   
-    defaultGlobalParams['amount'] = value;
+    globalParams['amount'] = value;
   });
-
   //position gui
   var guiDefaultX = guiPosition.add( guiDefaultParams, 'x' );
   guiDefaultX.onChange(function(value)
   {   
-    defaultGlobalParams['x'] = value;
+    globalParams['x'] = value;
   });
   var guiDefaultY = guiPosition.add( guiDefaultParams, 'y' );
   guiDefaultY.onChange(function(value)
   {   
-    defaultGlobalParams['y'] = value;
+    globalParams['y'] = value;
   });
   var guiDefaultZ = guiPosition.add( guiDefaultParams, 'z' );
   guiDefaultZ.onChange(function(value) 
   {   
-    defaultGlobalParams['z'] = value;
+    globalParams['z'] = value;
   }); 
   var guiDefaultEndX = guiPosition.add( guiDefaultParams, 'endx' );
   guiDefaultEndX.onChange(function(value)
   {   
-    defaultGlobalParams['endx'] = value;
+    globalParams['endx'] = value;
   });
   var guiDefaultEndY = guiPosition.add( guiDefaultParams, 'endy' );
   guiDefaultEndY.onChange(function(value)
   {   
-    defaultGlobalParams['endy'] = value;
+    globalParams['endy'] = value;
   });
   var guiDefaultEndZ = guiPosition.add( guiDefaultParams, 'endz' );
   guiDefaultEndZ.onChange(function(value) 
   {   
-    defaultGlobalParams['endz'] = value;
+    globalParams['endz'] = value;
   }); 
   var guiDefaultMoveX = guiPosition.add( guiDefaultParams, 'movexspeed', [ 'none', 'slow', 'medium', 'fast' ] ).name('move x');
   guiDefaultMoveX.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['movexspeed'] = getMoveSpeedAsNumber(value); 
-    }
-    else {
-      defaultGlobalParams['movexspeed'] = undefined;
-    }     
+    globalParams['movexspeed'] = (value !== 'none') ? getMoveSpeedAsNumber(value) : undefined;   
   });
   var guiDefaultMoveY = guiPosition.add( guiDefaultParams, 'moveyspeed', [ 'none', 'slow', 'medium', 'fast' ] ).name('move y');
   guiDefaultMoveY.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['moveyspeed'] = getMoveSpeedAsNumber(value); 
-    }
-    else {
-      defaultGlobalParams['moveyspeed'] = undefined;
-    }     
+    globalParams['moveyspeed'] = (value !== 'none') ? getMoveSpeedAsNumber(value) : undefined;   
   });
   var guiDefaultMoveZ = guiPosition.add( guiDefaultParams, 'movezspeed', [ 'none', 'slow', 'medium', 'fast' ] ).name('move z');
   guiDefaultMoveZ.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['movezspeed'] = getMoveSpeedAsNumber(value); 
-    }
-    else {
-      defaultGlobalParams['movezspeed'] = undefined;
-    }     
+    globalParams['movezspeed'] = (value !== 'none') ? getMoveSpeedAsNumber(value) : undefined;   
   });
   var guiDefaultSpinX = guiPosition.add( guiDefaultParams, 'spinx', [ 'none', 'slow', 'medium', 'fast' ] ).name('spin x');
   guiDefaultSpinX.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['spinx'] = getSpinSpeedAsNumber(value); 
-    }
-    else {
-      defaultGlobalParams['spinx'] = undefined;
-    }     
+    globalParams['spinx'] = (value !== 'none') ? getSpinSpeedAsNumber(value) : undefined;   
   });
   var guiDefaultSpinY = guiPosition.add( guiDefaultParams, 'spiny', [ 'none', 'slow', 'medium', 'fast' ] ).name('spin y');
   guiDefaultSpinY.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['spiny'] = getSpinSpeedAsNumber(value); 
-    }
-    else {
-      defaultGlobalParams['spiny'] = undefined;
-    }     
+    globalParams['spiny'] = (value !== 'none') ? getSpinSpeedAsNumber(value) : undefined;   
   });
   var guiDefaultSpinZ = guiPosition.add( guiDefaultParams, 'spinz', [ 'none', 'slow', 'medium', 'fast' ] ).name('spin z');
   guiDefaultSpinZ.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['spinz'] = getSpinSpeedAsNumber(value); 
-    }
-    else {
-      defaultGlobalParams['spinz'] = undefined;
-    }     
+    globalParams['spinz'] = (value !== 'none') ? getSpinSpeedAsNumber(value) : undefined;   
   });
   var guiDefaultOrbitX = guiPosition.add( guiDefaultParams, 'orbitx', [ 'none', 'slow', 'medium', 'fast' ] ).name('orbit x');
   guiDefaultOrbitX.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['orbitx'] = getOrbitSpeedAsNumber(value); 
-    }
-    else {
-      defaultGlobalParams['orbitx'] = undefined;
-    }     
+    globalParams['orbitx'] = (value !== 'none') ? getOrbitSpeedAsNumber(value) : undefined;   
   });
   var guiDefaultOrbitXRadius = guiPosition.add( guiDefaultParams, 'orbitxradius' ).name('orbit x radius');
   guiDefaultOrbitXRadius.onChange(function(value)
   {   
-      defaultGlobalParams['orbitxradius'] = value; 
+      globalParams['orbitxradius'] = value; 
   });
   var guiDefaultOrbitY = guiPosition.add( guiDefaultParams, 'orbity', [ 'none', 'slow', 'medium', 'fast' ] ).name('orbit y');
   guiDefaultOrbitY.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['orbity'] = getOrbitSpeedAsNumber(value); 
-    }
-    else {
-      defaultGlobalParams['orbity'] = undefined;
-    }     
+    globalParams['orbity'] = (value !== 'none') ? getOrbitSpeedAsNumber(value) : undefined;   
   });
   var guiDefaultOrbitYRadius = guiPosition.add( guiDefaultParams, 'orbityradius' ).name('orbit y radius');
   guiDefaultOrbitYRadius.onChange(function(value)
   {   
-      defaultGlobalParams['orbityradius'] = value;      
+      globalParams['orbityradius'] = value;      
   });
   var guiDefaultOrbitZ = guiPosition.add( guiDefaultParams, 'orbitz', [ 'none', 'slow', 'medium', 'fast' ] ).name('orbit z');
   guiDefaultOrbitZ.onChange(function(value)
   {   
-    if(value != 'none') {
-      defaultGlobalParams['orbitz'] = getOrbitSpeedAsNumber(value); 
-    }
-    else {
-      defaultGlobalParams['orbitz'] = undefined;
-    }     
+    globalParams['orbitz'] = (value !== 'none') ? getOrbitSpeedAsNumber(value) : undefined;   
   });
   var guiDefaultOrbitZRadius = guiPosition.add( guiDefaultParams, 'orbitzradius' ).name('orbit z radius');
   guiDefaultOrbitZRadius.onChange(function(value)
   {   
-      defaultGlobalParams['orbitzradius'] = value;      
+      globalParams['orbitzradius'] = value;      
   });
   //TODO use diff name, solid sounds like it's related to transparent, but its actually collidable
   var guiDefaultSolid = guiApperance.add( guiDefaultParams, 'solid' );
   guiDefaultSolid.onChange(function(value)
   {   
     //TODO decide to store as boolean or string(bool needs changes in parseParams)
-    defaultGlobalParams['solid'] = value+'';
+    globalParams['solid'] = value+'';
   });
   gui.close();//?
 
@@ -435,7 +385,7 @@ function init() {
   	  },
   	  'create sphere': function() {
         notify('create sphere');
-  	  	scene.add(createSphere(defaultGlobalParams));
+  	  	scene.add(createSphere(globalParams));
   	  },
   	  'create sphere *params': function(params) {
         notify('create sphere '+params);
@@ -444,7 +394,7 @@ function init() {
   	  },	  
       'create many spheres': function() {
         notify('create many spheres');
-        var spheres = createManySpheres(defaultGlobalParams);
+        var spheres = createManySpheres(globalParams);
         for(var i = 0; i < spheres.length; i++) {
           scene.add(spheres[i]);          
         }
@@ -468,7 +418,7 @@ function init() {
   	  },	
       'create many cubes': function() {
         notify('create many cubes');
-        var cubes = createManyCubes(defaultGlobalParams);
+        var cubes = createManyCubes(globalParams);
         for(var i = 0; i < cubes.length; i++) {
           scene.add(cubes[i]);          
         }
@@ -483,7 +433,7 @@ function init() {
   	  },
   	  'create ring': function() {
         notify('create ring');
-  	  	scene.add(createRing(defaultGlobalParams));
+  	  	scene.add(createRing(globalParams));
   	  },
   	  'create ring *params': function(params) {
         notify('create ring '+params);
@@ -492,7 +442,7 @@ function init() {
   	  },
       'create many rings': function() {
         notify('create many rings');
-        var rings = createManyRings(defaultGlobalParams);
+        var rings = createManyRings(globalParams);
         for(var i = 0; i < rings.length; i++) {
           scene.add(rings[i]);          
         }
@@ -508,7 +458,7 @@ function init() {
    	  //TorusKnot, annyang usually picks up 'not' instead of 'knot'
   	  'create not': function() {
         notify('create knot');
-  	  	scene.add(createTorusKnot(defaultGlobalParams));
+  	  	scene.add(createTorusKnot(globalParams));
   	  },
   	  'create not *params': function(params) {
         notify('create knot '+params);
@@ -517,7 +467,7 @@ function init() {
   	  },	
       'create many knots': function() {
         notify('create many knots');
-        var knots = createManyTorusKnots(defaultGlobalParams);
+        var knots = createManyTorusKnots(globalParams);
         for(var i = 0; i < knots.length; i++) {
           scene.add(knots[i]);          
         }
@@ -532,7 +482,7 @@ function init() {
   	  },
    	  'create cylinder': function() {
         notify('create cylinder');
-  	  	scene.add(createCylinder(defaultGlobalParams));
+  	  	scene.add(createCylinder(globalParams));
   	  },
   	  'create cylinder *params': function(params) {
         notify('create cylinder '+params);
@@ -541,7 +491,7 @@ function init() {
   	  },
       'create many cylinders': function() {
         notify('create many cylinders');
-        var cylinders = createManyCylinders(defaultGlobalParams);
+        var cylinders = createManyCylinders(globalParams);
         for(var i = 0; i < cylinders.length; i++) {
           scene.add(cylinders[i]);          
         }
@@ -556,7 +506,7 @@ function init() {
   	  },
       'create cone': function() {
         notify('create cone');
-        scene.add(createCone(defaultGlobalParams));
+        scene.add(createCone(globalParams));
       },
       'create cone *params': function(params) {
         notify('create cone '+params);
@@ -565,7 +515,7 @@ function init() {
       },
       'create many cones': function() {
         notify('create many cones');
-        var cones = createManyCones(defaultGlobalParams);
+        var cones = createManyCones(globalParams);
         for(var i = 0; i < cones.length; i++) {
           scene.add(cones[i]);          
         }
@@ -660,7 +610,7 @@ function init() {
   	  },*/
       'create bubble': function() {
         notify('create bubble');
-        scene.add(createBubble(defaultGlobalParams));
+        scene.add(createBubble(globalParams));
       },
       'create bubble *params': function(params) {
         notify('create bubble '+params);
@@ -669,7 +619,7 @@ function init() {
       },
       'create many bubbles': function() {
         notify('create many bubbles');
-        var geoms = createManyBubbles(defaultGlobalParams);   
+        var geoms = createManyBubbles(globalParams);   
         for(var i = 0; i < geoms.length; i++) {
           scene.add(geoms[i]);          
         }       
@@ -684,7 +634,7 @@ function init() {
       },
       'create mirror': function() {
         notify('create mirror');
-        scene.add(createMirror(defaultGlobalParams));
+        scene.add(createMirror(globalParams));
       },
       'create mirror *params': function(params) {
         notify('create mirror '+params);
@@ -693,7 +643,7 @@ function init() {
       },
       'create many mirrors': function() {
         notify('create many mirrors');
-        var geoms = createManyMirrors(defaultGlobalParams);   
+        var geoms = createManyMirrors(globalParams);   
         for(var i = 0; i < geoms.length; i++) {
           scene.add(geoms[i]);          
         }
@@ -717,7 +667,7 @@ function init() {
   	  },	
       'create many floors': function() {
         notify('create many floors');
-        var floors = createManyFloors(defaultGlobalParams);
+        var floors = createManyFloors(globalParams);
         for(var i = 0; i < floors.length; i++) {
           scene.add(floors[i]);          
         }
@@ -769,24 +719,24 @@ function init() {
   	  },
       'set *params': function(params) {
         notify('set '+params);
-        //pass defaultGlobalParams as second arg to set the defaultGlobalParams
-        parseParams(params, defaultGlobalParams);
-        updateGUI(defaultGlobalParams);
+        //pass globalParams as second arg to set the globalParams
+        parseParams(params, globalParams);
+        updateGUI(globalParams);
       },
   	  'set default *params': function(params) {
         notify('set default '+params);
-        //pass defaultGlobalParams as second arg to set the defaultGlobalParams
-        parseParams(params, defaultGlobalParams);
-        updateGUI(defaultGlobalParams);
+        //pass globalParams as second arg to set the globalParams
+        parseParams(params, globalParams);
+        updateGUI(globalParams);
   	  },
       'reset default': function() {
         notify('reset default');
         //reset all default params
-        resetDefaultGlobalParams();
+        resetGlobalParams();
       },
       'reset default *params': function(params) {
         notify('reset default '+params);
-        resetDefaultGlobalParams(params);
+        resetGlobalParams(params);
       },
   	  'undo': function() {
         notify('undo');
@@ -1104,18 +1054,10 @@ function render() {
   //movement/oscillations
   if(movingMeshs.length > 0) {
     var moveParams;
-    var currentx;
-    var startx;
-    var endx;
-    var currenty;
-    var starty;
-    var endy;
-    var currentz;
-    var startz;
-    var endz;
-    var xdir; //1 = positive direction on axis, -1 = negative direction on axis
-    var ydir;
-    var zdir;
+    var currentx, startx, endx;
+    var currenty, starty, endy;
+    var currentz, startz, endz;
+    var xdir, ydir, zdir; // positive number = positive direction on axis
     for (var i = 0; i < movingMeshs.length; i++) {
       moveParams = movingParams[i];
       //move along x-axis
@@ -1330,7 +1272,7 @@ function createGeometry(params, geometry, many) {
   var orbityradius = resolvedParams['orbityradius'];
   var orbitzradius = resolvedParams['orbitzradius'];
 
-  var defaultTexture = defaultGlobalParams['texture'];
+  var defaultTexture = globalParams['texture'];
   //for deciding when to use default material vs explicit color or texture
   var useColorOrTextureInstead = false;
   if(((texture != undefined && texture != 'none') 
@@ -1344,11 +1286,11 @@ function createGeometry(params, geometry, many) {
   if((texture == undefined || texture == 'none') && color != undefined) {
     if(ambient == undefined) {
       //TODO might cause some kinda light pink bug
-      if(defaultGlobalParams['ambient'] == undefined || ambient == '#ffb6c1') {
+      if(globalParams['ambient'] == undefined || ambient == '#ffb6c1') {
         ambient = color;
       }
       else {
-        ambient = defaultGlobalParams['ambient'];
+        ambient = globalParams['ambient'];
       }
     }
     var geometryMaterial = new THREE.MeshPhongMaterial( { 
@@ -1362,14 +1304,9 @@ function createGeometry(params, geometry, many) {
   else if((texture == undefined || texture == 'none') 
       && (defaultTexture == undefined || defaultTexture == 'none') 
       && color == undefined) {
-    color = defaultGlobalParams['color'];
+    color = globalParams['color'];
     if(ambient == undefined) {
-      if(defaultGlobalParams['ambient'] == undefined) {
-        ambient = color;
-      }
-      else {
-        ambient = defaultGlobalParams['ambient'];
-      }
+      ambient = (globalParams['ambient'] == undefined) ? color : globalParams['ambient'];
     }
     var geometryMaterial = new THREE.MeshPhongMaterial( { 
       color: color, 
@@ -1506,7 +1443,7 @@ function createGeometry(params, geometry, many) {
         }
         else if(material == 'mirror' || geometry == 'Mirror') {
           mirrors = true;
-          mapMirrorCameraToMirrorMaterial( x, y, z );
+          mapMirrorCamera( x, y, z );
           mirrorMesh = new THREE.Mesh(geom, mirrorMaterial ); 
           mirrorMesh.position.set( x, y, z );
           if(spin == true) {
@@ -1562,7 +1499,8 @@ function createGeometry(params, geometry, many) {
         }
         if(material == 'mirror' || geometry == 'Mirror') {
           mirrors = true;
-          mapMirrorCameraToMirrorMaterial( +x, +y, +z  );
+         // mapMirrorCameraToMirrorMaterial( +x, +y, +z  );
+          mapMirrorCamera( x, y, z  );
           for(var i = 0; i < amount; i++) {
             mirrorMesh = new THREE.Mesh(geom, mirrorMaterial ); 
             mirrorMesh.position.set( +x+i*xIncrement, +y+i*yIncrement, +z+i*zIncrement );
@@ -1761,20 +1699,22 @@ function createFloorOrWall(params,floorOrWall,many) {
     x = 0;
   }
   if(y == undefined){
-    if(floorOrWall == 'Floor') {
+    y = (floorOrWall == 'Floor') ? 0 : 500;
+    /*if(floorOrWall == 'Floor') {
       y = 0;
     }
     else {
       y = 500;
-    }
+    }*/
   }
   if(z == undefined){
-    if(floorOrWall == 'BackWall') {
+    z = (floorOrWall == 'BackWall') ? -500 : 0;
+/*    if(floorOrWall == 'BackWall') {
       z = -500;
     }
     else {
       z = 0;
-    }
+    }*/
   }
   if(size == undefined){
     //TODO default floor/wall size
@@ -1782,45 +1722,45 @@ function createFloorOrWall(params,floorOrWall,many) {
   }
   var btrans;
   if(transparent == undefined) {
-    btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
+    btrans = convertWordToBoolean(globalParams['transparent']);
   }
   else {
     btrans = convertWordToBoolean(transparent);
   }
   if(amount == undefined) {
-    amount = defaultGlobalParams['amount'];
+    amount = globalParams['amount'];
   }
   if(endx == undefined) {
-    if(defaultGlobalParams['endx'] == undefined) {
+    if(globalParams['endx'] == undefined) {
       endx = x;
     }
     else {
-      endx = defaultGlobalParams['endx'];
+      endx = globalParams['endx'];
     }
   }
   if(endy == undefined) {
-    if(defaultGlobalParams['endy'] == undefined) {
+    if(globalParams['endy'] == undefined) {
       endy = y;
     }
     else {
-      endy = defaultGlobalParams['endy'];
+      endy = globalParams['endy'];
     }
   }
   if(endz == undefined) {
-    if(defaultGlobalParams['endz'] == undefined) {
+    if(globalParams['endz'] == undefined) {
       endz = z;
     }
     else {
-      endz = defaultGlobalParams['endz'];
+      endz = globalParams['endz'];
     }
   }
   if(endsize == undefined) {
-    if(defaultGlobalParams['endsize'] != undefined) {
-      endsize = defaultGlobalParams['endsize'];
+    if(globalParams['endsize'] != undefined) {
+      endsize = globalParams['endsize'];
     }
   }
   if(texture == undefined) {
-    texture = defaultGlobalParams['texture'];
+    texture = globalParams['texture'];
   }
   if(texture == undefined) {
     var planeTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
@@ -1946,7 +1886,7 @@ function initMirror() {
   mirrorMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorCamera.renderTarget } );
 }
 
-function mapMirrorCameraToMirrorMaterial(x,y,z) {
+function mapMirrorCamera(x,y,z) {
   mirrorCamera = new THREE.CubeCamera( 0.5, 10000, 512 );
   mirrorCamera.position.x = x;
   mirrorCamera.position.y = y;
@@ -2043,7 +1983,7 @@ function undo() {
 ///////////////////////////////////////
 
 //NEW PARSEPARAMS METHOD!!! use state-diagram
-//--parsedParams, assoc array to store param->value (use defaultGlobalParams to setDefaultParams)
+//--parsedParams, assoc array to store param->value (use globalParams to setDefaultParams)
 function parseParams(params, parsedParams) {
   //TODO, if user speaks too fast comes in with no space (ex: z75)
   var paramsArray = params.split(" ");
@@ -2200,7 +2140,7 @@ function parseParams(params, parsedParams) {
       if(['x','y','z'].indexOf(currParam) != -1) {
         if(i === paramsArray.length-1) {
           //no more input so assign speed
-          var speed = (word.startsWith('spin') ? globalSpinMedium : globalOrbitSlow);
+          var speed = (word.startsWith('spin') ? spinSpeeds['medium'] : orbitSpeeds['slow']);
           parsedParams[word+currParam] = speed;
           currState = 's0';
         }
@@ -2217,11 +2157,11 @@ function parseParams(params, parsedParams) {
     }
     //move
     else if(currState == 's7') {
-      var moveSpeed = globalMoveSlow
+      var moveSpeed = moveSpeeds['slow'];
       if(i < paramsArray.length-1) {
         moveSpeed = checkForMoveSpeed(paramsArray[i+1].toLowerCase());
         if(moveSpeed === undefined) {
-          moveSpeed = globalMoveSlow;
+          moveSpeed = moveSpeeds['slow'];
         }
         else {
           i++;
@@ -2277,7 +2217,7 @@ function parseParams(params, parsedParams) {
       }
       else {
         if(parsedParams[word] === undefined) {
-          parsedParams[word] = (word.startsWith('spin') ? globalSpinMedium : globalOrbitSlow);
+          parsedParams[word] = (word.startsWith('spin') ? spinSpeeds['medium'] : orbitSpeeds['slow']);
         }
         currState = 's0';
         i--;
@@ -2294,7 +2234,7 @@ function parseParams(params, parsedParams) {
       }
       if(i === paramsArray.length-1 && parsedParams[word] === undefined) {
           //no more input & no speed, so assign speed
-          var speed = (word.startsWith('spin') ? globalSpinMedium : globalOrbitSlow);
+          var speed = (word.startsWith('spin') ? spinSpeeds['medium'] : orbitSpeeds['slow']);
           parsedParams[word] = speed;
           currState = 's0';
         }
@@ -2304,115 +2244,32 @@ function parseParams(params, parsedParams) {
   return parsedParams;
 }
 function checkForMoveSpeed(speed) {
-  if(speed === undefined) {
-    return undefined;
-  }
-  else {
-    if(speed == 'slow') {
-      return globalMoveSlow;
-    }
-    else if(speed == 'fast') {
-      return globalMoveFast;
-    } 
-    else if(speed == 'medium') {
-      return globalMoveMedium;
-    }
-    else {
-      return undefined;
-    }
-  }
-}
-function checkForSpinSpeed(speed) {
-  if(speed === undefined) {
-    return undefined;
-  }
-  else {
-    if(speed === 'slow') {
-      return globalSpinSlow;
-    }
-    else if(speed === 'fast') {
-      return globalSpinFast;
-    } 
-    else if(speed === 'medium') {
-      return globalSpinMedium;
-    }
-    else {
-      return undefined;
-    }
-  }
+  return (speed === undefined) ? undefined : moveSpeeds[speed];
 }
 function getSpeed(type, speed) {
     if(type === 'spin') {
-      if(speed === 'slow') {
-        return globalSpinSlow;
-      }
-      else if(speed === 'fast') {
-        return globalSpinFast;
-      } 
-      else if(speed === 'medium') {
-        return globalSpinMedium;
-      }
+      return spinSpeeds[speed];
     }
     else if(type === 'orbit') {
-      if(speed === 'slow') {
-        return globalOrbitSlow;
-      }
-      else if(speed === 'fast') {
-        return globalOrbitFast;
-      } 
-      else if(speed === 'medium') {
-        return globalOrbitMedium;
-      }
+      return orbitSpeeds[speed];
     }
-}
-function checkForSpeed(type, speed) {
-  if(speed === undefined) {
-    return (type === 'spin' ? globalSpinMedium : globalOrbitSlow);
-  }
-  else if(['slow','medium','fast'].indexOf(speed) === -1) {
-    return undefined;
-  }
-  else {
-    if(type === 'spin') {
-      if(speed === 'slow') {
-        return globalSpinSlow;
-      }
-      else if(speed === 'fast') {
-        return globalSpinFast;
-      } 
-      else if(speed === 'medium') {
-        return globalSpinMedium;
-      }
-    }
-    else if(type === 'orbit') {
-      if(speed === 'slow') {
-        return globalOrbitSlow;
-      }
-      else if(speed === 'fast') {
-        return globalOrbitFast;
-      } 
-      else if(speed === 'medium') {
-        return globalOrbitMedium;
-      }
-    }
-  }
 }
 
-function initDefaultGlobalParams() {
-  defaultGlobalParams = {};
-	defaultGlobalParams['x'] = 0;
-	defaultGlobalParams['y'] = 50;
-	defaultGlobalParams['z'] = 0;
-	defaultGlobalParams['size'] = 50;
-	defaultGlobalParams['color'] = 0xffb6c1;
-  defaultGlobalParams['transparent'] = false;
-  defaultGlobalParams['amount'] = 3;
+function initGlobalParams() {
+  globalParams = {};
+	globalParams['x'] = 0;
+	globalParams['y'] = 50;
+	globalParams['z'] = 0;
+	globalParams['size'] = 50;
+	globalParams['color'] = 0xffb6c1;
+  globalParams['transparent'] = false;
+  globalParams['amount'] = 3;
 }
 //resets default params and updates GUI
-function resetDefaultGlobalParams(params) {
+function resetGlobalParams(params) {
   if(params == undefined) {
     //reset all params
-    initDefaultGlobalParams();
+    initGlobalParams();
     //update gui, pass in nothing to reset
     updateGUI();
   }
@@ -2423,26 +2280,26 @@ function resetDefaultGlobalParams(params) {
     for(var i = 0; i < paramsArray.length; i++) {
       currParam = paramsArray[i];
       if(currParam == 'x' || currParam == 'y' || currParam == 'z') {
-        defaultGlobalParams[currParam] = 0;
+        globalParams[currParam] = 0;
       }
       else if(currParam == 'color') {
-        defaultGlobalParams['color'] = 0xffb6c1;
+        globalParams['color'] = 0xffb6c1;
       }
       else if(currParam == 'size') {
-        defaultGlobalParams['size'] = 50;
+        globalParams['size'] = 50;
       }
       else if(currParam == 'amount') {
-        defaultGlobalParams['amount'] = 3;
+        globalParams['amount'] = 3;
       }
       else if(currParam == 'transparent') {
-        defaultGlobalParams['transparent'] = false;
+        globalParams['transparent'] = false;
       }
       else {
-        defaultGlobalParams[currParam] = undefined;
+        globalParams[currParam] = undefined;
       }
     }
     //update gui
-    updateGUI(defaultGlobalParams);
+    updateGUI(globalParams);
   }
 }
 
@@ -2485,121 +2342,121 @@ function resolveParams(params) {
   var orbitzradius = params['orbitzradius'];
 
   if(x == undefined) {
-    x = defaultGlobalParams['x'];
+    x = globalParams['x'];
   }
   if(y == undefined) {
-    y = defaultGlobalParams['y'];
+    y = globalParams['y'];
   }
   if(z == undefined) {
-    z = defaultGlobalParams['z'];
+    z = globalParams['z'];
   }
   if(size == undefined) {
-    size = defaultGlobalParams['size'];
+    size = globalParams['size'];
     if(size == undefined) {
       size = 50;
     }
   }
   if(texture == undefined) {
-    texture = defaultGlobalParams['texture'];
+    texture = globalParams['texture'];
   }
   var btrans;
   if(transparent == undefined) {
-    btrans = convertWordToBoolean(defaultGlobalParams['transparent']);
+    btrans = convertWordToBoolean(globalParams['transparent']);
   }
   else {
     btrans = convertWordToBoolean(transparent);
   }
   if(amount == undefined) {
-    amount = defaultGlobalParams['amount'];
+    amount = globalParams['amount'];
   }
   if(endx == undefined) {
-    endx = defaultGlobalParams['endx'];
+    endx = globalParams['endx'];
     if(endx == undefined) {
       endx = x;
     }
   }
   if(endy == undefined) {
-    endy = defaultGlobalParams['endy'];
+    endy = globalParams['endy'];
     if(endy == undefined) {
       endy = y;
     }
   }
   if(endz == undefined) {
-    endz = defaultGlobalParams['endz'];
+    endz = globalParams['endz'];
     if(endz == undefined) {
       endz = z;
     }
   }
   if(endsize == undefined) {
-    if(defaultGlobalParams['endsize'] != undefined) {
-      endsize = defaultGlobalParams['endsize'];
+    if(globalParams['endsize'] != undefined) {
+      endsize = globalParams['endsize'];
     }
   }
   if(spin == undefined) {
-    spin = defaultGlobalParams['spin'];
+    spin = globalParams['spin'];
     if(spin == undefined) {
       spin = false;
     }
   }
   if(spinx == undefined) {
-    spinx = defaultGlobalParams['spinx'];
+    spinx = globalParams['spinx'];
     if(spinx == undefined) {
       spinx = 0;
     }
   }
   if(spiny == undefined) {
-    spiny = defaultGlobalParams['spiny'];
+    spiny = globalParams['spiny'];
     if(spiny == undefined) {
       spiny = 0;
     }
   }
   if(spinz == undefined) {
-    spinz = defaultGlobalParams['spinz'];
+    spinz = globalParams['spinz'];
     if(spinz == undefined) {
       spinz = 0;
     }
   }
   if(move == undefined) {
-    move = defaultGlobalParams['move'];
+    move = globalParams['move'];
     if(move == undefined) {
       move = false;
     }
   }
   if(movexspeed == undefined) {
-    movexspeed = defaultGlobalParams['movexspeed'];
+    movexspeed = globalParams['movexspeed'];
   }
   if(moveyspeed == undefined) {
-    moveyspeed = defaultGlobalParams['moveyspeed'];
+    moveyspeed = globalParams['moveyspeed'];
   }
   if(movezspeed == undefined) {
-    movezspeed = defaultGlobalParams['movezspeed'];
+    movezspeed = globalParams['movezspeed'];
   }
   if(width == undefined) {
-    width = defaultGlobalParams['width'];
+    width = globalParams['width'];
     /*if(width == undefined) {
       width = size;
     }*/
   }
   if(height == undefined) {
-    height = defaultGlobalParams['height'];
+    height = globalParams['height'];
     if(height == undefined) {
       height = size
     }
   }
   //dimension in z direction
   if(depth == undefined) {
-    depth = defaultGlobalParams['depth'];
+    depth = globalParams['depth'];
     if(depth == undefined) {
       depth = size
     }
   }
   if(material == undefined) {
-    material = defaultGlobalParams['material'];
+    material = globalParams['material'];
   }
   var bsolid;
   if(solid == undefined) {
-    bsolid = convertWordToBoolean(defaultGlobalParams['solid']);
-    if(defaultGlobalParams['solid'] == undefined) {
+    bsolid = convertWordToBoolean(globalParams['solid']);
+    if(globalParams['solid'] == undefined) {
       bsolid = false;
     }
   }
@@ -2607,43 +2464,43 @@ function resolveParams(params) {
     bsolid = convertWordToBoolean(solid);
   }
   if(orbit == undefined) {
-    orbit = defaultGlobalParams['orbit'];
+    orbit = globalParams['orbit'];
     if(orbit == undefined) {
       orbit = false;
     }
   }
   if(orbitx == undefined) {
-    orbitx = defaultGlobalParams['orbitx'];
+    orbitx = globalParams['orbitx'];
     if(orbitx == undefined) {
       orbitx = 0;
     }
   }
   if(orbity == undefined) {
-    orbity = defaultGlobalParams['orbity'];
+    orbity = globalParams['orbity'];
     if(orbity == undefined) {
       orbity = 0;
     }
   }
   if(orbitz == undefined) {
-    orbitz = defaultGlobalParams['orbitz'];
+    orbitz = globalParams['orbitz'];
     if(orbitz == undefined) {
       orbitz = 0;
     }
   }
   if(orbitxradius === undefined) {
-    orbitxradius = defaultGlobalParams['orbitxradius'];
+    orbitxradius = globalParams['orbitxradius'];
     if(orbitxradius === undefined) {
       orbitxradius = defaultOrbitRadius;
     }
   }
   if(orbityradius === undefined) {
-    orbitYradius = defaultGlobalParams['orbityradius'];
+    orbitYradius = globalParams['orbityradius'];
     if(orbityradius === undefined) {
       orbityradius = defaultOrbitRadius;
     }
   }
   if(orbitzradius === undefined) {
-    orbitzradius = defaultGlobalParams['orbitzradius'];
+    orbitzradius = globalParams['orbitzradius'];
     if(orbitzradius === undefined) {
       orbitzradius = defaultOrbitRadius;
     }
@@ -2688,55 +2545,44 @@ function isNumber(potentialNumber) {
 }
 
 function convertWordToBoolean(word) {
-	if(word == 'true') {
-		return true;
-	}
-	else {
-		return false;
-	}
+  return (word == 'true') ? true : false;
 }
 
 function getOrbitSpeedAsNumber(speed) {
   //TODO 1st line
-  defaultGlobalParams['orbit'] = true;
-  var orbitSpeed;
-  if(speed == 'slow') {
-    orbitSpeed = globalOrbitSlow;
+  globalParams['orbit'] = true;
+  return orbitSpeeds[speed];
+}
+
+function getOrbitSpeedAsWord(speed) {
+  var orbitSpeedWord;
+  if(speed == orbitSpeeds['slow']) {
+    orbitSpeedWord = 'slow';
   }
-  else if(speed == 'fast') {
-    orbitSpeed = globalOrbitFast;
+  else if(speed == orbitSpeeds['fast']) {
+    orbitSpeedWord = 'fast';
   } 
-  else if(speed == 'medium') {
-    orbitSpeed = globalOrbitMedium;
+  else if(speed == orbitSpeeds['medium']) {
+    orbitSpeedWord = 'medium';
   } 
-  return orbitSpeed;
+  return orbitSpeedWord;
 }
 
 function getSpinSpeedAsNumber(speed) {
   //TODO 1st line
-  defaultGlobalParams['spin'] = true;
-  var spinSpeed;
-  if(speed == 'slow') {
-    spinSpeed = globalSpinSlow;
-  }
-  else if(speed == 'fast') {
-    spinSpeed = globalSpinFast;
-  } 
-  else if(speed == 'medium') {
-    spinSpeed = globalSpinMedium;
-  } 
-  return spinSpeed;
+  globalParams['spin'] = true;
+  return spinSpeeds[speed];
 }
 
 function getSpinSpeedAsWord(speed) {
   var spinSpeedWord;
-  if(speed == globalSpinSlow) {
+  if(speed == spinSpeeds['slow']) {
     spinSpeedWord = 'slow';
   }
-  else if(speed == globalSpinFast) {
+  else if(speed == spinSpeeds['fast']) {
     spinSpeedWord = 'fast';
   } 
-  else if(speed == globalSpinMedium) {
+  else if(speed == spinSpeeds['medium']) {
     spinSpeedWord = 'medium';
   } 
   return spinSpeedWord;
@@ -2744,29 +2590,19 @@ function getSpinSpeedAsWord(speed) {
 
 function getMoveSpeedAsNumber(speed) {
   //TODO 1st line
-  defaultGlobalParams['move'] = true;
-  var moveSpeed;
-  if(speed == 'slow') {
-    moveSpeed = globalMoveSlow;
-  }
-  else if(speed == 'fast') {
-    moveSpeed = globalMoveFast;
-  } 
-  else if(speed == 'medium') {
-    moveSpeed = globalMoveMedium;
-  } 
-  return globalMoveSlow;
+  globalParams['move'] = true;
+  return moveSpeeds[speed];
 }
 
 function getMoveSpeedAsWord(speed) {
   var moveSpeedWord;
-  if(speed == globalMoveSlow) {
+  if(speed == moveSpeeds['slow']) {
     moveSpeedWord = 'slow';
   }
-  else if(speed == globalMoveFast) {
+  else if(speed == moveSpeeds['fast']) {
     moveSpeedWord = 'fast';
   } 
-  else if(speed == globalMoveMedium) {
+  else if(speed == moveSpeeds['medium']) {
     moveSpeedWord = 'medium';
   } 
   return moveSpeedWord;
@@ -2823,6 +2659,9 @@ function updateGUI(params) {
     else if((param == 'spinx' || param == 'spiny' || param == 'spinz') && params[param] != 'none') {
       guiDefaultParams[param] = getSpinSpeedAsWord(params[param]);      
     }
+    else if((param == 'orbitx' || param == 'orbity' || param == 'orbitz') && params[param] != 'none') {
+      guiDefaultParams[param] = getOrbitSpeedAsWord(params[param]);      
+    }    //TODO orbit
     else {
       guiDefaultParams[param] = params[param];
     }
@@ -2919,7 +2758,7 @@ function submitCommand(command) {
       scene.add(createSphere(parsedParams));    
     }
     else {
-      scene.add(createSphere(defaultGlobalParams));
+      scene.add(createSphere(globalParams));
     }
   }
   else if(command.indexOf('create many spheres') === 0) {
@@ -2933,7 +2772,7 @@ function submitCommand(command) {
       }
     }
     else {
-      var spheres = createManySpheres(defaultGlobalParams);
+      var spheres = createManySpheres(globalParams);
       for(var i = 0; i < spheres.length; i++) {
         scene.add(spheres[i]);          
       }    
@@ -2947,7 +2786,7 @@ function submitCommand(command) {
       scene.add(createCube(parsedParams));    
     }
     else {
-      scene.add(createCube(defaultGlobalParams));
+      scene.add(createCube(globalParams));
     }
   }
   else if(command.indexOf('create many cubes') === 0) {
@@ -2961,7 +2800,7 @@ function submitCommand(command) {
       }
     }
     else {
-      var geoms = createManyCubes(defaultGlobalParams);
+      var geoms = createManyCubes(globalParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }    
@@ -2975,7 +2814,7 @@ function submitCommand(command) {
       scene.add(createRing(parsedParams));    
     }
     else {
-      scene.add(createRing(defaultGlobalParams));
+      scene.add(createRing(globalParams));
     }
   }
   else if(command.indexOf('create many rings') === 0) {
@@ -2989,7 +2828,7 @@ function submitCommand(command) {
       }
     }
     else {
-      var geoms = createManyRings(defaultGlobalParams);
+      var geoms = createManyRings(globalParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }    
@@ -3003,7 +2842,7 @@ function submitCommand(command) {
       scene.add(createTorusKnot(parsedParams));    
     }
     else {
-      scene.add(createTorusKnot(defaultGlobalParams));
+      scene.add(createTorusKnot(globalParams));
     }
   }
   else if(command.indexOf('create many knots') === 0) {
@@ -3017,7 +2856,7 @@ function submitCommand(command) {
       }
     }
     else {
-      var geoms = createManyTorusKnots(defaultGlobalParams);
+      var geoms = createManyTorusKnots(globalParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }    
@@ -3031,7 +2870,7 @@ function submitCommand(command) {
       scene.add(createCylinder(parsedParams));    
     }
     else {
-      scene.add(createCylinder(defaultGlobalParams));
+      scene.add(createCylinder(globalParams));
     }
   }
   else if(command.indexOf('create many cylinders') === 0) {
@@ -3045,7 +2884,7 @@ function submitCommand(command) {
       }
     }
     else {
-      var geoms = createManyCylinders(defaultGlobalParams);
+      var geoms = createManyCylinders(globalParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }    
@@ -3059,7 +2898,7 @@ function submitCommand(command) {
       scene.add(createCone(parsedParams));    
     }
     else {
-      scene.add(createCone(defaultGlobalParams));
+      scene.add(createCone(globalParams));
     }
   }
   else if(command.indexOf('create many cones') === 0) {
@@ -3073,7 +2912,7 @@ function submitCommand(command) {
       }
     }
     else {
-      var geoms = createManyCones(defaultGlobalParams);
+      var geoms = createManyCones(globalParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }    
@@ -3087,7 +2926,7 @@ function submitCommand(command) {
       scene.add(createBubble(parsedParams));    
     }
     else {
-      scene.add(createBubble(defaultGlobalParams));
+      scene.add(createBubble(globalParams));
     }
   } 
   else if(command.indexOf('create many bubbles') === 0) {
@@ -3101,7 +2940,7 @@ function submitCommand(command) {
       }  
     }
     else {
-      var geoms = createManyBubbles(defaultGlobalParams);   
+      var geoms = createManyBubbles(globalParams);   
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       } 
@@ -3115,7 +2954,7 @@ function submitCommand(command) {
       scene.add(createMirror(parsedParams));    
     }
     else {
-      scene.add(createMirror(defaultGlobalParams));
+      scene.add(createMirror(globalParams));
     }
   }
   else if(command.indexOf('create many mirrors') === 0) {
@@ -3129,7 +2968,7 @@ function submitCommand(command) {
       }
     }
     else {
-      var geoms = createManyMirrors(defaultGlobalParams);   
+      var geoms = createManyMirrors(globalParams);   
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }
@@ -3157,7 +2996,7 @@ function submitCommand(command) {
       }
     }
     else {
-      var geoms = createManyFloors(defaultGlobalParams);
+      var geoms = createManyFloors(globalParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }    
@@ -3185,7 +3024,7 @@ function submitCommand(command) {
       }
     }
     else {
-      var geoms = createManyWalls(defaultGlobalParams);
+      var geoms = createManyWalls(globalParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       }    
@@ -3213,7 +3052,7 @@ function submitCommand(command) {
       }    
     }
     else {
-      var geoms = createManyBackWalls(defaultGlobalParams);
+      var geoms = createManyBackWalls(globalParams);
       for(var i = 0; i < geoms.length; i++) {
         scene.add(geoms[i]);          
       } 
@@ -3230,28 +3069,28 @@ function submitCommand(command) {
     var len = 'set default'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      //pass defaultGlobalParams as second arg to set the defaultGlobalParams
-      parseParams(params, defaultGlobalParams);
-      updateGUI(defaultGlobalParams);
+      //pass globalParams as second arg to set the globalParams
+      parseParams(params, globalParams);
+      updateGUI(globalParams);
     }
   }
   else if(command.indexOf('set') === 0) {
     var len = 'set'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      //pass defaultGlobalParams as second arg to set the defaultGlobalParams
-      parseParams(params, defaultGlobalParams);
-      updateGUI(defaultGlobalParams);
+      //pass globalParams as second arg to set the globalParams
+      parseParams(params, globalParams);
+      updateGUI(globalParams);
     }
   }
   else if(command.indexOf('reset default') === 0) {
     var len = 'reset default'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
-      resetDefaultGlobalParams(params);      
+      resetGlobalParams(params);      
     }
     else {
-      resetDefaultGlobalParams();
+      resetGlobalParams();
     }
   }
   else if(command.indexOf('undo') === 0) {
