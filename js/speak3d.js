@@ -767,6 +767,12 @@ function init() {
         notify('create text '+text);
   	  	scene.add(create3DText(text));
   	  },
+      'set *params': function(params) {
+        notify('set '+params);
+        //pass defaultGlobalParams as second arg to set the defaultGlobalParams
+        parseParams(params, defaultGlobalParams);
+        updateGUI(defaultGlobalParams);
+      },
   	  'set default *params': function(params) {
         notify('set default '+params);
         //pass defaultGlobalParams as second arg to set the defaultGlobalParams
@@ -3222,6 +3228,15 @@ function submitCommand(command) {
   }
   else if(command.indexOf('set default') === 0) {
     var len = 'set default'.length;
+    if(command.length > len) {
+      var params = command.substring(len+1);
+      //pass defaultGlobalParams as second arg to set the defaultGlobalParams
+      parseParams(params, defaultGlobalParams);
+      updateGUI(defaultGlobalParams);
+    }
+  }
+  else if(command.indexOf('set') === 0) {
+    var len = 'set'.length;
     if(command.length > len) {
       var params = command.substring(len+1);
       //pass defaultGlobalParams as second arg to set the defaultGlobalParams
