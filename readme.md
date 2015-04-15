@@ -22,7 +22,7 @@ Built off of examples in Lee Stemkoski's [Three.js examples](http://stemkoski.gi
 ## Voice Commands
 
   - 'create' geometry or 'create many' geometries w/ optional parameters
-  - 'set default' w/ parameters
+  - 'set' or 'set default' w/ parameters
   - say 'undo'
   - say 'save' to save what you generate as a text file that can later be uploaded with 'upload'
   - say 'open console' or press 'o' to submit typed out commands in the bottom left corner(submit with enter); say 'close console' to close it
@@ -51,6 +51,7 @@ Built off of examples in Lee Stemkoski's [Three.js examples](http://stemkoski.gi
   - 'transparent' followed by 'true' or 'false'
   - 'spin' followed by 'x', 'y', or 'z'
   - 'move' followed by 'x', 'y', or 'z'
+  - 'oribt' followed by 'x', 'y', or 'z', optionally followed by 'slow', 'medium', or 'fast and/or followed by 'radius' followed by a number 
   - 'solid' followed by a 'true' or 'false', this makes a geometry collidable when gravity is on
 
 ## Usage
