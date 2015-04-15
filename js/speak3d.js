@@ -1499,7 +1499,6 @@ function createGeometry(params, geometry, many) {
         }
         if(material == 'mirror' || geometry == 'Mirror') {
           mirrors = true;
-         // mapMirrorCameraToMirrorMaterial( +x, +y, +z  );
           mapMirrorCamera( x, y, z  );
           for(var i = 0; i < amount; i++) {
             mirrorMesh = new THREE.Mesh(geom, mirrorMaterial ); 
