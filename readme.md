@@ -119,8 +119,6 @@ You'll need [nodejs](http://nodejs.org/) installed
 ## To Do
 
   - ability to manipulate & remove existing geometries, incl. voice command to stop all motion
-  - just say 'set' instead of 'set default'
-  - reset default w/ params, sets given params and resets everything else
   - enhance dat.GUI usability and so it logs stuff for save/load
   - built-in models, GUI for user uploaded textures and models
   - bug with create many w/ mirror material (cameras) and loading more than one mirror from file
